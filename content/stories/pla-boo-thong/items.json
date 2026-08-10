@@ -1,0 +1,98 @@
+[
+  {
+    "key": "wood",
+    "name": "ไม้",
+    "description": "ไม้ที่เก็บได้จากต้นไม้บนเกาะ ใช้คราฟต์ของหลายอย่าง",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "coconut",
+    "name": "มะพร้าว",
+    "description": "กินแก้หิวและแก้กระหายได้",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "stone",
+    "name": "หิน",
+    "description": "หินที่เก็บได้รอบเกาะ ใช้คราฟต์เครื่องมือ",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "knife",
+    "name": "มีด",
+    "description": "มีดใช้ตัดของและป้องกันตัว",
+    "type": "TOOL",
+    "stackable": true,
+    "maxStack": 9
+  },
+  {
+    "key": "campfire",
+    "name": "กองไฟ",
+    "description": "กองไฟให้ความอบอุ่นและใช้ทำอาหาร",
+    "type": "BUILDING",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "shelter",
+    "name": "ที่พัก",
+    "description": "ที่พักหลบแดดหลบฝนบนเกาะ",
+    "type": "BUILDING",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "fallen-fruit",
+    "name": "ลูกไม้",
+    "description": "ลูกไม้ป่าที่ร่วงอยู่ใกล้บ่อน้ำ ใช้โปรยล่อสัตว์ประหลาดได้",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 9
+  },
+  {
+    "key": "goby-bone-fragment",
+    "name": "เศษกระดูกปลาทองประหลาด",
+    "description": "เศษกระดูกที่หลุดร่วงมาจากปลาประหลาดกลางบ่อน้ำ เย็นวาบเมื่อสัมผัส",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 1
+  },
+  {
+    "key": "sacred-flower",
+    "name": "ดอกไม้ศักดิ์สิทธิ์",
+    "description": "ดอกไม้สีขาวบริสุทธิ์ที่ขึ้นอยู่บนเกาะ กลิ่นหอมแปลกประหลาด",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 1
+  },
+  {
+    "key": "pearl-shell",
+    "name": "เปลือกหอยมุก",
+    "description": "เปลือกหอยแวววาวที่เกลื่อนอยู่ริมชายหาด",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 1
+  },
+  {
+    "key": "sandalwood",
+    "name": "ไม้จันทน์",
+    "description": "ไม้หอมเนื้อแกร่ง ต้องมีมีดถึงจะตัดได้",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 1
+  },
+  {
+    "key": "magic-ring",
+    "name": "แหวนวิเศษ",
+    "description": "แหวนประหลาดที่ปลาบู่ทองทิ้งไว้ให้ ส่องแสงจางๆ เหมือนกำลังรอเวลา...",
+    "type": "QUEST_ITEM",
+    "stackable": false,
+    "maxStack": 1
+  }
+]

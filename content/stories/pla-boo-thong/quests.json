@@ -1,0 +1,76 @@
+[
+  {
+    "key": "find-golden-goby",
+    "name": "ตามหาปลาบู่ทอง",
+    "steps": [
+      {
+        "key": "washed-ashore",
+        "title": "คลื่นซัดขึ้นฝั่ง",
+        "dialogue": [
+          { "speaker": "เรา", "thai": "...เรือ... เรืออับปาง? เราลอยมาเกยฝั่งเกาะร้างซะแล้ว" },
+          { "speaker": "เรา", "thai": "ต้องหาไม้มาก่อกองไฟ แล้วหามะพร้าวกินรองท้องก่อน ไม่งั้นไม่รอดถึงคืนแน่" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "wood", "quantity": 5 },
+          { "type": "COLLECT", "targetKey": "coconut", "quantity": 2 },
+          { "type": "CRAFT", "targetKey": "campfire", "quantity": 1 }
+        ],
+        "rewards": [{ "itemKey": "knife", "quantity": 1 }]
+      },
+      {
+        "key": "well-song",
+        "title": "เสียงเพลงจากบ่อน้ำ",
+        "dialogue": [
+          { "speaker": "เรา", "thai": "เอ๊ะ... นั่นเสียงอะไร เหมือนมีคนร้องเพลงลอยมาจากทางบ่อน้ำกลางเกาะ" },
+          { "speaker": "เรา", "thai": "แต่พอไปถึงกลับไม่เห็นใคร มีแต่ผิวน้ำที่กระเพื่อมเบาๆ ลองโปรยลูกไม้ล่อดูดีกว่า" }
+        ],
+        "objectives": [
+          { "type": "REACH_LOCATION", "targetKey": "well", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "fallen-fruit", "quantity": 3 }
+        ],
+        "rewards": [{ "itemKey": "goby-bone-fragment", "quantity": 1 }]
+      },
+      {
+        "key": "goby-revealed",
+        "title": "ปลาบู่ทองปรากฏตัว",
+        "dialogue": [
+          { "speaker": "ปลาบู่ทอง", "thai": "...ขอบใจนะที่โปรยลูกไม้ให้ ไม่มีใครมาที่นี่มานานแล้ว" },
+          { "speaker": "ปลาบู่ทอง", "thai": "เราคือดวงวิญญาณของนางเอื้อย ถูกแม่เลี้ยงและน้องสาวกลั่นแกล้งจนตาย แล้วถูกสาปให้ติดอยู่ที่เกาะนี้" },
+          { "speaker": "ปลาบู่ทอง", "thai": "ถ้าเจ้าช่วยเก็บของศักดิ์สิทธิ์สามอย่างมาให้ เราอาจปลดคำสาปได้... และเจ้าจะได้รู้ความจริงบางอย่างที่ซ่อนอยู่ใต้เกาะนี้" }
+        ],
+        "objectives": [{ "type": "TALK_TO", "targetKey": "golden-goby", "quantity": 1 }],
+        "rewards": []
+      },
+      {
+        "key": "collect-three-treasures",
+        "title": "เก็บของสามอย่าง",
+        "dialogue": [
+          { "speaker": "ปลาบู่ทอง", "thai": "ดอกไม้ศักดิ์สิทธิ์อยู่ทางเหนือของเกาะ เปลือกหอยมุกอยู่ริมหาด ส่วนไม้จันทน์นั้น... เจ้าต้องมีมีดถึงจะตัดได้" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "sacred-flower", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "pearl-shell", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "sandalwood", "quantity": 1 }
+        ],
+        "rewards": []
+      },
+      {
+        "key": "lift-the-curse",
+        "title": "ปลดคำสาป",
+        "dialogue": [
+          { "speaker": "ปลาบู่ทอง", "thai": "เจ้าทำสำเร็จแล้ว... ขอบใจจริงๆ" },
+          { "speaker": "ปลาบู่ทอง", "thai": "คำสาปนี้กำลังจะคลายลง... ในที่สุดเราก็จะได้ไปสู่ที่ที่ควรไป" },
+          { "speaker": "ปลาบู่ทอง", "thai": "รับแหวนวงนี้ไว้เถอะ มันไม่ใช่แหวนธรรมดา... มันจะพาเจ้าไปเจอเรื่องราวที่ใหญ่กว่านี้ ที่เกาะอีกฝั่งหนึ่ง ที่มีนางสังข์ทองรออยู่" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "sacred-flower", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "pearl-shell", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "sandalwood", "quantity": 1 },
+          { "type": "TALK_TO", "targetKey": "golden-goby", "quantity": 1 }
+        ],
+        "rewards": [{ "itemKey": "magic-ring", "quantity": 1 }],
+        "isEpisodeEnd": true
+      }
+    ]
+  }
+]

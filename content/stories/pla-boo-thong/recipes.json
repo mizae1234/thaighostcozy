@@ -1,0 +1,32 @@
+[
+  {
+    "key": "knife",
+    "name": "มีด",
+    "outputItemKey": "knife",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 2 },
+      { "itemKey": "stone", "quantity": 1 }
+    ]
+  },
+  {
+    "key": "campfire",
+    "name": "กองไฟ",
+    "outputItemKey": "campfire",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 5 },
+      { "itemKey": "coconut", "quantity": 2 }
+    ]
+  },
+  {
+    "key": "shelter",
+    "name": "ที่พัก",
+    "outputItemKey": "shelter",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 8 },
+      { "itemKey": "stone", "quantity": 3 }
+    ]
+  }
+]

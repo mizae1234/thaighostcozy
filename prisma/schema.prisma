@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ItemType {
+  RESOURCE
+  TOOL
+  QUEST_ITEM
+  CONSUMABLE
+  BUILDING
+}
+
+model Story {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  theme     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items    Item[]
+  recipes  Recipe[]
+  quests   Quest[]
+  progress PlayerProgress[]
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  storyId     String
+  story       Story    @relation(fields: [storyId], references: [id])
+  key         String
+  name        String
+  description String?
+  type        ItemType
+  iconAsset   String?
+  stackable   Boolean  @default(true)
+  maxStack    Int?     @default(99)
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recipeIngredients RecipeIngredient[] @relation("ingredientItem")
+  recipeOutputs     Recipe[]           @relation("outputItem")
+  inventoryEntries  InventoryItem[]
+
+  @@unique([storyId, key])
+}
+
+model Recipe {
+  id                    String     @id @default(cuid())
+  storyId               String
+  story                 Story      @relation(fields: [storyId], references: [id])
+  key                   String
+  name                  String
+  outputItemId          String
+  outputItem            Item       @relation("outputItem", fields: [outputItemId], references: [id])
+  outputQty             Int        @default(1)
+  requiredToolItemKey   String?
+  unlockedByQuestStepId String?
+  unlockedByQuestStep   QuestStep? @relation(fields: [unlockedByQuestStepId], references: [id])
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  ingredients RecipeIngredient[]
+
+  @@unique([storyId, key])
+}
+
+model RecipeIngredient {
+  id       String @id @default(cuid())
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  itemId   String
+  item     Item   @relation("ingredientItem", fields: [itemId], references: [id])
+  quantity Int    @default(1)
+
+  @@unique([recipeId, itemId])
+}
+
+model Quest {
+  id        String   @id @default(cuid())
+  storyId   String
+  story     Story    @relation(fields: [storyId], references: [id])
+  key       String
+  name      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  steps QuestStep[]
+
+  @@unique([storyId, key])
+}
+
+model QuestStep {
+  id             String   @id @default(cuid())
+  questId        String
+  quest          Quest    @relation(fields: [questId], references: [id])
+  key            String
+  order          Int
+  title          String
+  content        Json
+  requiresStepId String?
+  isEpisodeEnd   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  recipesUnlocked Recipe[]
+  playerProgress  PlayerProgress[]
+
+  @@unique([questId, key])
+}
+
+model PlayerProgress {
+  id                String     @id @default(cuid())
+  playerId          String
+  storyId           String
+  story             Story      @relation(fields: [storyId], references: [id])
+  currentStepId     String?
+  currentStep       QuestStep? @relation(fields: [currentStepId], references: [id])
+  completedStepKeys Json       @default("[]")
+  positionX         Float      @default(0)
+  positionY         Float      @default(0)
+  hunger            Float      @default(100)
+  thirst            Float      @default(100)
+  health            Float      @default(100)
+  lastSavedAt       DateTime   @default(now())
+  createdAt         DateTime   @default(now())
+
+  inventory InventoryItem[]
+
+  @@unique([playerId, storyId])
+}
+
+model InventoryItem {
+  id               String         @id @default(cuid())
+  playerProgressId String
+  playerProgress   PlayerProgress @relation(fields: [playerProgressId], references: [id], onDelete: Cascade)
+  itemId           String
+  item             Item           @relation(fields: [itemId], references: [id])
+  quantity         Int            @default(0)
+
+  @@unique([playerProgressId, itemId])
+}
