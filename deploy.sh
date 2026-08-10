@@ -2,7 +2,7 @@
 # =============================================
 # Thai Folklore Survival Deploy Script
 # Domain: game.technomand-ai.cloud
-# Port:   3030
+# Port:   3050
 # Path:   /home/web/thaifolkloresurvival
 # =============================================
 
@@ -72,7 +72,7 @@ server {
     server_name game.technomand-ai.cloud;
 
     location / {
-        proxy_pass http://127.0.0.1:3030;
+        proxy_pass http://127.0.0.1:3050;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
