@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { fitDisplaySize } from '../utils/fitDisplaySize';
 
-const HARVEST_COOLDOWN_MS = 1500;
+const HARVEST_COOLDOWN_MS = 25000;
 const DISPLAY_MAX_DIM = 64;
 
 export default class ResourceNode {
@@ -81,10 +81,17 @@ export default class ResourceNode {
   }
 
   canHarvest(now: number): boolean {
-    return now - this.lastHarvestedAt >= HARVEST_COOLDOWN_MS;
+    const ready = now - this.lastHarvestedAt >= HARVEST_COOLDOWN_MS;
+    if (ready) {
+      this.sprite.setAlpha(1.0);
+      this.shadow.setAlpha(1.0);
+    }
+    return ready;
   }
 
   harvest(now: number) {
     this.lastHarvestedAt = now;
+    this.sprite.setAlpha(0.3);
+    this.shadow.setAlpha(0.1);
   }
 }

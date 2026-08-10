@@ -84,7 +84,8 @@ export default class Player {
     wasd: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>,
     isDialogueActive: boolean,
     isEpisodeEnd: boolean,
-    isStarving: boolean
+    isStarving: boolean,
+    speedMultiplier = 1.0
   ) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
@@ -116,7 +117,9 @@ export default class Player {
     const moving = vx !== 0 || vy !== 0;
 
     if (moving) {
-      const currentSpeed = isStarving ? SPEED * 0.5 : SPEED;
+      const currentSpeed = isStarving 
+        ? (SPEED * speedMultiplier) * 0.5 
+        : SPEED * speedMultiplier;
 
       const length = Math.hypot(vx, vy);
       body.setVelocity((vx / length) * currentSpeed, (vy / length) * currentSpeed);

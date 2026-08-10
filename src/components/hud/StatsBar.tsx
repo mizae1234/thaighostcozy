@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect } from 'react';
 import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useParams } from 'next/navigation';
@@ -10,6 +11,8 @@ import PanelFrame from './PanelFrame';
 export default function StatsBar() {
   const hunger = usePlayerStatsStore((state) => state.hunger);
   const thirst = usePlayerStatsStore((state) => state.thirst);
+  const nickname = usePlayerStatsStore((state) => state.nickname);
+  const setNickname = usePlayerStatsStore((state) => state.setNickname);
   const eatCoconut = usePlayerStatsStore((state) => state.eatCoconut);
   const coconutCount = useInventoryStore((state) => state.quantities.coconut ?? 0);
 
@@ -17,6 +20,15 @@ export default function StatsBar() {
   const slug = params?.slug;
   const isGhostMode = slug === 'ghost-whisperer';
   
+  useEffect(() => {
+    if (!nickname && typeof window !== 'undefined') {
+      const stored = localStorage.getItem('thaighost_nickname');
+      if (stored) {
+        setNickname(stored);
+      }
+    }
+  }, [nickname, setNickname]);
+
   const buttonLabel = isGhostMode 
     ? `🍵 ดื่มชาใบตอง (${coconutCount})` 
     : `🥥 กินมะพร้าว (${coconutCount})`;
@@ -25,6 +37,11 @@ export default function StatsBar() {
     <div className="pointer-events-auto absolute left-5 top-5 w-56">
       <PanelFrame>
         <div className="flex flex-col gap-2">
+          {nickname && (
+            <div className="text-amber-200 text-xs font-black border-b border-amber-900/20 pb-1 mb-0.5 tracking-wider">
+              👤 ผู้รอดชีวิต: {nickname}
+            </div>
+          )}
           <StatBar type="hunger" value={hunger} />
           <StatBar type="thirst" value={thirst} />
           <button

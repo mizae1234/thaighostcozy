@@ -22,6 +22,7 @@ import GachaPanel from '@/components/hud/GachaPanel';
 import MuteluPassPanel from '@/components/hud/MuteluPassPanel';
 import OfferingShopPanel from '@/components/hud/OfferingShopPanel';
 import AdSimulatorModal from '@/components/hud/AdSimulatorModal';
+import CardAlbumModal from '@/components/hud/CardAlbumModal';
 
 const PhaserGame = dynamic(() => import('@/game/PhaserGame'), { ssr: false });
 
@@ -39,6 +40,7 @@ export default function PlayPage({ params }: PlayPageProps) {
   const [showPass, setShowPass] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [showAd, setShowAd] = useState(false);
+  const [showCardAlbum, setShowCardAlbum] = useState(false);
   const [adRewardCoins, setAdRewardCoins] = useState(150);
   
   // Fainting Respawn States
@@ -48,6 +50,17 @@ export default function PlayPage({ params }: PlayPageProps) {
   const { coins, addCoins } = useInventoryStore();
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedCoins = localStorage.getItem('thaighost_coins');
+      if (storedCoins) {
+        useInventoryStore.setState({ coins: parseInt(storedCoins, 10) });
+      }
+      const storedGhosts = localStorage.getItem('thaighost_unlocked_ghosts');
+      if (storedGhosts) {
+        useInventoryStore.setState({ unlockedGhosts: JSON.parse(storedGhosts) });
+      }
+    }
+
     useContentStore.getState().load(slug).then(() => {
       const quests = useContentStore.getState().quests;
       useQuestStore.getState().initQuests(quests);
@@ -58,7 +71,11 @@ export default function PlayPage({ params }: PlayPageProps) {
     };
     
     const handleResourceCollected = (payload: ResourceCollectedPayload) => {
-      useInventoryStore.getState().add(payload.itemKey, payload.amount);
+      const unlocked = useInventoryStore.getState().unlockedGhosts;
+      const hasPob = unlocked.includes('pob');
+      const finalAmount = hasPob ? payload.amount + 1 : payload.amount;
+      
+      useInventoryStore.getState().add(payload.itemKey, finalAmount);
       
       // Cozy Mode Reward: Give 10 coins for every item harvested!
       if (slug === 'ghost-whisperer') {
@@ -177,6 +194,14 @@ export default function PlayPage({ params }: PlayPageProps) {
                 🔮 สุ่มกาชา
               </button>
 
+              {/* Card Album button */}
+              <button
+                onClick={() => setShowCardAlbum(true)}
+                className="rounded-full border border-sky-500/30 bg-sky-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-sky-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+              >
+                📖 สมุดการ์ด
+              </button>
+
               {/* Pass button */}
               <button
                 onClick={() => setShowPass(true)}
@@ -208,6 +233,7 @@ export default function PlayPage({ params }: PlayPageProps) {
         {showGacha && <GachaPanel onClose={() => setShowGacha(false)} />}
         {showPass && <MuteluPassPanel onClose={() => setShowPass(false)} />}
         {showShop && <OfferingShopPanel onClose={() => setShowShop(false)} />}
+        {showCardAlbum && <CardAlbumModal isOpen={showCardAlbum} onClose={() => setShowCardAlbum(false)} />}
         {showAd && (
           <AdSimulatorModal 
             rewardCoins={adRewardCoins} 

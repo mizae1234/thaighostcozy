@@ -14,7 +14,10 @@ interface PlayerStatsState {
   hunger: number;
   thirst: number;
   health: number;
+  nickname: string | null;
+  setNickname: (name: string) => void;
   tickDecay: () => void;
+  deductOnAction: (hungerAmt: number, thirstAmt: number) => void;
   respawn: () => void;
   eatCoconut: () => EatResult;
 }
@@ -23,11 +26,28 @@ export const usePlayerStatsStore = create<PlayerStatsState>((set) => ({
   hunger: 100,
   thirst: 100,
   health: 100,
+  nickname: null,
+
+  setNickname: (name: string) => set({ nickname: name }),
+
+  deductOnAction: (hungerAmt: number, thirstAmt: number) => {
+    set((state) => ({
+      hunger: Math.max(0, state.hunger - hungerAmt),
+      thirst: Math.max(0, state.thirst - thirstAmt),
+    }));
+  },
 
   tickDecay: () => {
     set((state) => {
-      const nextHunger = Math.max(0, state.hunger - DECAY_PER_TICK);
-      const nextThirst = Math.max(0, state.thirst - DECAY_PER_TICK);
+      const unlockedGhosts = useInventoryStore.getState().unlockedGhosts;
+      const hasNaga = unlockedGhosts.includes('naga');
+      const hasKuman = unlockedGhosts.includes('kuman');
+
+      const hungerDecay = hasKuman ? DECAY_PER_TICK * 0.8 : DECAY_PER_TICK;
+      const thirstDecay = hasNaga ? DECAY_PER_TICK * 0.7 : DECAY_PER_TICK;
+
+      const nextHunger = Math.max(0, state.hunger - hungerDecay);
+      const nextThirst = Math.max(0, state.thirst - thirstDecay);
       
       // If either hunger or thirst is 0, start losing health rapidly!
       let nextHealth = state.health;

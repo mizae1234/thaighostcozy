@@ -131,6 +131,12 @@ model PlayerProgress {
   hunger            Float      @default(100)
   thirst            Float      @default(100)
   health            Float      @default(100)
+  nickname          String?
+  deviceOs          String?
+  deviceModel       String?
+  browser           String?
+  resolution        String?
+  userAgent         String?
   lastSavedAt       DateTime   @default(now())
   createdAt         DateTime   @default(now())
 

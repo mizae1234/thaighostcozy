@@ -49,20 +49,34 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   },
 
   addCoins: (amount) => {
-    set((state) => ({ coins: state.coins + amount }));
+    set((state) => {
+      const nextCoins = state.coins + amount;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('thaighost_coins', String(nextCoins));
+      }
+      return { coins: nextCoins };
+    });
   },
 
   deductCoins: (amount) => {
     const current = get().coins;
     if (current < amount) return false;
-    set((state) => ({ coins: current - amount }));
+    const nextCoins = current - amount;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('thaighost_coins', String(nextCoins));
+    }
+    set({ coins: nextCoins });
     return true;
   },
 
   unlockGhost: (ghostKey) => {
     const list = get().unlockedGhosts;
     if (list.includes(ghostKey)) return;
-    set((state) => ({ unlockedGhosts: [...state.unlockedGhosts, ghostKey] }));
+    const nextGhosts = [...list, ghostKey];
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('thaighost_unlocked_ghosts', JSON.stringify(nextGhosts));
+    }
+    set({ unlockedGhosts: nextGhosts });
   },
 
   addPassPoints: (amount) => {

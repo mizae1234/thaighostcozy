@@ -155,7 +155,10 @@ export default class MainScene extends Phaser.Scene {
     const thirst = usePlayerStatsStore.getState().thirst;
     const isStarving = hunger === 0 || thirst === 0;
 
-    this.player.update(this.cursors, this.wasd, isDialogueActive, isEpisodeEnd, isStarving);
+    const hasTani = useInventoryStore.getState().unlockedGhosts.includes('tani');
+    const speedMultiplier = hasTani ? 1.2 : 1.0;
+
+    this.player.update(this.cursors, this.wasd, isDialogueActive, isEpisodeEnd, isStarving, speedMultiplier);
     this.clampToIsland();
     this.emitPlayerMovedIfChanged();
     this.tryHarvest();
@@ -463,6 +466,7 @@ export default class MainScene extends Phaser.Scene {
       this.questNodes = this.questNodes.filter((n) => n !== questNode);
 
       EventBus.emit('resource-collected', { itemKey: questNode.itemKey, amount: questNode.yieldAmount });
+      usePlayerStatsStore.getState().deductOnAction(5, 5);
       return;
     }
 
@@ -477,6 +481,7 @@ export default class MainScene extends Phaser.Scene {
 
     node.harvest(now);
     EventBus.emit('resource-collected', { itemKey: node.itemKey, amount: node.yieldAmount });
+    usePlayerStatsStore.getState().deductOnAction(5, 5);
   }
 
   private onBuildingPlaced(payload: BuildingPlacedPayload) {
