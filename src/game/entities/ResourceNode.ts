@@ -6,7 +6,7 @@ const DISPLAY_MAX_DIM = 64;
 
 export default class ResourceNode {
   readonly sprite: Phaser.Physics.Arcade.Sprite;
-  private readonly shadow: Phaser.GameObjects.Image;
+  readonly shadow: Phaser.GameObjects.Image;
   readonly itemKey: string;
   readonly yieldAmount: number;
   private lastHarvestedAt = -Infinity;

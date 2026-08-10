@@ -101,12 +101,12 @@ async function main() {
           }
         }
 
-        const stepRow = await prisma.questStep.upsert({
+        const stepRow = (await prisma.questStep.upsert({
           where: { questId_key: { questId: questRow.id, key: step.key } },
           update: {
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards },
+            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards } as any,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },
@@ -115,11 +115,11 @@ async function main() {
             key: step.key,
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards },
+            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards } as any,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },
-        });
+        })) as { id: string };
 
         previousStepId = stepRow.id;
       }

@@ -9,6 +9,7 @@ import { useQuestStore } from '../../stores/useQuestStore';
 import { useInventoryStore } from '../../stores/useInventoryStore';
 import { useInteractionStore } from '../../stores/useInteractionStore';
 import { useContentStore } from '../../stores/useContentStore';
+import { usePlayerStatsStore } from '../../stores/usePlayerStatsStore';
 
 const BUILDING_DISPLAY_MAX_DIM = 88;
 
@@ -148,7 +149,13 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    this.player.update(this.cursors, this.wasd);
+    const isDialogueActive = useQuestStore.getState().isDialogueActive;
+    const isEpisodeEnd = useQuestStore.getState().isEpisodeEnd;
+    const hunger = usePlayerStatsStore.getState().hunger;
+    const thirst = usePlayerStatsStore.getState().thirst;
+    const isStarving = hunger === 0 || thirst === 0;
+
+    this.player.update(this.cursors, this.wasd, isDialogueActive, isEpisodeEnd, isStarving);
     this.clampToIsland();
     this.emitPlayerMovedIfChanged();
     this.tryHarvest();
@@ -270,8 +277,8 @@ export default class MainScene extends Phaser.Scene {
     // Clear previous quest items
     this.questNodes.forEach((node) => {
       node.sprite.destroy();
-      if ((node as any).shadow) {
-        (node as any).shadow.destroy();
+      if (node.shadow) {
+        node.shadow.destroy();
       }
     });
     this.questNodes = [];
@@ -404,7 +411,7 @@ export default class MainScene extends Phaser.Scene {
         this.shopBuilding.y
       );
       if (dist < 45) {
-        EventBus.emit('open-shop-ui');
+        EventBus.emit('open-shop-ui', undefined);
         return;
       }
     }
@@ -433,7 +440,7 @@ export default class MainScene extends Phaser.Scene {
               color: '#ff3333',
               stroke: '#000000',
               strokeThickness: 3,
-              fontWeight: 'bold',
+              fontStyle: 'bold',
             },
           ).setOrigin(0.5);
 
@@ -450,8 +457,8 @@ export default class MainScene extends Phaser.Scene {
 
       questNode.harvest(now);
       questNode.sprite.destroy();
-      if ((questNode as any).shadow) {
-        (questNode as any).shadow.destroy();
+      if (questNode.shadow) {
+        questNode.shadow.destroy();
       }
       this.questNodes = this.questNodes.filter((n) => n !== questNode);
 

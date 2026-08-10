@@ -77,7 +77,7 @@ export default function QuestTracker() {
       <ul className="space-y-2">
         {activeStep.objectives.map((obj, i) => {
           let currentVal = 0;
-          let targetVal = obj.quantity ?? 1;
+          const targetVal = obj.quantity ?? 1;
           let label = '';
           let isDone = false;
 

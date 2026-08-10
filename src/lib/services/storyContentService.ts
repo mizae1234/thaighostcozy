@@ -57,6 +57,7 @@ export async function getStoryContentBySlug(slug: string): Promise<StoryContentR
     key: quest.key,
     name: quest.name,
     steps: quest.steps.map((step) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const content = step.content as any;
       return {
         key: step.key,

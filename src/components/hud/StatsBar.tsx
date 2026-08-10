@@ -43,7 +43,7 @@ export default function StatsBar() {
             <button
               type="button"
               onClick={(e) => {
-                EventBus.emit('toggle-camera-zoom');
+                EventBus.emit('toggle-camera-zoom', undefined);
                 e.currentTarget.blur();
               }}
               className="flex items-center justify-center gap-1.5 rounded-lg border border-yellow-600/35 bg-slate-900/60 px-3 py-1.5 text-xs font-semibold text-amber-200 transition-colors hover:bg-slate-800"

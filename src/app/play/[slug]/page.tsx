@@ -87,7 +87,7 @@ export default function PlayPage({ params }: PlayPageProps) {
         const health = usePlayerStatsStore.getState().health;
         if (health <= 0) {
           // Teleport player back to spawn near house
-          EventBus.emit('respawn-player');
+          EventBus.emit('respawn-player', undefined);
           
           // Reset player stats
           usePlayerStatsStore.getState().respawn();

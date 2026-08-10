@@ -13,7 +13,7 @@ export default function HomePage() {
     <main
       className="relative flex min-h-screen w-screen flex-col items-center justify-between overflow-hidden bg-cover bg-center text-stone-100 selection:bg-amber-500 selection:text-black"
       style={{
-        backgroundImage: "url('/assets/stories/pla-boo-thong/tiles/island-background.png')",
+        backgroundImage: "url('/assets/stories/ghost-whisperer/tiles/landing-bg-clean.png')",
       }}
     >
       {/* Dark vignette overlay for readibility */}
@@ -36,7 +36,7 @@ export default function HomePage() {
           COZY SPIRITS & FOLKLORE
         </h2>
         <p className="mt-6 max-w-md text-xs sm:text-sm text-stone-300 font-medium leading-relaxed drop-shadow-md">
-          "สัมผัสมิตรภาพ คลี่คลายความหลัง และร่วมทางไปกับเหล่าภูตผีไทยแสนอบอุ่น"
+          “สัมผัสมิตรภาพ คลี่คลายความหลัง และร่วมทางไปกับเหล่าภูตผีไทยแสนอบอุ่น”
         </p>
 
         {/* Small badge showing online players count */}

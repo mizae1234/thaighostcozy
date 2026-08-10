@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import type { Direction } from '../types';
 import { fitDisplaySize } from '../utils/fitDisplaySize';
-import { useQuestStore } from '@/stores/useQuestStore';
-import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
 
 const SPEED = 120;
 const DISPLAY_MAX_DIM = 76;
@@ -81,12 +79,16 @@ export default class Player {
     this.shadow.setPosition(this.sprite.x, this.sprite.y + this.sprite.displayHeight * 0.36);
   }
 
-  update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, wasd: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>) {
+  update(
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys,
+    wasd: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>,
+    isDialogueActive: boolean,
+    isEpisodeEnd: boolean,
+    isStarving: boolean
+  ) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
     // Freeze player controls during dialogue/episode-end screens
-    const isDialogueActive = useQuestStore.getState().isDialogueActive;
-    const isEpisodeEnd = useQuestStore.getState().isEpisodeEnd;
     if (isDialogueActive || isEpisodeEnd) {
       body.setVelocity(0, 0);
       this.sprite.stop();
@@ -114,9 +116,6 @@ export default class Player {
     const moving = vx !== 0 || vy !== 0;
 
     if (moving) {
-      const hunger = usePlayerStatsStore.getState().hunger;
-      const thirst = usePlayerStatsStore.getState().thirst;
-      const isStarving = hunger === 0 || thirst === 0;
       const currentSpeed = isStarving ? SPEED * 0.5 : SPEED;
 
       const length = Math.hypot(vx, vy);

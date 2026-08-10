@@ -33,7 +33,7 @@ export default function CraftPanel() {
       const recipe = recipes.find((r) => r.key === recipeKey);
       if (recipe) {
         const item = useContentStore.getState().getItem(recipe.outputItemKey);
-        const itemName = item?.thai || item?.name || recipe.outputItemKey;
+        const itemName = item?.name || recipe.outputItemKey;
         const icon = ICON_BY_RECIPE[recipeKey] || '🛠️';
         
         // Show floating message in center of screen
