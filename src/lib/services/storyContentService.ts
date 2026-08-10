@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import type { ItemContent, RecipeContent } from '@/lib/content/types';
+import type { ItemContent, RecipeContent, QuestContent } from '@/lib/content/types';
 
 export interface StoryContentResponse {
   items: ItemContent[];
   recipes: RecipeContent[];
+  quests: QuestContent[];
 }
 
 export async function getStoryContentBySlug(slug: string): Promise<StoryContentResponse | null> {
@@ -15,6 +16,14 @@ export async function getStoryContentBySlug(slug: string): Promise<StoryContentR
         include: {
           outputItem: true,
           ingredients: { include: { item: true } },
+        },
+      },
+      quests: {
+        orderBy: { order: 'asc' },
+        include: {
+          steps: {
+            orderBy: { order: 'asc' },
+          },
         },
       },
     },
@@ -44,5 +53,21 @@ export async function getStoryContentBySlug(slug: string): Promise<StoryContentR
     })),
   }));
 
-  return { items, recipes };
+  const quests: QuestContent[] = story.quests.map((quest) => ({
+    key: quest.key,
+    name: quest.name,
+    steps: quest.steps.map((step) => {
+      const content = step.content as any;
+      return {
+        key: step.key,
+        title: step.title,
+        dialogue: content.dialogue || [],
+        objectives: content.objectives || [],
+        rewards: content.rewards || [],
+        isEpisodeEnd: step.isEpisodeEnd,
+      };
+    }),
+  }));
+
+  return { items, recipes, quests };
 }

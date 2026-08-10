@@ -15,7 +15,7 @@
           { "type": "COLLECT", "targetKey": "coconut", "quantity": 2 },
           { "type": "CRAFT", "targetKey": "campfire", "quantity": 1 }
         ],
-        "rewards": [{ "itemKey": "knife", "quantity": 1 }]
+        "rewards": []
       },
       {
         "key": "well-song",

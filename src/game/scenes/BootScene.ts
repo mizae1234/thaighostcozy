@@ -40,11 +40,19 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('node-coconut', `${TILES_BASE}/prop-palm-tree.png`);
     this.load.image('node-stone', `${TILES_BASE}/prop-rocks.png`);
     this.load.image('building-campfire', `${TILES_BASE}/prop-campfire.png`);
+    this.load.image('prop-flower', `${TILES_BASE}/prop-flower.png`);
+    this.load.image('prop-shell', `${TILES_BASE}/prop-shell.png`);
+    this.load.image('prop-sandalwood', `${TILES_BASE}/prop-sandalwood.png`);
+    this.load.image('prop-fallen-fruit', `${TILES_BASE}/prop-fallen-fruit.png`);
 
-    this.load.image('player-down', `${PLAYER_BASE}/player-down.png`);
-    this.load.image('player-up', `${PLAYER_BASE}/player-up.png`);
-    this.load.image('player-left', `${PLAYER_BASE}/player-left.png`);
-    this.load.image('player-right', `${PLAYER_BASE}/player-right.png`);
+    this.load.image('player-down', `${PLAYER_BASE}/player-down1.png`);
+    this.load.image('player-down-walk1', `${PLAYER_BASE}/player-down-walk1.png`);
+    this.load.image('player-down-walk2', `${PLAYER_BASE}/player-down-walk2.png`);
+    this.load.image('player-up', `${PLAYER_BASE}/player-up1.png`);
+    this.load.image('player-left', `${PLAYER_BASE}/player-left1.png`);
+    this.load.image('player-left-walk1', `${PLAYER_BASE}/player-left-walk1.png`);
+    this.load.image('player-right', `${PLAYER_BASE}/player-right1.png`);
+    this.load.image('player-right-walk1', `${PLAYER_BASE}/player-right-walk1.png`);
 
     this.load.image('golden-goby', `${NPC_BASE}/golden-goby.png`);
   }

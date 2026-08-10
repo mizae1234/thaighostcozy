@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useContentStore } from '@/stores/useContentStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
+import { useInteractionStore } from '@/stores/useInteractionStore';
 import PanelFrame from './PanelFrame';
 
 const ICON_BY_RECIPE: Record<string, string> = {
@@ -28,7 +29,25 @@ export default function CraftPanel() {
 
   const handleCraft = (recipeKey: string) => {
     const result = craft(recipeKey);
-    setMessage(result.success ? 'คราฟต์สำเร็จ' : `คราฟต์ไม่ได้: ${result.reason}`);
+    if (result.success) {
+      const recipe = recipes.find((r) => r.key === recipeKey);
+      if (recipe) {
+        const item = useContentStore.getState().getItem(recipe.outputItemKey);
+        const itemName = item?.thai || item?.name || recipe.outputItemKey;
+        const icon = ICON_BY_RECIPE[recipeKey] || '🛠️';
+        
+        // Show floating message in center of screen
+        useInteractionStore.getState().setPrompt(`คราฟต์สำเร็จ! ได้รับ ${itemName} ${icon}`, 'info');
+        setTimeout(() => {
+          if (useInteractionStore.getState().promptText?.includes(`ได้รับ ${itemName}`)) {
+            useInteractionStore.getState().setPrompt(null);
+          }
+        }, 3000);
+      }
+      setMessage('คราฟต์สำเร็จ');
+    } else {
+      setMessage(`คราฟต์ไม่ได้: ${result.reason}`);
+    }
   };
 
   return (

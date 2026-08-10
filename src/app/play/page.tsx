@@ -8,9 +8,14 @@ import { usePlayerStore } from '@/stores/usePlayerStore';
 import { useContentStore } from '@/stores/useContentStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
+import { useQuestStore } from '@/stores/useQuestStore';
 import StatsBar from '@/components/hud/StatsBar';
 import InventoryPanel from '@/components/hud/InventoryPanel';
 import CraftPanel from '@/components/hud/CraftPanel';
+import DialogueOverlay from '@/components/hud/DialogueOverlay';
+import EpisodeEndOverlay from '@/components/hud/EpisodeEndOverlay';
+import QuestTracker from '@/components/hud/QuestTracker';
+import InteractionPrompt from '@/components/hud/InteractionPrompt';
 
 const PhaserGame = dynamic(() => import('@/game/PhaserGame'), { ssr: false });
 
@@ -19,7 +24,10 @@ const HUNGER_THIRST_TICK_MS = 3000;
 
 export default function PlayPage() {
   useEffect(() => {
-    useContentStore.getState().load(STORY_SLUG);
+    useContentStore.getState().load(STORY_SLUG).then(() => {
+      const quests = useContentStore.getState().quests;
+      useQuestStore.getState().initQuests(quests);
+    });
 
     const handlePlayerMoved = (payload: PlayerMovedPayload) => {
       usePlayerStore.getState().setFromGame(payload);
@@ -27,17 +35,25 @@ export default function PlayPage() {
     const handleResourceCollected = (payload: ResourceCollectedPayload) => {
       useInventoryStore.getState().add(payload.itemKey, payload.amount);
     };
+    const handleBuildingPlaced = (payload: { recipeKey: string }) => {
+      useQuestStore.getState().triggerBuildingPlaced(payload.recipeKey);
+    };
 
     EventBus.on('player-moved', handlePlayerMoved);
     EventBus.on('resource-collected', handleResourceCollected);
+    EventBus.on('building-placed', handleBuildingPlaced);
 
     const decayInterval = setInterval(() => {
-      usePlayerStatsStore.getState().tickDecay();
+      // Only decay if dialogue is not active (optional, but realistic)
+      if (!useQuestStore.getState().isDialogueActive && !useQuestStore.getState().isEpisodeEnd) {
+        usePlayerStatsStore.getState().tickDecay();
+      }
     }, HUNGER_THIRST_TICK_MS);
 
     return () => {
       EventBus.off('player-moved', handlePlayerMoved);
       EventBus.off('resource-collected', handleResourceCollected);
+      EventBus.off('building-placed', handleBuildingPlaced);
       clearInterval(decayInterval);
     };
   }, []);
@@ -45,21 +61,19 @@ export default function PlayPage() {
   return (
     <main className="flex h-screen w-screen items-center justify-center bg-black">
       {/* Locked to the game's 16:9 base resolution so HUD margins stay
-          correct relative to the visible canvas, regardless of the
-          browser window's own aspect ratio (Phaser's own FIT letterboxing
-          happens outside this box, not inside it). `aspect-video` alone can
-          collapse to 0x0 as a bare flex child with no other sizing hint in
-          some browsers — pairing explicit w-full/h-full with max-w/max-h
-          computed from the *other* axis via the aspect-ratio forces a
-          definite size deterministically. */}
+          correct relative to the visible canvas */}
       <div
-        className="relative aspect-video h-full max-h-full w-full max-w-full"
+        className="relative aspect-video h-full max-h-full w-full max-w-full overflow-hidden"
         style={{ maxWidth: 'min(100%, calc(100vh * 16 / 9))', maxHeight: 'min(100%, calc(100vw * 9 / 16))' }}
       >
         <PhaserGame />
         <StatsBar />
         <InventoryPanel />
         <CraftPanel />
+        <QuestTracker />
+        <InteractionPrompt />
+        <DialogueOverlay />
+        <EpisodeEndOverlay />
       </div>
     </main>
   );

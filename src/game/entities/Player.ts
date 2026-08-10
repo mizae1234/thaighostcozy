@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { Direction } from '../types';
 import { fitDisplaySize } from '../utils/fitDisplaySize';
+import { useQuestStore } from '@/stores/useQuestStore';
 
 const SPEED = 120;
 const DISPLAY_MAX_DIM = 76;
@@ -24,6 +25,56 @@ export default class Player {
     this.sprite.setCollideWorldBounds(true);
     fitDisplaySize(this.sprite, DISPLAY_MAX_DIM);
     this.updateShadowPosition();
+
+    // Create walk animations if they do not exist
+    if (!scene.anims.exists('walk-down')) {
+      scene.anims.create({
+        key: 'walk-down',
+        frames: [
+          { key: 'player-down' },
+          { key: 'player-down-walk1' },
+          { key: 'player-down' },
+          { key: 'player-down-walk2' }
+        ],
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+
+    if (!scene.anims.exists('walk-left')) {
+      scene.anims.create({
+        key: 'walk-left',
+        frames: [
+          { key: 'player-left' },
+          { key: 'player-left-walk1' }
+        ],
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+
+    if (!scene.anims.exists('walk-right')) {
+      scene.anims.create({
+        key: 'walk-right',
+        frames: [
+          { key: 'player-right' },
+          { key: 'player-right-walk1' }
+        ],
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+
+    if (!scene.anims.exists('walk-up')) {
+      scene.anims.create({
+        key: 'walk-up',
+        frames: [
+          { key: 'player-up' }
+        ],
+        frameRate: 6,
+        repeat: -1
+      });
+    }
   }
 
   private updateShadowPosition() {
@@ -32,6 +83,21 @@ export default class Player {
 
   update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, wasd: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+
+    // Freeze player controls during dialogue/episode-end screens
+    const isDialogueActive = useQuestStore.getState().isDialogueActive;
+    const isEpisodeEnd = useQuestStore.getState().isEpisodeEnd;
+    if (isDialogueActive || isEpisodeEnd) {
+      body.setVelocity(0, 0);
+      this.sprite.stop();
+      this.sprite.setAngle(0);
+      const fitScale = DISPLAY_MAX_DIM / Math.max(this.sprite.width, this.sprite.height);
+      this.sprite.setDisplaySize(this.sprite.width * fitScale, this.sprite.height * fitScale);
+      this.isMoving = false;
+      this.updateShadowPosition();
+      return;
+    }
+
     let vx = 0;
     let vy = 0;
 
@@ -57,12 +123,42 @@ export default class Player {
       else if (vy < 0) this.direction = 'up';
       else if (vy > 0) this.direction = 'down';
 
-      if (this.direction !== previousDirection) {
-        this.sprite.setTexture(TEXTURE_BY_DIRECTION[this.direction]);
-        fitDisplaySize(this.sprite, DISPLAY_MAX_DIM);
+      // Play walk animation for the corresponding direction
+      const animKey = `walk-${this.direction}`;
+      if (!this.sprite.anims.isPlaying || this.sprite.anims.currentAnim?.key !== animKey) {
+        this.sprite.play(animKey);
       }
+
+      // Wobble/Bobbing effect to complement the leg movement
+      const time = this.sprite.scene.time.now;
+      const stepSpeed = 0.016;
+      let wobbleAngle = 0;
+      let scaleX = 1;
+      let scaleY = 1;
+
+      if (this.direction === 'up' || this.direction === 'down') {
+        scaleY = 1 - Math.sin(time * stepSpeed * 2) * 0.04;
+        scaleX = 1 + Math.sin(time * stepSpeed * 2) * 0.02;
+        wobbleAngle = Math.sin(time * stepSpeed) * 3;
+      } else {
+        wobbleAngle = this.direction === 'left' ? -4 : 4;
+        scaleY = 1 + Math.sin(time * stepSpeed * 2) * 0.03;
+      }
+
+      this.sprite.setAngle(wobbleAngle);
+      const fitScale = DISPLAY_MAX_DIM / Math.max(this.sprite.width, this.sprite.height);
+      this.sprite.setDisplaySize(
+        this.sprite.width * fitScale * scaleX,
+        this.sprite.height * fitScale * scaleY
+      );
     } else {
       body.setVelocity(0, 0);
+      this.sprite.stop();
+      this.sprite.setAngle(0);
+      this.sprite.setTexture(TEXTURE_BY_DIRECTION[this.direction]);
+      
+      const fitScale = DISPLAY_MAX_DIM / Math.max(this.sprite.width, this.sprite.height);
+      this.sprite.setDisplaySize(this.sprite.width * fitScale, this.sprite.height * fitScale);
     }
 
     this.isMoving = moving;
