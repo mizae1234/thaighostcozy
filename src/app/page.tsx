@@ -30,20 +30,20 @@ export default function HomePage() {
       {/* Header / Logo Section */}
       <div className="relative z-10 mt-20 flex flex-col items-center text-center px-4">
         <h1 className="text-5xl font-black uppercase tracking-widest text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] md:text-7xl">
-          PAWANA
+          THAIGHOST COZY
         </h1>
-        <h2 className="mt-1 text-xs font-extrabold uppercase tracking-[0.3em] text-amber-400 drop-shadow-md sm:text-sm">
-          THE OCCULT SURVIVAL
+        <h2 className="mt-1 text-xs font-extrabold uppercase tracking-[0.3em] text-emerald-400 drop-shadow-md sm:text-sm">
+          COZY SPIRITS & FOLKLORE
         </h2>
         <p className="mt-6 max-w-md text-xs sm:text-sm text-stone-300 font-medium leading-relaxed drop-shadow-md">
-          \"เอาชีวิตรอด... อย่าก้าวออกนอกกำแพงสัจจะวิญญาณ\"
+          "สัมผัสมิตรภาพ คลี่คลายความหลัง และร่วมทางไปกับเหล่าภูตผีไทยแสนอบอุ่น"
         </p>
 
         {/* Small badge showing online players count */}
         <div className="mt-6 flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/70 px-4 py-1.5 shadow-md">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">
-            23 ผู้รอดชีวิตกำลังออนไลน์
+            23 ผู้สื่อวิญญาณกำลังออนไลน์
           </span>
         </div>
       </div>
@@ -114,15 +114,19 @@ export default function HomePage() {
               </li>
               <li className="flex items-start gap-2.5">
                 <span className="text-amber-500">🌌</span>
-                <span><strong>ปะทะและรวบรวม:</strong> กดปุ่ม <strong>Spacebar</strong> เพื่อเก็บวัตถุดิบ (ลังไม้, มะพร้าว) หรือพูดคุยสนทนากับวิญญาณ</span>
+                <span><strong>เก็บกู้ทรัพยากร:</strong> กดปุ่ม <strong>Spacebar</strong> เพื่อเก็บวัตถุดิบในสวน (ไม้, ใบตอง, หิน) หรือพูดคุยสนทนากับวิญญาณ</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <span className="text-amber-500">🛠️</span>
-                <span><strong>เมนูคราฟต์ของ:</strong> ดูรายการวัตถุดิบที่ต้องการแล้วคลิกสร้าง <strong>มีด</strong> หรือ <strong>ศาลมูจิ</strong> ที่แท็บคราฟต์ด้านซ้ายล่าง</span>
+                <span><strong>เมนูคราฟต์ของ:</strong> ดูรายการวัตถุดิบที่ต้องการแล้วคลิกสร้างไอเทม เช่น <strong>มีด</strong> หรือ <strong>ศาลพระภูมิมูจิ</strong> ที่แท็บคราฟต์ด้านซ้ายล่าง</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <span className="text-amber-500">❤️</span>
                 <span><strong>เอาชีวิตรอด:</strong> ระวังเกจค่าความหิวความกระหายทางซ้ายบนให้ดี หากหมดเกจพลังจะลดฮวบลงเรื่อยๆ</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="text-amber-500">🔍</span>
+                <span><strong>ปรับมุมกล้อง:</strong> กดปุ่ม <strong>Z</strong> บนแป้นคีย์บอร์ดเพื่อสลับมุมกล้องเป็น <strong>มุมกว้าง (Wide View)</strong> หรือซูมเข้าอบอุ่นได้ตลอดเวลา</span>
               </li>
             </ul>
             <button

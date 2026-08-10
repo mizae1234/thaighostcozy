@@ -11,7 +11,7 @@ export default function InventoryPanel() {
   const entries = Object.entries(quantities).filter(([, qty]) => qty > 0);
 
   return (
-    <div className="pointer-events-auto absolute right-5 top-5 w-48">
+    <div className="pointer-events-auto absolute right-5 top-20 w-48">
       <PanelFrame title="กระเป๋า">
         {entries.length === 0 && <div className="text-xs text-white/50">ว่างเปล่า</div>}
         <div className="flex flex-col gap-1">

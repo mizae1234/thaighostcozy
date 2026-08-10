@@ -45,11 +45,14 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('prop-shell', `${tilesBase}/prop-shell.png`);
     this.load.image('prop-sandalwood', `${tilesBase}/prop-sandalwood.png`);
     this.load.image('prop-fallen-fruit', `${tilesBase}/prop-fallen-fruit.png`);
+    this.load.image('building-shop', `${tilesBase}/prop-shop.png`);
 
     this.load.image('player-down', `${playerBase}/player-down1.png`);
     this.load.image('player-down-walk1', `${playerBase}/player-down-walk1.png`);
     this.load.image('player-down-walk2', `${playerBase}/player-down-walk2.png`);
     this.load.image('player-up', `${playerBase}/player-up1.png`);
+    this.load.image('player-up-walk1', `${playerBase}/player-up-walk1.png`);
+    this.load.image('player-up-walk2', `${playerBase}/player-up-walk2.png`);
     this.load.image('player-left', `${playerBase}/player-left1.png`);
     this.load.image('player-left-walk1', `${playerBase}/player-left-walk1.png`);
     this.load.image('player-right', `${playerBase}/player-right1.png`);

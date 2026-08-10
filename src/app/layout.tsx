@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'เกาะปลาบู่ทอง',
-  description: 'Thai folklore survival game — MVP',
+  title: 'ThaiGhost Cozy',
+  description: 'สัมผัสมิตรภาพและตำนานวิญญาณไทย',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

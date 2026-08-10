@@ -8,6 +8,7 @@ import type { BuildingPlacedPayload, PlayerMovedPayload } from '../types';
 import { useQuestStore } from '../../stores/useQuestStore';
 import { useInventoryStore } from '../../stores/useInventoryStore';
 import { useInteractionStore } from '../../stores/useInteractionStore';
+import { useContentStore } from '../../stores/useContentStore';
 
 const BUILDING_DISPLAY_MAX_DIM = 88;
 
@@ -15,7 +16,7 @@ const BUILDING_DISPLAY_MAX_DIM = 88;
 // island background (island-background.png), matched by eye to open ground.
 const ISLAND_BOUNDS = { centerX: 640, centerY: 360, radiusX: 480, radiusY: 260 };
 
-const RESOURCE_NODE_LAYOUT: Array<{ x: number; y: number; itemKey: string; texture: string }> = [
+const PLABOO_RESOURCE_LAYOUT: Array<{ x: number; y: number; itemKey: string; texture: string }> = [
   { x: 460, y: 277, itemKey: 'wood', texture: 'node-wood' },
   { x: 820, y: 277, itemKey: 'wood', texture: 'node-wood' },
   { x: 460, y: 443, itemKey: 'wood', texture: 'node-wood' },
@@ -28,6 +29,34 @@ const RESOURCE_NODE_LAYOUT: Array<{ x: number; y: number; itemKey: string; textu
   { x: 400, y: 332, itemKey: 'stone', texture: 'node-stone' },
   { x: 880, y: 332, itemKey: 'stone', texture: 'node-stone' },
   { x: 640, y: 499, itemKey: 'stone', texture: 'node-stone' },
+];
+
+const GHOST_RESOURCE_LAYOUT: Array<{ x: number; y: number; itemKey: string; texture: string }> = [
+  // Top-Left (behind greenhouse/fence)
+  { x: 130, y: 220, itemKey: 'wood', texture: 'node-wood' },
+  { x: 140, y: 165, itemKey: 'stone', texture: 'node-stone' },
+  
+  // Center-Left (near greenhouse edge)
+  { x: 140, y: 330, itemKey: 'coconut', texture: 'node-coconut' },
+  
+  // Bottom-Left corner
+  { x: 180, y: 520, itemKey: 'wood', texture: 'node-wood' },
+  { x: 240, y: 440, itemKey: 'coconut', texture: 'node-coconut' },
+  { x: 260, y: 560, itemKey: 'stone', texture: 'node-stone' },
+  
+  // Bottom-Center / below pond
+  { x: 500, y: 560, itemKey: 'wood', texture: 'node-wood' },
+  { x: 440, y: 580, itemKey: 'stone', texture: 'node-stone' },
+  { x: 740, y: 580, itemKey: 'stone', texture: 'node-stone' },
+  
+  // Top-Right far corner
+  { x: 860, y: 160, itemKey: 'wood', texture: 'node-wood' },
+  { x: 800, y: 240, itemKey: 'coconut', texture: 'node-coconut' },
+  { x: 880, y: 200, itemKey: 'stone', texture: 'node-stone' },
+  
+  // Center-Right / next to pond
+  { x: 840, y: 380, itemKey: 'coconut', texture: 'node-coconut' },
+  { x: 820, y: 440, itemKey: 'stone', texture: 'node-stone' },
 ];
 
 const BUILDING_TEXTURE_BY_RECIPE: Record<string, string> = {
@@ -43,8 +72,10 @@ export default class MainScene extends Phaser.Scene {
   private resourceNodes: ResourceNode[] = [];
   private questNodes: ResourceNode[] = [];
   private goldenGobySprite: Phaser.GameObjects.Image | null = null;
+  private shopBuilding: Phaser.GameObjects.Image | null = null;
   private currentStepKey: string | null = null;
   private lastEmitted: PlayerMovedPayload | null = null;
+  private zoomKey!: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super('Main');
@@ -54,10 +85,17 @@ export default class MainScene extends Phaser.Scene {
     this.add.image(0, 0, 'island-background').setOrigin(0, 0).setDisplaySize(WORLD_WIDTH, WORLD_HEIGHT);
     this.spawnResourceNodes();
 
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    if (slug === 'ghost-whisperer') {
+      this.shopBuilding = this.add.image(340, 520, 'building-shop');
+      fitDisplaySize(this.shopBuilding, 88);
+    }
+
     this.player = new Player(this, ISLAND_BOUNDS.centerX, ISLAND_BOUNDS.centerY);
 
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    this.cameras.main.setZoom(2);
+    const defaultZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
+    this.cameras.main.setZoom(defaultZoom);
     this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
 
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -68,6 +106,7 @@ export default class MainScene extends Phaser.Scene {
       right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
     this.harvestKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.zoomKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
     const handleBuildingPlaced = this.onBuildingPlaced.bind(this);
     EventBus.on('building-placed', handleBuildingPlaced);
@@ -78,9 +117,25 @@ export default class MainScene extends Phaser.Scene {
     };
     EventBus.on('quest-step-changed', handleQuestStepChanged);
 
+    const handleRespawn = () => {
+      this.player.sprite.setPosition(ISLAND_BOUNDS.centerX, ISLAND_BOUNDS.centerY);
+    };
+    EventBus.on('respawn-player', handleRespawn);
+
+    const handleToggleZoom = () => {
+      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
+      const wideZoom = slug === 'ghost-whisperer' ? 1.1 : 1.2;
+      const targetZoom = this.cameras.main.zoom > 1.4 ? wideZoom : closeZoom;
+      this.cameras.main.zoomTo(targetZoom, 300, 'Sine.easeInOut');
+    };
+    EventBus.on('toggle-camera-zoom', handleToggleZoom);
+
     this.events.once('shutdown', () => {
       EventBus.off('building-placed', handleBuildingPlaced);
       EventBus.off('quest-step-changed', handleQuestStepChanged);
+      EventBus.off('respawn-player', handleRespawn);
+      EventBus.off('toggle-camera-zoom', handleToggleZoom);
     });
 
     // Run once on load to spawn entities for current active step
@@ -99,6 +154,15 @@ export default class MainScene extends Phaser.Scene {
     this.tryHarvest();
     this.checkWellDistance();
     this.updateInteractionPrompt();
+
+    // Toggle camera zoom with Z key
+    if (Phaser.Input.Keyboard.JustDown(this.zoomKey)) {
+      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
+      const wideZoom = slug === 'ghost-whisperer' ? 1.1 : 1.2;
+      const targetZoom = this.cameras.main.zoom > 1.4 ? wideZoom : closeZoom;
+      this.cameras.main.zoomTo(targetZoom, 300, 'Sine.easeInOut');
+    }
   }
 
   private updateInteractionPrompt() {
@@ -111,24 +175,39 @@ export default class MainScene extends Phaser.Scene {
     const playerX = this.player.sprite.x;
     const playerY = this.player.sprite.y;
 
+    // Resolve story slug
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+
     // 1. Check Goby NPC proximity
     if (this.goldenGobySprite) {
       const dist = Phaser.Math.Distance.Between(playerX, playerY, this.goldenGobySprite.x, this.goldenGobySprite.y);
       if (dist < 45) {
+        const npcName = slug === 'ghost-whisperer' ? 'แม่นางตานี' : 'ปลาบู่ทอง';
+        const actionSuffix = slug === 'ghost-whisperer' ? 'เพื่อบำบัดจิตใจ' : 'เพื่อปลดคำสาป';
         if (this.currentStepKey === 'goby-revealed') {
-          useInteractionStore.getState().setPrompt('คุยกับ ปลาบู่ทอง', 'talk');
+          useInteractionStore.getState().setPrompt(`คุยกับ ${npcName}`, 'talk');
           return;
         } else if (this.currentStepKey === 'lift-the-curse') {
-          useInteractionStore.getState().setPrompt('คุยกับ ปลาบู่ทอง เพื่อปลดคำสาป', 'talk');
+          useInteractionStore.getState().setPrompt(`คุยกับ ${npcName} ${actionSuffix}`, 'talk');
           return;
         }
+      }
+    }
+
+    // 1.5. Check Shop proximity (Ghost Mode only)
+    if (this.shopBuilding) {
+      const dist = Phaser.Math.Distance.Between(playerX, playerY, this.shopBuilding.x, this.shopBuilding.y);
+      if (dist < 45) {
+        useInteractionStore.getState().setPrompt('เปิดร้านค้าสายมู', 'talk');
+        return;
       }
     }
 
     // 2. Check well proximity (Step 2 well-song)
     if (this.currentStepKey === 'well-song') {
       const wellX = 640;
-      const wellY = 360;
+      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const wellY = slug === 'ghost-whisperer' ? 460 : 360;
       const dist = Phaser.Math.Distance.Between(playerX, playerY, wellX, wellY);
       if (dist < 100 && !useQuestStore.getState().reachedLocations['well']) {
         useInteractionStore.getState().setPrompt('เดินเข้าไปใกล้บ่อน้ำโบราณเพื่อฟังเพลง', 'info');
@@ -146,19 +225,17 @@ export default class MainScene extends Phaser.Scene {
     );
 
     if (closeQuestNode) {
+      const itemData = useContentStore.getState().getItem(closeQuestNode.itemKey);
+      const thaiName = itemData?.name || closeQuestNode.itemKey;
       if (closeQuestNode.itemKey === 'sandalwood') {
         const hasKnife = useInventoryStore.getState().quantities['knife'] > 0;
         if (!hasKnife) {
-          useInteractionStore.getState().setPrompt('ต้องมี มีด (สร้างจากเมนูซ้าย) เพื่อตัดไม้จันทน์', 'warning');
+          useInteractionStore.getState().setPrompt(`ต้องมี มีด (สร้างจากเมนูซ้าย) เพื่อตัด${thaiName}`, 'warning');
         } else {
-          useInteractionStore.getState().setPrompt('ตัด ไม้จันทน์', 'harvest');
+          useInteractionStore.getState().setPrompt(`ตัด ${thaiName}`, 'harvest');
         }
-      } else if (closeQuestNode.itemKey === 'sacred-flower') {
-        useInteractionStore.getState().setPrompt('เก็บ ดอกไม้ศักดิ์สิทธิ์', 'harvest');
-      } else if (closeQuestNode.itemKey === 'pearl-shell') {
-        useInteractionStore.getState().setPrompt('เก็บ เปลือกหอยมุก', 'harvest');
-      } else if (closeQuestNode.itemKey === 'fallen-fruit') {
-        useInteractionStore.getState().setPrompt('เก็บ ลูกไม้ร่วงหล่น', 'harvest');
+      } else {
+        useInteractionStore.getState().setPrompt(`เก็บ ${thaiName}`, 'harvest');
       }
       return;
     }
@@ -171,7 +248,8 @@ export default class MainScene extends Phaser.Scene {
     );
 
     if (closeNode) {
-      const thaiName = closeNode.itemKey === 'wood' ? 'ลังไม้' : closeNode.itemKey === 'coconut' ? 'มะพร้าว' : 'หิน';
+      const itemData = useContentStore.getState().getItem(closeNode.itemKey);
+      const thaiName = itemData?.name || (closeNode.itemKey === 'wood' ? 'ลังไม้' : closeNode.itemKey === 'coconut' ? 'มะพร้าว' : 'หิน');
       useInteractionStore.getState().setPrompt(`เก็บ ${thaiName}`, 'harvest');
       return;
     }
@@ -181,7 +259,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private spawnResourceNodes() {
-    this.resourceNodes = RESOURCE_NODE_LAYOUT.map(({ x, y, itemKey, texture }) => new ResourceNode(this, x, y, texture, itemKey));
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    const layout = slug === 'ghost-whisperer' ? GHOST_RESOURCE_LAYOUT : PLABOO_RESOURCE_LAYOUT;
+    this.resourceNodes = layout.map(({ x, y, itemKey, texture }) => new ResourceNode(this, x, y, texture, itemKey));
   }
 
   private onQuestStepChanged(stepKey: string) {
@@ -260,7 +340,8 @@ export default class MainScene extends Phaser.Scene {
   private checkWellDistance() {
     if (this.currentStepKey === 'well-song') {
       const wellX = 640;
-      const wellY = 360;
+      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const wellY = slug === 'ghost-whisperer' ? 460 : 360;
       const dist = Phaser.Math.Distance.Between(
         this.player.sprite.x,
         this.player.sprite.y,
@@ -275,6 +356,11 @@ export default class MainScene extends Phaser.Scene {
 
   // Clamping to island boundary ellipse
   private clampToIsland() {
+    const slug = typeof window !== 'undefined' 
+      ? window.location.pathname.split('/').pop() 
+      : 'pla-boo-thong';
+    if (slug === 'ghost-whisperer') return;
+
     const sprite = this.player.sprite;
     const dx = (sprite.x - ISLAND_BOUNDS.centerX) / ISLAND_BOUNDS.radiusX;
     const dy = (sprite.y - ISLAND_BOUNDS.centerY) / ISLAND_BOUNDS.radiusY;
@@ -299,13 +385,27 @@ export default class MainScene extends Phaser.Scene {
         this.player.sprite.x,
         this.player.sprite.y,
         this.goldenGobySprite.x,
-        this.goldenGobySprite.y,
+        this.goldenGobySprite.y
       );
       if (dist < 45) {
         if (this.currentStepKey === 'goby-revealed' || this.currentStepKey === 'lift-the-curse') {
           useQuestStore.getState().triggerTalkToNPC('golden-goby');
           return;
         }
+      }
+    }
+
+    // 1.5. Check Shop Proximity to open shop UI
+    if (this.shopBuilding) {
+      const dist = Phaser.Math.Distance.Between(
+        this.player.sprite.x,
+        this.player.sprite.y,
+        this.shopBuilding.x,
+        this.shopBuilding.y
+      );
+      if (dist < 45) {
+        EventBus.emit('open-shop-ui');
+        return;
       }
     }
 
@@ -321,10 +421,12 @@ export default class MainScene extends Phaser.Scene {
       if (questNode.itemKey === 'sandalwood') {
         const hasKnife = useInventoryStore.getState().quantities['knife'] > 0;
         if (!hasKnife) {
+          const itemData = useContentStore.getState().getItem('sandalwood');
+          const sandalwoodName = itemData?.name || 'ไม้จันทน์';
           const warnText = this.add.text(
             this.player.sprite.x,
             this.player.sprite.y - 42,
-            'ต้องใช้มีดเพื่อตัดไม้จันทน์!',
+            `ต้องใช้มีดเพื่อตัด${sandalwoodName}!`,
             {
               fontFamily: 'Courier',
               fontSize: '14px',

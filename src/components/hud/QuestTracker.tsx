@@ -4,7 +4,8 @@ import { useQuestStore } from '@/stores/useQuestStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useContentStore } from '@/stores/useContentStore';
 
-const STEP_THAI_TITLES: Record<string, string> = {
+// Pla Boo Thong static fallback dictionaries
+const PLA_BOO_STEP_TITLES: Record<string, string> = {
   'washed-ashore': 'ภารกิจที่ 1: ฟื้นฟูร่างกายหลังคลื่นซัด',
   'well-song': 'ภารกิจที่ 2: ตามหาบ่อน้ำศักดิ์สิทธิ์',
   'goby-revealed': 'ภารกิจที่ 3: สื่อสารกับปลาบู่ทอง',
@@ -12,7 +13,7 @@ const STEP_THAI_TITLES: Record<string, string> = {
   'lift-the-curse': 'ภารกิจที่ 5: ปลดปล่อยวิญญาณปลาบู่ทอง',
 };
 
-const STEP_HINTS: Record<string, string> = {
+const PLA_BOO_HINTS: Record<string, string> = {
   'washed-ashore': '💡 คำแนะนำ: เดินเก็บลังไม้ 5 ชิ้น และมะพร้าว 2 ลูกตามชายหาด จากนั้นเปิดเมนูคราฟต์ด้านซ้ายเพื่อสร้างกองไฟ',
   'well-song': '💡 คำแนะนำ: เดินไปทางขวาบนเพื่อตามหาบ่อน้ำโบราณใจกลางเกาะ และเก็บลูกไม้สีเขียว 3 ลูกที่ตกอยู่รอบบ่อน้ำ',
   'goby-revealed': '💡 คำแนะนำ: ยืนใกล้ปลาบู่ทองสีทองเหนือบ่อน้ำ แล้วกดปุ่ม Space เพื่อพูดคุย',
@@ -20,17 +21,21 @@ const STEP_HINTS: Record<string, string> = {
   'lift-the-curse': '💡 คำแนะนำ: นำของวิเศษทั้ง 3 อย่างไปคุยกับปลาบู่ทองที่บ่อน้ำโบราณเพื่อปลดคำสาป!',
 };
 
-const TARGET_THAI_NAMES: Record<string, string> = {
-  'wood': 'ลังไม้',
-  'coconut': 'มะพร้าว',
-  'stone': 'ก้อนหิน',
-  'campfire': 'กองไฟ',
-  'well': 'บ่อน้ำโบราณ',
-  'golden-goby': 'ปลาบู่ทอง',
-  'fallen-fruit': 'ลูกไม้ร่วงหล่น',
-  'sacred-flower': 'ดอกไม้ศักดิ์สิทธิ์',
-  'pearl-shell': 'เปลือกหอยมุก',
-  'sandalwood': 'ไม้จันทน์',
+// Ghost Whisperer static fallback dictionaries
+const GHOST_STEP_TITLES: Record<string, string> = {
+  'washed-ashore': 'ภารกิจที่ 1: อัญเชิญศาลพระภูมิมินิมอล',
+  'well-song': 'ภารกิจที่ 2: ตามหากิ๊บหนีบผมตานี',
+  'goby-revealed': 'ภารกิจที่ 3: บำบัดจิตใจนางตานี',
+  'collect-three-treasures': 'ภารกิจที่ 4: ตามหาของมงคล 3 อย่าง',
+  'lift-the-curse': 'ภารกิจที่ 5: ผูกมิตรภาพนิรันดร์',
+};
+
+const GHOST_HINTS: Record<string, string> = {
+  'washed-ashore': '💡 คำแนะนำ: เดินเก็บไม้บอร์ดมูจิ 5 ชิ้น และชาใบตอง 2 ถ้วย จากนั้นเปิดเมนูคราฟต์ด้านซ้ายเพื่อสร้างศาลพระภูมิมูจิ',
+  'well-song': '💡 คำแนะนำ: เดินไปทางขวาบนเพื่อตามหาบ่อน้ำโบราณในป่ากล้วย และเก็บกิ๊บหนีบผมใบตอง 3 อันที่ร่วงอยู่รอบบ่อน้ำ',
+  'goby-revealed': '💡 คำแนะนำ: ยืนใกล้บ่อน้ำโบราณ แล้วกดปุ่ม Space เพื่อพูดคุยช่วยเหลือระบายความเครียดให้นางตานี',
+  'collect-three-treasures': '💡 คำแนะนำ: คราฟต์มีดหมอมัสตาร์ดจากเมนูซ้ายล่าง จากนั้นเดินหาของมงคล 3 อย่าง: ดอกไม้บำบัดทางเหนือ, เปลือกหอยเรโทรทางหาดซ้าย, และสับไม้จันทน์มูเตลูทางทิศใต้ (ต้องใช้มีดหมอ)',
+  'lift-the-curse': '💡 คำแนะนำ: นำของมงคลทั้ง 3 อย่างไปคุยพิธีกับนางตานีที่บ่อน้ำโบราณเพื่อปลดล็อกมิตรภาพนิรันดร์!',
 };
 
 export default function QuestTracker() {
@@ -45,14 +50,26 @@ export default function QuestTracker() {
   const activeStep = quest.steps[currentStepIndex];
   if (!activeStep) return null;
 
-  const stepTitle = STEP_THAI_TITLES[activeStep.key] || activeStep.key;
-  const stepHint = STEP_HINTS[activeStep.key] || '';
+  // Determine current slug from window path
+  const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+  const isGhostMode = slug === 'ghost-whisperer';
+
+  // Get localized step titles and hints
+  const stepTitle = isGhostMode 
+    ? (GHOST_STEP_TITLES[activeStep.key] || activeStep.title || activeStep.key)
+    : (PLA_BOO_STEP_TITLES[activeStep.key] || activeStep.title || activeStep.key);
+    
+  const stepHint = isGhostMode
+    ? (GHOST_HINTS[activeStep.key] || '')
+    : (PLA_BOO_HINTS[activeStep.key] || '');
 
   return (
-    <div className="absolute left-4 top-36 z-40 w-64 rounded-2xl border-2 border-amber-900/60 bg-amber-950/80 p-4 text-amber-100 shadow-xl backdrop-blur-md transition-all md:w-72">
+    <div className="absolute left-4 top-[195px] z-40 w-64 rounded-2xl border-2 border-amber-900/60 bg-amber-950/80 p-4 text-amber-100 shadow-xl backdrop-blur-md transition-all md:w-72">
       {/* Header */}
       <div className="mb-2.5 border-b border-amber-800/60 pb-2">
-        <h3 className="text-xs font-extrabold uppercase tracking-widest text-amber-400">ภารกิจหลัก: ตามหาปลาบู่ทอง</h3>
+        <h3 className="text-xs font-extrabold uppercase tracking-widest text-amber-400">
+          ภารกิจหลัก: {quest.name}
+        </h3>
         <p className="text-sm font-bold text-amber-200 mt-0.5">{stepTitle}</p>
       </div>
 
@@ -64,7 +81,18 @@ export default function QuestTracker() {
           let label = '';
           let isDone = false;
 
-          const targetName = TARGET_THAI_NAMES[obj.targetKey] || obj.targetKey;
+          // Resolve target name dynamically from database items
+          const dbItem = useContentStore.getState().getItem(obj.targetKey);
+          let targetName = dbItem ? dbItem.name : obj.targetKey;
+
+          // If it is not an item, fallback to custom localization
+          if (!dbItem) {
+            if (obj.targetKey === 'well') {
+              targetName = isGhostMode ? 'บ่อน้ำโบราณท้ายสวน' : 'บ่อน้ำโบราณ';
+            } else if (obj.targetKey === 'golden-goby') {
+              targetName = isGhostMode ? 'นางตานี' : 'แม่ปลาบู่ทอง';
+            }
+          }
 
           if (obj.type === 'COLLECT') {
             currentVal = inventory[obj.targetKey] || 0;

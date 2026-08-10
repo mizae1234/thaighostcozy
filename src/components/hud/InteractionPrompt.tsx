@@ -32,10 +32,13 @@ export default function InteractionPrompt() {
         className={`flex items-center gap-3 rounded-full border-2 px-4 py-2 shadow-2xl backdrop-blur-md transition-all ${borderClass}`}
       >
         {/* Interaction key indicator */}
-        {promptType !== 'warning' && (
+        {promptType !== 'warning' && promptType !== 'info' && (
           <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase font-bold font-mono tracking-widest ${badgeClass}`}>
             SPACE
           </span>
+        )}
+        {promptType === 'info' && (
+          <span className="text-xs">💡</span>
         )}
         {promptType === 'warning' && (
           <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badgeClass}`}>

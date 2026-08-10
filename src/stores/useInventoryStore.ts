@@ -10,13 +10,30 @@ export interface CraftResult {
 
 interface InventoryState {
   quantities: Record<string, number>;
+  coins: number;
+  unlockedGhosts: string[];
+  passPoints: number;
+  passLevel: number;
+  isPremiumPass: boolean;
+  
   add: (itemKey: string, amount: number) => void;
   remove: (itemKey: string, amount: number) => boolean;
   craft: (recipeKey: string) => CraftResult;
+  
+  addCoins: (amount: number) => void;
+  deductCoins: (amount: number) => boolean;
+  unlockGhost: (ghostKey: string) => void;
+  addPassPoints: (amount: number) => void;
+  upgradePremiumPass: () => void;
 }
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
   quantities: {},
+  coins: 500, // 500 default coins to allow instant testing
+  unlockedGhosts: [],
+  passPoints: 0,
+  passLevel: 1,
+  isPremiumPass: false,
 
   add: (itemKey, amount) => {
     set((state) => ({
@@ -29,6 +46,34 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     if (current < amount) return false;
     set((state) => ({ quantities: { ...state.quantities, [itemKey]: current - amount } }));
     return true;
+  },
+
+  addCoins: (amount) => {
+    set((state) => ({ coins: state.coins + amount }));
+  },
+
+  deductCoins: (amount) => {
+    const current = get().coins;
+    if (current < amount) return false;
+    set((state) => ({ coins: current - amount }));
+    return true;
+  },
+
+  unlockGhost: (ghostKey) => {
+    const list = get().unlockedGhosts;
+    if (list.includes(ghostKey)) return;
+    set((state) => ({ unlockedGhosts: [...state.unlockedGhosts, ghostKey] }));
+  },
+
+  addPassPoints: (amount) => {
+    const points = get().passPoints + amount;
+    // Level up every 100 points, max level 10
+    const nextLevel = Math.min(10, Math.floor(points / 100) + 1);
+    set({ passPoints: points, passLevel: nextLevel });
+  },
+
+  upgradePremiumPass: () => {
+    set({ isPremiumPass: true });
   },
 
   craft: (recipeKey) => {

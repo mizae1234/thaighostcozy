@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Direction } from '../types';
 import { fitDisplaySize } from '../utils/fitDisplaySize';
 import { useQuestStore } from '@/stores/useQuestStore';
+import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
 
 const SPEED = 120;
 const DISPLAY_MAX_DIM = 76;
@@ -26,55 +27,54 @@ export default class Player {
     fitDisplaySize(this.sprite, DISPLAY_MAX_DIM);
     this.updateShadowPosition();
 
-    // Create walk animations if they do not exist
-    if (!scene.anims.exists('walk-down')) {
-      scene.anims.create({
-        key: 'walk-down',
-        frames: [
-          { key: 'player-down' },
-          { key: 'player-down-walk1' },
-          { key: 'player-down' },
-          { key: 'player-down-walk2' }
-        ],
-        frameRate: 6,
-        repeat: -1
-      });
-    }
+    // Recreate walk animations using the current preloaded textures
+    if (scene.anims.exists('walk-down')) scene.anims.remove('walk-down');
+    scene.anims.create({
+      key: 'walk-down',
+      frames: [
+        { key: 'player-down' },
+        { key: 'player-down-walk1' },
+        { key: 'player-down' },
+        { key: 'player-down-walk2' }
+      ],
+      frameRate: 6,
+      repeat: -1
+    });
 
-    if (!scene.anims.exists('walk-left')) {
-      scene.anims.create({
-        key: 'walk-left',
-        frames: [
-          { key: 'player-left' },
-          { key: 'player-left-walk1' }
-        ],
-        frameRate: 6,
-        repeat: -1
-      });
-    }
+    if (scene.anims.exists('walk-left')) scene.anims.remove('walk-left');
+    scene.anims.create({
+      key: 'walk-left',
+      frames: [
+        { key: 'player-left' },
+        { key: 'player-left-walk1' }
+      ],
+      frameRate: 6,
+      repeat: -1
+    });
 
-    if (!scene.anims.exists('walk-right')) {
-      scene.anims.create({
-        key: 'walk-right',
-        frames: [
-          { key: 'player-right' },
-          { key: 'player-right-walk1' }
-        ],
-        frameRate: 6,
-        repeat: -1
-      });
-    }
+    if (scene.anims.exists('walk-right')) scene.anims.remove('walk-right');
+    scene.anims.create({
+      key: 'walk-right',
+      frames: [
+        { key: 'player-right' },
+        { key: 'player-right-walk1' }
+      ],
+      frameRate: 6,
+      repeat: -1
+    });
 
-    if (!scene.anims.exists('walk-up')) {
-      scene.anims.create({
-        key: 'walk-up',
-        frames: [
-          { key: 'player-up' }
-        ],
-        frameRate: 6,
-        repeat: -1
-      });
-    }
+    if (scene.anims.exists('walk-up')) scene.anims.remove('walk-up');
+    scene.anims.create({
+      key: 'walk-up',
+      frames: [
+        { key: 'player-up' },
+        { key: 'player-up-walk1' },
+        { key: 'player-up' },
+        { key: 'player-up-walk2' }
+      ],
+      frameRate: 6,
+      repeat: -1
+    });
   }
 
   private updateShadowPosition() {
@@ -114,8 +114,13 @@ export default class Player {
     const moving = vx !== 0 || vy !== 0;
 
     if (moving) {
+      const hunger = usePlayerStatsStore.getState().hunger;
+      const thirst = usePlayerStatsStore.getState().thirst;
+      const isStarving = hunger === 0 || thirst === 0;
+      const currentSpeed = isStarving ? SPEED * 0.5 : SPEED;
+
       const length = Math.hypot(vx, vy);
-      body.setVelocity((vx / length) * SPEED, (vy / length) * SPEED);
+      body.setVelocity((vx / length) * currentSpeed, (vy / length) * currentSpeed);
 
       const previousDirection = this.direction;
       if (vx < 0) this.direction = 'left';

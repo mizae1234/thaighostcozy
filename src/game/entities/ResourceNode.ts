@@ -71,6 +71,10 @@ export default class ResourceNode {
       displayDim = 32;
     } else if (itemKey === 'coconut') {
       displayDim = 88;
+    } else if (itemKey === 'stone') {
+      displayDim = 36;
+    } else if (itemKey === 'wood') {
+      displayDim = 46;
     }
 
     fitDisplaySize(this.sprite, displayDim);
