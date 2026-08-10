@@ -1,9 +1,5 @@
 import Phaser from 'phaser';
 
-const TILES_BASE = '/assets/stories/pla-boo-thong/tiles';
-const PLAYER_BASE = '/assets/stories/pla-boo-thong/sprites/player';
-const NPC_BASE = '/assets/stories/pla-boo-thong/sprites/npc';
-
 const PLACEHOLDER_BASE_SIZE = 48;
 
 function generateBuildingTexture(scene: Phaser.Scene, key: string, fillColor: number, strokeColor: number) {
@@ -35,26 +31,31 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('island-background', `${TILES_BASE}/island-background.png`);
-    this.load.image('node-wood', `${TILES_BASE}/prop-crate.png`);
-    this.load.image('node-coconut', `${TILES_BASE}/prop-palm-tree.png`);
-    this.load.image('node-stone', `${TILES_BASE}/prop-rocks.png`);
-    this.load.image('building-campfire', `${TILES_BASE}/prop-campfire.png`);
-    this.load.image('prop-flower', `${TILES_BASE}/prop-flower.png`);
-    this.load.image('prop-shell', `${TILES_BASE}/prop-shell.png`);
-    this.load.image('prop-sandalwood', `${TILES_BASE}/prop-sandalwood.png`);
-    this.load.image('prop-fallen-fruit', `${TILES_BASE}/prop-fallen-fruit.png`);
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    const tilesBase = `/assets/stories/${slug}/tiles`;
+    const playerBase = `/assets/stories/${slug}/sprites/player`;
+    const npcBase = `/assets/stories/${slug}/sprites/npc`;
 
-    this.load.image('player-down', `${PLAYER_BASE}/player-down1.png`);
-    this.load.image('player-down-walk1', `${PLAYER_BASE}/player-down-walk1.png`);
-    this.load.image('player-down-walk2', `${PLAYER_BASE}/player-down-walk2.png`);
-    this.load.image('player-up', `${PLAYER_BASE}/player-up1.png`);
-    this.load.image('player-left', `${PLAYER_BASE}/player-left1.png`);
-    this.load.image('player-left-walk1', `${PLAYER_BASE}/player-left-walk1.png`);
-    this.load.image('player-right', `${PLAYER_BASE}/player-right1.png`);
-    this.load.image('player-right-walk1', `${PLAYER_BASE}/player-right-walk1.png`);
+    this.load.image('island-background', `${tilesBase}/island-background.png`);
+    this.load.image('node-wood', `${tilesBase}/prop-crate.png`);
+    this.load.image('node-coconut', `${tilesBase}/prop-palm-tree.png`);
+    this.load.image('node-stone', `${tilesBase}/prop-rocks.png`);
+    this.load.image('building-campfire', `${tilesBase}/prop-campfire.png`);
+    this.load.image('prop-flower', `${tilesBase}/prop-flower.png`);
+    this.load.image('prop-shell', `${tilesBase}/prop-shell.png`);
+    this.load.image('prop-sandalwood', `${tilesBase}/prop-sandalwood.png`);
+    this.load.image('prop-fallen-fruit', `${tilesBase}/prop-fallen-fruit.png`);
 
-    this.load.image('golden-goby', `${NPC_BASE}/golden-goby.png`);
+    this.load.image('player-down', `${playerBase}/player-down1.png`);
+    this.load.image('player-down-walk1', `${playerBase}/player-down-walk1.png`);
+    this.load.image('player-down-walk2', `${playerBase}/player-down-walk2.png`);
+    this.load.image('player-up', `${playerBase}/player-up1.png`);
+    this.load.image('player-left', `${playerBase}/player-left1.png`);
+    this.load.image('player-left-walk1', `${playerBase}/player-left-walk1.png`);
+    this.load.image('player-right', `${playerBase}/player-right1.png`);
+    this.load.image('player-right-walk1', `${playerBase}/player-right-walk1.png`);
+
+    this.load.image('golden-goby', `${npcBase}/golden-goby.png`);
   }
 
   create() {

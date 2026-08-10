@@ -1,0 +1,90 @@
+[
+  {
+    "key": "wood",
+    "name": "ไม้บอร์ดมูจิ",
+    "description": "แผ่นไม้สไตล์นอร์ดิกสหรับประกอบศาลพระภูมิ",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "coconut",
+    "name": "ชาใบตอง",
+    "description": "ชาใบตองหอมฟุ้งสไตล์ออร์แกนิก",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "stone",
+    "name": "หินสไตล์มูจิ",
+    "description": "หินแม่น้ำขัดเรียบสลับการจัดวางศาล",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "knife",
+    "name": "มีดหมอมัสตาร์ด",
+    "description": "มีดหมอสีเหลืองพาสเทลลงอักขระสตรีทแฟชั่น",
+    "type": "TOOL",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "campfire",
+    "name": "ศาลพระภูมิมูจิ",
+    "description": "ศาลพระภูมิสไตล์นอร์ดิกอุ่นใจมินิมอล",
+    "type": "BUILDING",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "fallen-fruit",
+    "name": "กิ๊บหนีบผมตานี",
+    "description": "กิ๊บหนีบผมใบตองสีพาสเทลที่นางตานีทำตกไว้",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "sacred-flower",
+    "name": "ดอกไม้แก้เครียด",
+    "description": "ดอกไม้ศักดิ์สิทธิ์ที่ช่วยบำบัดอาการเครียดสะสม",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "pearl-shell",
+    "name": "เปลือกหอยเรโทร",
+    "description": "เปลือกหอยมุกสีพาสเทลสไตล์ Y2K",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "sandalwood",
+    "name": "ไม้จันทน์มูเตลู",
+    "description": "ไม้จันทน์วิเศษที่ผ่านการปลุกเสกมาแล้ว",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "goby-bone-fragment",
+    "name": "ชาสมุนไพรตานี",
+    "description": "ชาสมุนไพรช่วยปรับสมดุลวิญญาณ",
+    "type": "QUEST_ITEM",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "magic-ring",
+    "name": "แหวนสายมูทองคำ",
+    "description": "แหวนทองคำลงอักขระเพื่อมิตรภาพที่ยั่งยืน",
+    "type": "QUEST_ITEM",
+    "stackable": false,
+    "maxStack": 1
+  }
+]

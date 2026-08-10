@@ -1,0 +1,78 @@
+[
+  {
+    "key": "find-golden-goby",
+    "name": "มูเตลูทาวน์: บ้านนี้ผีชิล",
+    "steps": [
+      {
+        "key": "washed-ashore",
+        "title": "ตามหาตานีในป่ากล้วย",
+        "dialogue": [
+          { "speaker": "เรา", "thai": "เฮ้อ... วันนี้มาเดินหาคอนเทนต์มูเตลูสตรีมมิ่งในสวนกล้วยร้างท้ายหมู่บ้านแฮะ" },
+          { "speaker": "เรา", "thai": "เอ๊ะ! นั่นศาลเก่าโทรมๆ นี่นา เหมือนมีวิญญาณนางตานีแฝงอยู่ แต่เธอสั่นกลัวเพราะศาลผุพังหมดแล้ว" },
+          { "speaker": "เรา", "thai": "ต้องรีบเก็บแผ่นไม้ 5 ชิ้น มะพร้าวน้ำหอม 2 ลูก แล้วสร้างศาลสไตล์มินิมอลมูจิให้เธออยู่ชั่วคราวก่อนแล้วกัน!" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "wood", "quantity": 5 },
+          { "type": "COLLECT", "targetKey": "coconut", "quantity": 2 },
+          { "type": "CRAFT", "targetKey": "campfire", "quantity": 1 }
+        ],
+        "rewards": []
+      },
+      {
+        "key": "well-song",
+        "title": "ตามหากิ๊บหนีบผมตานี",
+        "dialogue": [
+          { "speaker": "เรา", "thai": "เย้! สร้างศาลมูจิสีขาวนวลเสร็จแล้ว นางตานีดูชอบใจและย้ายเข้าไปสิงสถิตทันที" },
+          { "speaker": "เรา", "thai": "แต่มองดูดีๆ เธอยังหน้ามุ่ยอยู่เลยแฮะ... ลองสืบถามดูเธอบอกว่ากิ๊บหนีบผมใบตองตกหายแถวบ่อน้ำเก่า" },
+          { "speaker": "เรา", "thai": "งั้นเราลองเดินไปหาบ่อน้ำโบราณใจกลางสวนกล้วย แล้วเก็บกิ๊บหนีบผม 3 อันที่ร่วงหล่นแถวนั้นดีกว่า!" }
+        ],
+        "objectives": [
+          { "type": "REACH_LOCATION", "targetKey": "well", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "fallen-fruit", "quantity": 3 }
+        ],
+        "rewards": [{ "itemKey": "goby-bone-fragment", "quantity": 1 }]
+      },
+      {
+        "key": "goby-revealed",
+        "title": "เจรจาบำบัดจิตใจ",
+        "dialogue": [
+          { "speaker": "นางตานี", "thai": "กิ๊บใบตองที่ตามหาจริงๆ ด้วย! ขอบใจมากนะเจ้านักเรียนสายมูเตลู" },
+          { "speaker": "นางตานี", "thai": "แต่พักนี้ข้าเครียดสะสมเหลือเกิน นอนไม่ค่อยหลับเพราะคนเอาขยะมาทิ้งในป่ากล้วยบ่อยๆ" },
+          { "speaker": "นางตานี", "thai": "ถ้าเจ้าช่วยสวดคาถาบำบัดจิตวิญญาณและช่วยหาของวิเศษสามอย่างให้ ข้าอาจหลุดพ้นจากคำสาปความเครียดนี้ได้นะ" }
+        ],
+        "objectives": [{ "type": "TALK_TO", "targetKey": "golden-goby", "quantity": 1 }],
+        "rewards": []
+      },
+      {
+        "key": "collect-three-treasures",
+        "title": "ตามหาของมงคล 3 อย่าง",
+        "dialogue": [
+          { "speaker": "นางตานี", "thai": "ดอกไม้แก้เครียดอยู่ทุ่งหญ้าทางเหนือ เปลือกหอยมุกเรโทรอยู่ชายหาดซ้าย ส่วนไม้จันทน์มูเตลู... เจ้าต้องคราฟต์มีดหมอมัสตาร์ดมาตัดนะ" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "sacred-flower", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "pearl-shell", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "sandalwood", "quantity": 1 }
+        ],
+        "rewards": []
+      },
+      {
+        "key": "lift-the-curse",
+        "title": "ผูกมิตรภาพนิรันดร์",
+        "dialogue": [
+          { "speaker": "นางตานี", "thai": "เจ้าหามาครบจริงด้วย! ของวิเศษเหล่านี้ช่วยฟื้นฟูธรรมชาติป่ากล้วยและพลังวิญญาณข้าสำเร็จแล้ว" },
+          { "speaker": "นางตานี", "thai": "ข้าตานีขอปฏิญาณว่าจะเป็นวิญญาณผู้พิทักษ์และช่วยดูแลสวนผลไม้ให้เจ้าตลอดไป" },
+          { "speaker": "นางตานี", "thai": "รับแหวนสายมูทองคำวงนี้ไว้เถอะ มิตรภาพของเราจะคงอยู่ตลอดไปนะ!" }
+        ],
+        "objectives": [
+          { "type": "COLLECT", "targetKey": "sacred-flower", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "pearl-shell", "quantity": 1 },
+          { "type": "COLLECT", "targetKey": "sandalwood", "quantity": 1 },
+          { "type": "TALK_TO", "targetKey": "golden-goby", "quantity": 1 }
+        ],
+        "rewards": [{ "itemKey": "magic-ring", "quantity": 1 }],
+        "isEpisodeEnd": true
+      }
+    ]
+  }
+]

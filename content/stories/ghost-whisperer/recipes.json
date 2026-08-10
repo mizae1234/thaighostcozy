@@ -1,0 +1,22 @@
+[
+  {
+    "key": "knife",
+    "name": "มีดหมอมัสตาร์ด",
+    "outputItemKey": "knife",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 2 },
+      { "itemKey": "stone", "quantity": 1 }
+    ]
+  },
+  {
+    "key": "campfire",
+    "name": "ศาลพระภูมิมูจิ",
+    "outputItemKey": "campfire",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 5 },
+      { "itemKey": "coconut", "quantity": 2 }
+    ]
+  }
+]
