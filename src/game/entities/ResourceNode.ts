@@ -28,7 +28,7 @@ export default class ResourceNode {
       // Palm tree shadow (larger) at the base of the trunk
       this.shadow.setScale(1.5, 1.3);
       this.shadow.y = y + 40;
-    } else if (itemKey === 'wood') {
+    } else if (itemKey === 'wood' || itemKey === 'coin-sack') {
       // Crate shadow (smaller) and shift crate slightly down to ground it
       this.shadow.setScale(1.0, 1.0);
       y += 8; // Move crate down to align bottom with shadow
@@ -79,6 +79,8 @@ export default class ResourceNode {
       displayDim = 36;
     } else if (itemKey === 'wood') {
       displayDim = 46;
+    } else if (itemKey === 'coin-sack') {
+      displayDim = 32;
     }
 
     fitDisplaySize(this.sprite, displayDim);
@@ -97,7 +99,7 @@ export default class ResourceNode {
       let shadowY = ry + 16;
       if (this.itemKey === 'coconut') {
         shadowY = ry + 40;
-      } else if (this.itemKey === 'wood') {
+      } else if (this.itemKey === 'wood' || this.itemKey === 'coin-sack') {
         shadowY = ry + 10;
       } else if (this.itemKey === 'stone') {
         shadowY = ry + 12;
