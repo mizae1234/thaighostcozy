@@ -251,7 +251,9 @@ export default class MainScene extends Phaser.Scene {
       this.darkOverlay.setVisible(true);
       this.maskGraphics.clear();
       this.maskGraphics.fillStyle(0xffffff);
-      this.maskGraphics.fillCircle(this.player.sprite.x, this.player.sprite.y, 110);
+      const hasFlashlight = (useInventoryStore.getState().quantities['flashlight'] ?? 0) > 0;
+      const radius = hasFlashlight ? 180 : 115;
+      this.maskGraphics.fillCircle(this.player.sprite.x, this.player.sprite.y, radius);
     } else if (this.darkOverlay) {
       this.darkOverlay.setVisible(false);
     }
@@ -918,23 +920,17 @@ export default class MainScene extends Phaser.Scene {
 
     if (this.backgroundImage) {
       if (this.currentArea === 'orchard') {
-        if (isNight && this.textures.exists('island-background-night')) {
-          this.backgroundImage.setTexture('island-background-night');
-        } else {
-          this.backgroundImage.setTexture('island-background');
-        }
-      } else if (this.currentArea === 'temple') {
-        if (isNight && this.textures.exists('temple-background-night')) {
-          this.backgroundImage.setTexture('temple-background-night');
-        } else if (this.textures.exists('temple-background')) {
-          this.backgroundImage.setTexture('temple-background');
-        }
-      } else if (this.currentArea === 'market') {
-        if (isNight && this.textures.exists('market-background-night')) {
-          this.backgroundImage.setTexture('market-background-night');
-        } else if (this.textures.exists('market-background')) {
-          this.backgroundImage.setTexture('market-background');
-        }
+        this.backgroundImage.setTexture('island-background');
+      } else if (this.currentArea === 'temple' && this.textures.exists('temple-background')) {
+        this.backgroundImage.setTexture('temple-background');
+      } else if (this.currentArea === 'market' && this.textures.exists('market-background')) {
+        this.backgroundImage.setTexture('market-background');
+      }
+
+      if (isNight) {
+        this.backgroundImage.setTint(0x1a1a36); // Beautiful deep midnight blue tint
+      } else {
+        this.backgroundImage.clearTint();
       }
     }
 
