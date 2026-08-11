@@ -50,7 +50,7 @@ export default function HomePage() {
       {/* Header / Logo Section */}
       <div className="relative z-10 mt-12 flex flex-col items-center text-center px-4">
         <h1 className="text-5xl font-black uppercase tracking-widest text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] md:text-7xl">
-          PAWANA
+          THAIGHOST COZY
         </h1>
         <h2 className="mt-1 text-xs font-extrabold uppercase tracking-[0.3em] text-emerald-400 drop-shadow-md sm:text-sm">
           COZY SPIRITS & FOLKLORE
