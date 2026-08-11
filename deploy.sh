@@ -61,6 +61,10 @@ docker compose up -d
 echo "⏳ Waiting for containers to start..."
 sleep 10
 
+# Run database seeding
+echo "🗄️ Seeding database content inside the container..."
+docker exec "$CONTAINER" npx prisma db seed || true
+
 # ── Nginx reverse proxy setup ──────────────────────────────
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN"
 if [ ! -f "$NGINX_CONF" ]; then
@@ -107,7 +111,7 @@ docker ps --filter "name=$CONTAINER"
 
 # Show recent logs
 echo ""
-echo "📄 App logs (last 20 lines):"
+echo "📄 App logs - last 20 lines:"
 docker logs --tail 20 "$CONTAINER" 2>&1 || true
 
 echo ""

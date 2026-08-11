@@ -126,5 +126,13 @@
     "type": "CLOTHING",
     "stackable": false,
     "maxStack": 1
+  },
+  {
+    "key": "herbal-tonic",
+    "name": "ยาหอมห้าเจดีย์ป้าศรี",
+    "description": "ยาดมยาหอมสมุนไพรแผนโบราณตราห้าเจดีย์ป้าศรี กดดื่มเพื่อฟื้นฟูพลังชีวิต +50 HP และดับกระหายทันที",
+    "type": "CONSUMABLE",
+    "stackable": true,
+    "maxStack": 99
   }
 ]

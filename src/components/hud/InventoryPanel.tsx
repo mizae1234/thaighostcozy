@@ -61,6 +61,13 @@ export default function InventoryPanel() {
         thirst: Math.min(100, state.thirst + 20),
       }));
       triggerToast('🍌 ทานกล้วยน้ำว้าแล้ว! (+30 หิว, +20 น้ำ)');
+    } else if (itemKey === 'herbal-tonic') {
+      useInventoryStore.getState().remove('herbal-tonic', 1);
+      usePlayerStatsStore.setState((state) => ({
+        health: Math.min(100, state.health + 50),
+        thirst: Math.min(100, state.thirst + 30),
+      }));
+      triggerToast('🍶 ดื่มยาหอมห้าเจดีย์ป้าศรีแล้ว! ชื่นใจนักแล (+50 เลือด, +30 น้ำ)');
     } else if (itemKey === 'boba-tea') {
       useInventoryStore.getState().remove('boba-tea', 1);
       usePlayerStatsStore.setState((state) => ({
@@ -150,7 +157,7 @@ export default function InventoryPanel() {
         {selectedKey && (quantities[selectedKey] ?? 0) > 0 && (() => {
           const item = getItem(selectedKey);
           const emoji = ITEM_EMOJIS[selectedKey] || '📦';
-          const isUseable = ['coconut', 'boba-tea', 'retro-sunglasses', 'elephant-pants', 'flashlight', 'amulet'].includes(selectedKey);
+          const isUseable = ['coconut', 'boba-tea', 'herbal-tonic', 'retro-sunglasses', 'elephant-pants', 'flashlight', 'amulet'].includes(selectedKey);
           const isClothing = ['retro-sunglasses', 'elephant-pants'].includes(selectedKey);
           const isCurrentlyEquipped = equippedItems[selectedKey] === true;
 
