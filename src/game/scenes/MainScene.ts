@@ -1006,7 +1006,7 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.rareNodes.forEach((node) => {
-      const isCorrectArea = (node as any).area === this.currentArea;
+      const isCorrectArea = (node as unknown as { area?: string }).area === this.currentArea;
       const isGoldenHerbAtNight = node.itemKey !== 'golden-herb' || isNight;
       const isVisible = isCorrectArea && isGoldenHerbAtNight;
       node.sprite.setVisible(isVisible);
