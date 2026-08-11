@@ -351,7 +351,7 @@ export default function PlayPage({ params }: PlayPageProps) {
   }, [slug]);
 
   return (
-    <main className="relative flex h-screen w-screen items-center justify-center bg-black select-none">
+    <main className="relative flex h-[100dvh] w-screen items-center justify-center bg-black select-none overflow-hidden">
       {/* Full screen canvas container for native portrait/landscape resizing */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <PhaserGame slug={slug} />
@@ -496,7 +496,7 @@ export default function PlayPage({ params }: PlayPageProps) {
         {isMobile && slug === 'ghost-whisperer' && (
           <>
             {/* Virtual Joystick bottom-left */}
-            <div className="absolute bottom-16 left-6 z-40 select-none touch-none">
+            <div className="absolute bottom-28 left-6 z-40 select-none touch-none">
               <div 
                 ref={joystickRef}
                 onTouchStart={handleJoystickTouch}
@@ -527,7 +527,7 @@ export default function PlayPage({ params }: PlayPageProps) {
             </div>
 
             {/* Action button bottom-right */}
-            <div className="absolute bottom-16 right-6 z-40 select-none touch-none">
+            <div className="absolute bottom-28 right-6 z-40 select-none touch-none">
               <button
                 type="button"
                 onTouchStart={() => EventBus.emit('virtual-harvest', undefined)}
