@@ -426,7 +426,7 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
         {/* Import Share Code Form */}
         <div className="mt-4 flex-shrink-0 bg-stone-50 border border-stone-200 rounded-2xl p-4 text-left">
           <h4 className="text-[10px] font-black uppercase tracking-wider text-[#2D4B32] mb-1.5 flex items-center gap-1.5 select-none">
-            👥 รับบัฟแชร์จากการส่งรหัสการ์ดของเพื่อน (Enter Friend's Share Code)
+            👥 รับบัฟแชร์จากการส่งรหัสการ์ดของเพื่อน (Enter Friend&apos;s Share Code)
           </h4>
           <div className="flex gap-2">
             <input

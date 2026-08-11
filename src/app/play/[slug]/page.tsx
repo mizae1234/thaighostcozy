@@ -123,7 +123,7 @@ export default function PlayPage({ params }: PlayPageProps) {
     setVirtualKeys({ up: false, down: false, left: false, right: false });
   };
 
-  const handleJoystickMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleJoystickMouseDown = (_e: React.MouseEvent<HTMLDivElement>) => {
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!joystickRef.current) return;
       const rect = joystickRef.current.getBoundingClientRect();
@@ -542,12 +542,12 @@ export default function PlayPage({ params }: PlayPageProps) {
               {/* Story scroll description */}
               <div className="max-h-[220px] overflow-y-auto px-2 text-left space-y-4 mt-3 scrollbar-thin scrollbar-thumb-stone-200">
                 <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
-                  คุณได้รับจดหมายมรดกจาก <strong className="text-[#C96E3A] font-black">"ตาเดช"</strong> คุณตาผู้ล่วงลับ ทิ้งมรดกชิ้นสุดท้ายเป็นบ้านไม้และสวนกล้วยน้ำว้าโบราณในหมู่บ้านชนบทอันเงียบสงบ
+                  คุณได้รับจดหมายมรดกจาก <strong className="text-[#C96E3A] font-black">&ldquo;ตาเดช&rdquo;</strong> คุณตาผู้ล่วงลับ ทิ้งมรดกชิ้นสุดท้ายเป็นบ้านไม้และสวนกล้วยน้ำว้าโบราณในหมู่บ้านชนบทอันเงียบสงบ
                 </p>
                 <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
                   เมื่อคุณก้าวเท้าเข้าสู่หมู่บ้านนี้ กลับมีผู้ใหญ่บ้านเข้ามาทักทายพร้อมเอ่ยเตือนกฎเหล็กด้วยท่าทางมีพิรุธ: 
                   <span className="italic block mt-1 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl text-rose-800 font-extrabold text-xs md:text-sm">
-                    "หลังพระอาทิตย์ตกดิน... อย่าริอ่านก้าวเท้าออกจากบ้านสวนป่ากล้วยเด็ดขาด!"
+                    &ldquo;หลังพระอาทิตย์ตกดิน... อย่าริอ่านก้าวเท้าออกจากบ้านสวนป่ากล้วยเด็ดขาด!&rdquo;
                   </span>
                 </p>
                 <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">

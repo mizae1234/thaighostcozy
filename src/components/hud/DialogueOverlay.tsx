@@ -3,8 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useQuestStore } from '@/stores/useQuestStore';
 
+interface ChoiceOption {
+  key: string;
+  text: string;
+  cardKey: string;
+  cardName: string;
+  cardDesc: string;
+  itemReward?: string;
+}
+
 export default function DialogueOverlay() {
-  const [revealedChoice, setRevealedChoice] = useState<any>(null);
+  const [revealedChoice, setRevealedChoice] = useState<ChoiceOption | null>(null);
 
   const { 
     isDialogueActive, 

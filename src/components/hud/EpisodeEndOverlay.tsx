@@ -115,7 +115,7 @@ export default function EpisodeEndOverlay() {
             </div>
             <h3 className="relative z-10 text-lg font-bold text-yellow-400">รางวัล: แหวนวิเศษ</h3>
             <p className="relative z-10 text-xs text-slate-300 text-center max-w-md mt-1 italic">
-              "แหวนประหลาดที่ปลาบู่ทองทิ้งไว้ให้ ส่องแสงจางๆ เหมือนกำลังรอเวลาไขความลับใหญ่ที่ซ่อนอยู่อีกเกาะ"
+              &ldquo;แหวนประหลาดที่ปลาบู่ทองทิ้งไว้ให้ ส่องแสงจางๆ เหมือนกำลังรอเวลาไขความลับใหญ่ที่ซ่อนอยู่อีกเกาะ&rdquo;
             </p>
           </div>
         )}
