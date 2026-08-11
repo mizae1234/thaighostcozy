@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useParams } from 'next/navigation';
@@ -27,6 +27,7 @@ export default function StatsBar() {
   const level = Math.floor(currentStepIndex / 2) + 1;
 
   const quantities = useInventoryStore((state) => state.quantities);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const params = useParams();
   const slug = params?.slug;
@@ -41,6 +42,13 @@ export default function StatsBar() {
     }
   }, [nickname, setNickname]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 1024;
+      setIsCollapsed(isMobile);
+    }
+  }, []);
+
   const buttonLabel = isGhostMode 
     ? `🍵 ดื่มชาใบตอง (${coconutCount})` 
     : `🥥 กินมะพร้าว (${coconutCount})`;
@@ -51,7 +59,6 @@ export default function StatsBar() {
     const bananaCount = quantities['coconut'] ?? 0;
     const herbCount = quantities['night-herb'] ?? 0;
 
-    // 1. Critical Health
     if (health <= 30) {
       return {
         text: "🚨 พลังชีวิตวิกฤต! รีบกดกินอาหารฟื้นฟู หรือคราฟต์ไฟฉาย 🔦 เพื่อช่วยมองเห็นและหลบหลีกผีร้าย",
@@ -59,7 +66,6 @@ export default function StatsBar() {
       };
     }
 
-    // 2. Night Time Phase
     if (isNight) {
       if (!hasFlashlight) {
         return {
@@ -79,7 +85,6 @@ export default function StatsBar() {
       };
     }
 
-    // 3. Low Hunger / Thirst
     if (hunger <= 30 || thirst <= 30) {
       return {
         text: "🔋 พลังกายใกล้หมด! ไปร้านป้าศรีเพื่อซื้อ แว่น Y2K 🕶️ ช่วยชะลออัตราหิวลง 20% หรือกดดื่มชา/กินผลผลิตเติมพลัง",
@@ -87,7 +92,6 @@ export default function StatsBar() {
       };
     }
 
-    // 4. Low Coins but has sellable items
     if (coins < 50 && (bananaCount > 0 || herbCount > 0)) {
       return {
         text: "🪙 เงินเหรียญทองเหลือน้อย? นำกล้วยน้ำว้า 🍌 หรือว่านราตรี 🌿 ไปขายที่ร้านป้าศรีเพื่อแลกเป็นเงินทุน",
@@ -95,7 +99,6 @@ export default function StatsBar() {
       };
     }
 
-    // 5. Default cozy game advice
     return {
       text: "💡 เคล็ดลับมู: คราฟต์สิ่งก่อสร้างหรือซื้ออุปกรณ์แฟชั่นเพื่อรับความสามารถในการเดินทางและคุ้มครองถาวร!",
       color: "text-stone-800 bg-stone-50 border-stone-200"
@@ -106,9 +109,13 @@ export default function StatsBar() {
     <div className="pointer-events-auto absolute left-3 top-3 md:left-5 md:top-5 z-40 origin-top-left scale-[0.8] md:scale-100 flex items-start gap-3 select-none">
       
       {/* Left Column: Avatar & Coins */}
-      <div className="flex flex-col items-center gap-2">
-        {/* Avatar Frame with Level Badge */}
-        <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-yellow-100 border-4 border-white shadow-lg flex items-center justify-center overflow-visible">
+      <div className="flex flex-col items-center gap-1.5">
+        {/* Avatar Frame with Level Badge (Clickable to expand/collapse) */}
+        <div 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="relative w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-yellow-100 border-4 border-white shadow-lg flex items-center justify-center overflow-visible cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+          title="กดคลิกเพื่อเปิด/ปิดแผงสเตตัส"
+        >
           {/* Survivor Face Emoji */}
           <span className="text-3xl">🧑‍🌾</span>
           
@@ -123,58 +130,83 @@ export default function StatsBar() {
           <span>🪙</span>
           <span>{coins}</span>
         </div>
+
+        {/* Collapsed Compact Indicators for Mobile */}
+        {isCollapsed && (
+          <div className="flex flex-col gap-1 items-center mt-1 scale-90 w-full animate-fade-in">
+            <div className="flex items-center justify-center gap-1 bg-[#ffeded] border border-rose-250 px-2 py-0.5 rounded-full shadow-sm text-rose-700 text-[8px] font-black w-full max-w-[56px]">
+              <span>❤️</span>
+              <span>{Math.round(health)}</span>
+            </div>
+            <div className="flex items-center justify-center gap-1 bg-[#fff8eb] border border-amber-250 px-2 py-0.5 rounded-full shadow-sm text-amber-700 text-[8px] font-black w-full max-w-[56px]">
+              <span>🔋</span>
+              <span>{Math.round(hunger)}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Right Column: Profile Panel containing 3 stats bars */}
-      <div className="flex flex-col gap-2.5 rounded-2xl border-2 border-[#2D4B32]/10 bg-white/90 backdrop-blur-md p-3.5 shadow-xl w-52 md:w-56 text-stone-850">
-        {nickname && (
-          <div className="text-stone-800 text-[10px] font-black border-b border-stone-150 pb-1 mb-0.5 tracking-wider truncate text-left">
-            👤 ผู้รอดชีวิต: {nickname}
+      {!isCollapsed && (
+        <div className="flex flex-col gap-2.5 rounded-2xl border-2 border-[#2D4B32]/10 bg-white/90 backdrop-blur-md p-3.5 shadow-xl w-52 md:w-56 text-stone-850 animate-slide-up relative">
+          {/* Close button inside the card for mobile convenience */}
+          <button
+            type="button"
+            onClick={() => setIsCollapsed(true)}
+            className="absolute top-2 right-2 text-stone-400 hover:text-stone-600 block md:hidden text-xs p-1"
+          >
+            ✕
+          </button>
+
+          {nickname && (
+            <div className="text-stone-800 text-[10px] font-black border-b border-stone-150 pb-1 mb-0.5 tracking-wider truncate text-left pr-4">
+              👤 ผู้รอดชีวิต: {nickname}
+            </div>
+          )}
+          
+          <div className="flex flex-col gap-2">
+            <StatBar type="health" value={health} />
+            <StatBar type="hunger" value={hunger} />
+            <StatBar type="thirst" value={thirst} />
           </div>
-        )}
-        
-        <div className="flex flex-col gap-2">
-          <StatBar type="health" value={health} />
-          <StatBar type="hunger" value={hunger} />
-          <StatBar type="thirst" value={thirst} />
-        </div>
 
-        {/* Food Action Button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            eatCoconut();
-            e.currentTarget.blur();
-          }}
-          disabled={coconutCount <= 0}
-          className="mt-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#2D4B32] hover:bg-[#1E3322] disabled:bg-stone-150 disabled:text-stone-400 py-1.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm transition-colors active:scale-95"
-        >
-          {buttonLabel}
-        </button>
-
-        {isGhostMode && (
+          {/* Food Action Button */}
           <button
             type="button"
             onClick={(e) => {
-              EventBus.emit('toggle-camera-zoom', undefined);
+              eatCoconut();
               e.currentTarget.blur();
             }}
-            className="flex items-center justify-center gap-1 rounded-xl border border-stone-205 bg-[#FCFBF9] hover:bg-stone-100 py-1 text-[9px] font-black text-stone-750 shadow-sm transition-colors active:scale-95"
+            disabled={coconutCount <= 0}
+            className="mt-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#2D4B32] hover:bg-[#1E3322] disabled:bg-stone-150 disabled:text-stone-400 py-1.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm transition-colors active:scale-95"
           >
-            🔍 ซูมกล้อง (2 ระยะ)
+            {buttonLabel}
           </button>
-        )}
 
-        {/* Dynamic tutorial recommendation card */}
-        {(() => {
-          const advice = getCozyAdvice();
-          return (
-            <div className={`mt-2 p-2.5 rounded-xl border text-left text-[9px] leading-relaxed font-bold animate-fade-in shadow-inner ${advice.color}`}>
-              {advice.text}
-            </div>
-          );
-        })()}
-      </div>
+          {isGhostMode && (
+            <button
+              type="button"
+              onClick={(e) => {
+                EventBus.emit('toggle-camera-zoom', undefined);
+                e.currentTarget.blur();
+              }}
+              className="flex items-center justify-center gap-1 rounded-xl border border-stone-200 bg-[#FCFBF9] hover:bg-stone-100 py-1 text-[9px] font-black text-stone-750 shadow-sm transition-colors active:scale-95"
+            >
+              🔍 ซูมกล้อง (2 ระยะ)
+            </button>
+          )}
+
+          {/* Dynamic tutorial recommendation card */}
+          {(() => {
+            const advice = getCozyAdvice();
+            return (
+              <div className={`mt-2 p-2.5 rounded-xl border text-left text-[9px] leading-relaxed font-bold animate-fade-in shadow-inner ${advice.color}`}>
+                {advice.text}
+              </div>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 }
