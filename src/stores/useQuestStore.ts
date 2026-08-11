@@ -343,7 +343,7 @@ export const useQuestStore = create<QuestState>((set, get) => {
 
     checkObjectives: () => {
       const step = getActiveStep();
-      if (!step || get().isDialogueActive) return;
+      if (!step || get().isDialogueActive || !step.objectives || step.objectives.length === 0) return;
 
       const inventory = useInventoryStore.getState().quantities;
       const { reachedLocations, talkedNPCs, placedBuildings } = get();
