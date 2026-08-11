@@ -104,10 +104,15 @@ export default class Player {
     let vx = 0;
     let vy = 0;
 
-    const left = cursors.left.isDown || wasd.left.isDown;
-    const right = cursors.right.isDown || wasd.right.isDown;
-    const up = cursors.up.isDown || wasd.up.isDown;
-    const down = cursors.down.isDown || wasd.down.isDown;
+    const virtualLeft = this.sprite.scene.registry.get('virtual-left') === true;
+    const virtualRight = this.sprite.scene.registry.get('virtual-right') === true;
+    const virtualUp = this.sprite.scene.registry.get('virtual-up') === true;
+    const virtualDown = this.sprite.scene.registry.get('virtual-down') === true;
+
+    const left = cursors.left.isDown || wasd.left.isDown || virtualLeft;
+    const right = cursors.right.isDown || wasd.right.isDown || virtualRight;
+    const up = cursors.up.isDown || wasd.up.isDown || virtualUp;
+    const down = cursors.down.isDown || wasd.down.isDown || virtualDown;
 
     if (left) vx -= 1;
     if (right) vx += 1;

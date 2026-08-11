@@ -32,4 +32,5 @@ export type GameEvents = {
   'respawn-player': undefined | void;
   'toggle-camera-zoom': undefined | void;
   'quest-step-changed': { questKey: string | null; stepKey: string; stepIndex: number };
+  'virtual-harvest': undefined | void;
 };

@@ -41,13 +41,49 @@ export default function PlayPage({ params }: PlayPageProps) {
   const [showShop, setShowShop] = useState(false);
   const [showAd, setShowAd] = useState(false);
   const [showCardAlbum, setShowCardAlbum] = useState(false);
-  const [adRewardCoins, setAdRewardCoins] = useState(150);
-  
+  const { coins } = useInventoryStore();
+
   // Fainting Respawn States
   const [showFaintOverlay, setShowFaintOverlay] = useState(false);
   const [faintPenaltyText, setFaintPenaltyText] = useState('');
 
-  const { coins, addCoins } = useInventoryStore();
+  const [isMobile, setIsMobile] = useState(false);
+  const [showCraftModal, setShowCraftModal] = useState(false);
+  const [currentScene, setCurrentScene] = useState<unknown>(null);
+  const [virtualKeys, setVirtualKeys] = useState({
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ua = navigator.userAgent;
+      const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || window.innerWidth < 1024;
+      setIsMobile(mobileCheck);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleSceneReady = (scene: unknown) => {
+      setCurrentScene(scene);
+    };
+    EventBus.on('current-scene-ready', handleSceneReady);
+    return () => {
+      EventBus.off('current-scene-ready', handleSceneReady);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentScene && typeof currentScene === 'object' && 'registry' in currentScene) {
+      const reg = (currentScene as { registry: { set: (key: string, value: boolean) => void } }).registry;
+      reg.set('virtual-up', virtualKeys.up);
+      reg.set('virtual-down', virtualKeys.down);
+      reg.set('virtual-left', virtualKeys.left);
+      reg.set('virtual-right', virtualKeys.right);
+    }
+  }, [virtualKeys, currentScene]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -218,6 +254,16 @@ export default function PlayPage({ params }: PlayPageProps) {
                 🛒 ร้านค้า
               </button>
 
+              {/* Mobile Craft button */}
+              {isMobile && (
+                <button
+                  onClick={() => setShowCraftModal(true)}
+                  className="rounded-full border border-amber-500/30 bg-stone-900/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                >
+                  🛠️ คราฟต์
+                </button>
+              )}
+
               {/* Ad Reward Button */}
               <button
                 onClick={() => setShowAd(true)}
@@ -234,14 +280,89 @@ export default function PlayPage({ params }: PlayPageProps) {
         {showPass && <MuteluPassPanel onClose={() => setShowPass(false)} />}
         {showShop && <OfferingShopPanel onClose={() => setShowShop(false)} />}
         {showCardAlbum && <CardAlbumModal isOpen={showCardAlbum} onClose={() => setShowCardAlbum(false)} />}
+        {showCraftModal && <CraftPanel isModal onClose={() => setShowCraftModal(false)} />}
         {showAd && (
           <AdSimulatorModal 
-            rewardCoins={adRewardCoins} 
+            rewardCoins={150} 
             onRewardClaimed={() => {
               // Optional: show a mini toast on successful ad reward
             }} 
             onClose={() => setShowAd(false)} 
           />
+        )}
+
+        {/* Virtual Mobile Controls */}
+        {isMobile && slug === 'ghost-whisperer' && (
+          <>
+            {/* D-Pad bottom-left */}
+            <div className="absolute bottom-6 left-6 z-40 select-none touch-none">
+              <div className="relative w-36 h-36 bg-stone-950/50 border border-stone-800/40 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
+                {/* UP */}
+                <button
+                  type="button"
+                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, up: true }))}
+                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
+                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, up: true }))}
+                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
+                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
+                  className="absolute top-1 w-12 h-10 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-t-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
+                >
+                  ▲
+                </button>
+                {/* DOWN */}
+                <button
+                  type="button"
+                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, down: true }))}
+                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
+                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, down: true }))}
+                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
+                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
+                  className="absolute bottom-1 w-12 h-10 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-b-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
+                >
+                  ▼
+                </button>
+                {/* LEFT */}
+                <button
+                  type="button"
+                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, left: true }))}
+                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
+                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, left: true }))}
+                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
+                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
+                  className="absolute left-1 w-10 h-12 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-l-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
+                >
+                  ◀
+                </button>
+                {/* RIGHT */}
+                <button
+                  type="button"
+                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, right: true }))}
+                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
+                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, right: true }))}
+                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
+                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
+                  className="absolute right-1 w-10 h-12 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-r-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
+                >
+                  ▶
+                </button>
+                {/* CENTER DECORATION */}
+                <div className="w-10 h-10 bg-amber-500/10 rounded-full border border-amber-500/5 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Action button bottom-right */}
+            <div className="absolute bottom-6 right-6 z-40 select-none touch-none">
+              <button
+                type="button"
+                onTouchStart={() => EventBus.emit('virtual-harvest', undefined)}
+                onMouseDown={() => EventBus.emit('virtual-harvest', undefined)}
+                className="w-20 h-20 bg-gradient-to-r from-amber-500 via-yellow-450 to-amber-500 active:scale-90 border-2 border-amber-400/50 rounded-full flex flex-col items-center justify-center text-black font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all"
+              >
+                <span className="text-xl">✨</span>
+                <span>ACTION</span>
+              </button>
+            </div>
+          </>
         )}
 
       </div>

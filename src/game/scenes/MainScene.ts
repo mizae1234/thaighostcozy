@@ -132,11 +132,17 @@ export default class MainScene extends Phaser.Scene {
     };
     EventBus.on('toggle-camera-zoom', handleToggleZoom);
 
+    const handleVirtualHarvest = () => {
+      this.tryHarvest(true);
+    };
+    EventBus.on('virtual-harvest', handleVirtualHarvest);
+
     this.events.once('shutdown', () => {
       EventBus.off('building-placed', handleBuildingPlaced);
       EventBus.off('quest-step-changed', handleQuestStepChanged);
       EventBus.off('respawn-player', handleRespawn);
       EventBus.off('toggle-camera-zoom', handleToggleZoom);
+      EventBus.off('virtual-harvest', handleVirtualHarvest);
     });
 
     // Run once on load to spawn entities for current active step
@@ -383,8 +389,8 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  private tryHarvest() {
-    if (!Phaser.Input.Keyboard.JustDown(this.harvestKey)) return;
+  private tryHarvest(force = false) {
+    if (!force && !Phaser.Input.Keyboard.JustDown(this.harvestKey)) return;
 
     const now = this.time.now;
     const playerBounds = this.player.sprite.getBounds();
