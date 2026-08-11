@@ -56,6 +56,34 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
   const [summonedGhost, setSummonedGhost] = useState<GhostData | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+
+  const handleShare = async (ghost: GhostData) => {
+    const shareText = `ฉันสุ่มอัญเชิญ "${ghost.name}" (${ghost.rarity} Companion) ได้ในตู้สุ่มอาร์ตทอยสายมู! 🔮\n${ghost.buff}\n\nมาช่วยกันเฝ้าสวนกล้วยและสู้ผีวิญญาณป่ากล้วยไปด้วยกันใน Thai Folklore Survival!`;
+    const shareUrl = typeof window !== 'undefined' ? window.location.origin + '/play/ghost-whisperer' : 'https://game.technomand-ai.cloud/play/ghost-whisperer';
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'อัญเชิญวิญญาณคู่หูสำเร็จ!',
+          text: shareText,
+          url: shareUrl,
+        });
+        setShareStatus('แชร์สำเร็จ! 🎉');
+        setTimeout(() => setShareStatus(null), 2000);
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\nลิงก์เล่นเกม: ${shareUrl}`);
+        setShareStatus('คัดลอกลิงก์แชร์แล้ว! 📋');
+        setTimeout(() => setShareStatus(null), 2000);
+      } catch (err) {
+        console.error('Failed to copy text:', err);
+      }
+    }
+  };
 
   const handleRoll = () => {
     if (isRolling) return;
@@ -158,14 +186,23 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
               </div>
 
               {/* Rarity and name banner */}
-              <div className="text-center mt-2">
+              <div className="text-center mt-2 flex flex-col items-center">
                 <span className={`inline-block rounded-full border px-3 py-0.5 text-[10px] font-extrabold tracking-wider ${summonedGhost.rarityColor} mb-1`}>
                   {summonedGhost.rarity} Companion
                 </span>
                 <h3 className="text-lg font-black text-[#2D4B32]">{summonedGhost.name}</h3>
-                <p className="mt-1 text-xs text-stone-600 max-w-xs font-bold leading-relaxed">
+                <p className="mt-1 text-xs text-stone-600 max-w-xs font-bold leading-relaxed mb-3">
                   {summonedGhost.buff}
                 </p>
+                
+                {/* Share Button */}
+                <button
+                  type="button"
+                  onClick={() => handleShare(summonedGhost)}
+                  className="px-4 py-1.5 rounded-full bg-[#C96E3A] hover:bg-[#b35e2e] text-white text-[9px] font-black tracking-wider uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  📢 {shareStatus || 'แชร์อวดเพื่อน (Share)'}
+                </button>
               </div>
             </div>
           ) : (

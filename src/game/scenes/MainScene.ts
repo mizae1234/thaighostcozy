@@ -72,6 +72,7 @@ export default class MainScene extends Phaser.Scene {
   private harvestKey!: Phaser.Input.Keyboard.Key;
   private resourceNodes: ResourceNode[] = [];
   private questNodes: ResourceNode[] = [];
+  private rareNodes: ResourceNode[] = [];
   private goldenGobySprite: Phaser.GameObjects.Image | null = null;
   private shopBuilding: Phaser.GameObjects.Image | null = null;
   private currentStepKey: string | null = null;
@@ -101,6 +102,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundImage = this.add.image(0, 0, 'island-background').setOrigin(0, 0).setDisplaySize(WORLD_WIDTH, WORLD_HEIGHT);
     this.spawnResourceNodes();
+    this.spawnRareDrops();
 
     const slug = this.registry.get('storySlug') || 'pla-boo-thong';
     const isGhostMode = slug === 'ghost-whisperer';
@@ -455,6 +457,22 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
+    // 3.5. Check rare ground drops
+    const closeRareNode = this.rareNodes.find(
+      (node) =>
+        node.canHarvest(now) &&
+        node.sprite.visible &&
+        Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, node.sprite.getBounds()),
+    );
+
+    if (closeRareNode) {
+      const itemData = useContentStore.getState().getItem(closeRareNode.itemKey);
+      const thaiName = itemData?.name || 'ไอเทมหายาก';
+      const promptText = closeRareNode.itemKey === 'coin-sack' ? `เปิด ${thaiName}` : `เก็บ ${thaiName}`;
+      useInteractionStore.getState().setPrompt(promptText, 'harvest');
+      return;
+    }
+
     // 4. Check normal resource nodes
     const closeNode = this.resourceNodes.find(
       (node) =>
@@ -482,6 +500,25 @@ export default class MainScene extends Phaser.Scene {
       const ry = y + (Math.random() - 0.5) * 120;
       return new ResourceNode(this, rx, ry, texture, itemKey);
     });
+  }
+
+  private spawnRareDrops() {
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    if (slug !== 'ghost-whisperer') return;
+
+    this.rareNodes = [
+      // Orchard Map Drops (Chest and Golden Tani Herb)
+      Object.assign(new ResourceNode(this, 940, 250, 'prop-grandpa-box', 'coin-sack'), { area: 'orchard' }),
+      Object.assign(new ResourceNode(this, 740, 480, 'prop-flower', 'golden-herb'), { area: 'orchard' }),
+
+      // Temple Map Drops (Sacred Amulet and Chest)
+      Object.assign(new ResourceNode(this, 220, 280, 'prop-shell', 'sacred-amulet'), { area: 'temple' }),
+      Object.assign(new ResourceNode(this, 960, 480, 'prop-grandpa-box', 'coin-sack'), { area: 'temple' }),
+
+      // Market Map Drops (Chests)
+      Object.assign(new ResourceNode(this, 420, 220, 'prop-grandpa-box', 'coin-sack'), { area: 'market' }),
+      Object.assign(new ResourceNode(this, 880, 520, 'prop-grandpa-box', 'coin-sack'), { area: 'market' }),
+    ];
   }
 
   private onQuestStepChanged(stepKey: string) {
@@ -826,6 +863,31 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
+    // 2.5. Check rare node harvesting
+    const rareNode = this.rareNodes.find(
+      (candidate) =>
+        candidate.canHarvest(now) &&
+        candidate.sprite.visible &&
+        Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, candidate.sprite.getBounds()),
+    );
+
+    if (rareNode) {
+      rareNode.harvest(now);
+      useInventoryStore.getState().add(rareNode.itemKey, rareNode.yieldAmount);
+      
+      const itemData = useContentStore.getState().getItem(rareNode.itemKey);
+      const thaiName = itemData?.name || 'ไอเทมหายาก';
+      const toastText = rareNode.itemKey === 'coin-sack' ? `ได้รับ ${thaiName} ใส่กระเป๋าแล้ว! 🎒` : `ได้รับ ${thaiName} ใส่กระเป๋าแล้ว! 🎒`;
+      
+      useInteractionStore.getState().setPrompt(toastText, 'info');
+      setTimeout(() => {
+        useInteractionStore.getState().setPrompt(null);
+      }, 2000);
+
+      usePlayerStatsStore.getState().deductOnAction(5, 5);
+      return;
+    }
+
     // 3. Last, check normal node harvesting
     const node = this.resourceNodes.find(
       (candidate) =>
@@ -940,6 +1002,16 @@ export default class MainScene extends Phaser.Scene {
       node.sprite.setVisible(showResources);
       if (node.shadow) {
         node.shadow.setVisible(showResources);
+      }
+    });
+
+    this.rareNodes.forEach((node) => {
+      const isCorrectArea = (node as any).area === this.currentArea;
+      const isGoldenHerbAtNight = node.itemKey !== 'golden-herb' || isNight;
+      const isVisible = isCorrectArea && isGoldenHerbAtNight;
+      node.sprite.setVisible(isVisible);
+      if (node.shadow) {
+        node.shadow.setVisible(isVisible);
       }
     });
 
