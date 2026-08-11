@@ -23,6 +23,8 @@ import MuteluPassPanel from '@/components/hud/MuteluPassPanel';
 import OfferingShopPanel from '@/components/hud/OfferingShopPanel';
 import AdSimulatorModal from '@/components/hud/AdSimulatorModal';
 import CardAlbumModal from '@/components/hud/CardAlbumModal';
+import SiansiModal from '@/components/hud/SiansiModal';
+import LottoModal from '@/components/hud/LottoModal';
 
 const PhaserGame = dynamic(() => import('@/game/PhaserGame'), { ssr: false });
 
@@ -41,6 +43,15 @@ export default function PlayPage({ params }: PlayPageProps) {
   const [showShop, setShowShop] = useState(false);
   const [showAd, setShowAd] = useState(false);
   const [showCardAlbum, setShowCardAlbum] = useState(false);
+  const [showSiansi, setShowSiansi] = useState(false);
+  const [showLotto, setShowLotto] = useState(false);
+  const [lottoDrawResult, setLottoDrawResult] = useState<{
+    drawn: boolean;
+    won: boolean;
+    ticket: string;
+    winningNumber: string;
+    prize: number;
+  } | null>(null);
   const { coins } = useInventoryStore();
 
   // Tutorial Alert States
@@ -68,6 +79,41 @@ export default function PlayPage({ params }: PlayPageProps) {
       setShowPrologue(true);
     }
   }, [slug, currentStepIndex]);
+
+  // Lottery result check on wakeup (when currentStepIndex updates)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const currentStep = useQuestStore.getState().quests[0]?.steps[currentStepIndex];
+    if (currentStep && currentStep.phase === 'DAY') {
+      const ticket = localStorage.getItem('thaighost_lotto_ticket');
+      const boughtDay = localStorage.getItem('thaighost_lotto_bought_day');
+
+      if (ticket && boughtDay) {
+        // If it was bought on a previous step day index, draw!
+        if (boughtDay !== String(currentStepIndex)) {
+          const winningNumber = String(Math.floor(Math.random() * 105) % 100).padStart(2, '0');
+          const won = ticket === winningNumber;
+          const prize = 1000;
+
+          if (won) {
+            useInventoryStore.getState().addCoins(prize);
+          }
+
+          setLottoDrawResult({
+            drawn: true,
+            won,
+            ticket,
+            winningNumber,
+            prize
+          });
+
+          localStorage.removeItem('thaighost_lotto_ticket');
+          localStorage.removeItem('thaighost_lotto_bought_day');
+        }
+      }
+    }
+  }, [currentStepIndex]);
 
   // Fainting Respawn States
   const [showFaintOverlay, setShowFaintOverlay] = useState(false);
@@ -241,10 +287,20 @@ export default function PlayPage({ params }: PlayPageProps) {
       setShowShop(true);
     };
 
+    const handleOpenSiansi = () => {
+      setShowSiansi(true);
+    };
+
+    const handleOpenLotto = () => {
+      setShowLotto(true);
+    };
+
     EventBus.on('player-moved', handlePlayerMoved);
     EventBus.on('resource-collected', handleResourceCollected);
     EventBus.on('building-placed', handleBuildingPlaced);
     EventBus.on('open-shop-ui', handleOpenShop);
+    EventBus.on('open-siansi-ui', handleOpenSiansi);
+    EventBus.on('open-lotto-ui', handleOpenLotto);
 
     const decayInterval = setInterval(() => {
       if (!useQuestStore.getState().isDialogueActive && !useQuestStore.getState().isEpisodeEnd) {
@@ -288,20 +344,20 @@ export default function PlayPage({ params }: PlayPageProps) {
       EventBus.off('resource-collected', handleResourceCollected);
       EventBus.off('building-placed', handleBuildingPlaced);
       EventBus.off('open-shop-ui', handleOpenShop);
+      EventBus.off('open-siansi-ui', handleOpenSiansi);
+      EventBus.off('open-lotto-ui', handleOpenLotto);
       clearInterval(decayInterval);
     };
   }, [slug]);
 
   return (
-    <main className="flex h-screen w-screen items-center justify-center bg-black select-none">
-      {/* Locked to the game's 16:9 base resolution so HUD margins stay
-          correct relative to the visible canvas */}
-      <div
-        className="relative aspect-video h-full max-h-full w-full max-w-full overflow-hidden"
-        style={{ maxWidth: 'min(100%, calc(100vh * 16 / 9))', maxHeight: 'min(100%, calc(100vw * 9 / 16))' }}
-      >
+    <main className="relative flex h-screen w-screen items-center justify-center bg-black select-none">
+      {/* Full screen canvas container for native portrait/landscape resizing */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
         <PhaserGame slug={slug} />
-        <StatsBar />
+      </div>
+
+      <StatsBar />
         <InventoryPanel />
         <CraftPanel />
         <QuestTracker />
@@ -504,8 +560,6 @@ export default function PlayPage({ params }: PlayPageProps) {
           </div>
         )}
 
-      </div>
-
       {/* Global Overlays & Dialogue */}
       <DialogueOverlay />
       <EpisodeEndOverlay />
@@ -516,6 +570,8 @@ export default function PlayPage({ params }: PlayPageProps) {
       {showShop && <OfferingShopPanel onClose={() => setShowShop(false)} />}
       {showCardAlbum && <CardAlbumModal isOpen={showCardAlbum} onClose={() => setShowCardAlbum(false)} />}
       {showCraftModal && <CraftPanel isModal onClose={() => setShowCraftModal(false)} />}
+      {showSiansi && <SiansiModal isOpen={showSiansi} onClose={() => setShowSiansi(false)} />}
+      {showLotto && <LottoModal isOpen={showLotto} onClose={() => setShowLotto(false)} />}
       {showAd && (
         <AdSimulatorModal 
           rewardCoins={150} 
@@ -524,6 +580,52 @@ export default function PlayPage({ params }: PlayPageProps) {
           }} 
           onClose={() => setShowAd(false)} 
         />
+      )}
+
+      {/* Lotto Draw Result Overlay */}
+      {lottoDrawResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 select-none pointer-events-auto">
+          <div className="bg-[#1C2E21] border border-amber-500 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <div className="absolute inset-1.5 rounded-[22px] border border-amber-500/10 pointer-events-none" />
+            <div className="text-5xl mb-4">
+              {lottoDrawResult.won ? '🎉' : '💸'}
+            </div>
+            
+            <h3 className="text-sm font-black text-amber-400 mb-2 uppercase tracking-wide">
+              {lottoDrawResult.won ? 'ยินดีด้วย! คุณถูกสลากเลขเด็ด!' : 'สลากกินแบ่งออกแล้ว!'}
+            </h3>
+
+            <div className="bg-[#2D4B32]/30 border border-[#2D4B32]/50 rounded-2xl p-4 my-4 flex flex-col gap-2">
+              <div className="flex justify-between text-xs text-stone-300 font-bold">
+                <span>หมายเลขที่คุณซื้อ:</span>
+                <span className="font-extrabold text-amber-300">{lottoDrawResult.ticket}</span>
+              </div>
+              <div className="flex justify-between text-xs text-stone-300 font-bold">
+                <span>ผลรางวัลที่ออก:</span>
+                <span className="font-extrabold text-amber-350">{lottoDrawResult.winningNumber}</span>
+              </div>
+              {lottoDrawResult.won && (
+                <div className="flex justify-between text-xs text-stone-300 font-bold border-t border-[#2D4B32]/30 pt-2 mt-1">
+                  <span>เงินรางวัลแจ็กพอต:</span>
+                  <span className="font-black text-yellow-400">+{lottoDrawResult.prize} 🪙</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-[11px] text-stone-400 leading-relaxed font-bold mb-5">
+              {lottoDrawResult.won 
+                ? 'โชคหล่นทับเข้าข้างคนมูเตลู! ได้รับ 1,000 เหรียญมูเตลูเข้ากระเป๋าสำเร็จ' 
+                : 'งวดนี้ยังไม่ถูกรางวัล ไม่เป็นไร แวะไปสอยเลขใหม่จากแผงตลาดสดได้เสมอนะครับ!'}
+            </p>
+
+            <button
+              onClick={() => setLottoDrawResult(null)}
+              className="w-full rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 py-3 text-xs font-black uppercase tracking-widest text-black shadow-md transition-all active:scale-95"
+            >
+              ปิดหน้าจอ
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Story Prologue Intro Overlay */}

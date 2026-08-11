@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useInventoryStore } from './useInventoryStore';
+import { usePlayerStatsStore } from './usePlayerStatsStore';
 import { EventBus } from '@/game/EventBus';
 import type { DialogueLine, QuestContent, QuestStepContent } from '@/lib/content/types';
 
@@ -29,6 +30,7 @@ interface QuestState {
   startQuest: (questKey: string) => void;
   nextDialogue: () => void;
   selectChoice: (choiceKey: string) => void;
+  openSleepChoices: () => void;
   
   // Triggers for external actions
   triggerLocationReached: (locationKey: string) => void;
@@ -150,12 +152,32 @@ export const useQuestStore = create<QuestState>((set, get) => {
         // Dialogue completed!
         const step = getActiveStep();
         if (step && step.choices && step.choices.length > 0) {
-          set({ showChoices: true });
+          // If it is a NIGHT step, do not open choices immediately!
+          // Let the player play the night gameplay first.
+          if (step.phase === 'NIGHT') {
+            set({ isDialogueActive: false, dialogueLines: [], dialogueIndex: 0, showChoices: false });
+          } else {
+            set({ showChoices: true });
+          }
         } else {
+          const previousLines = get().dialogueLines;
           set({ isDialogueActive: false, dialogueLines: [], dialogueIndex: 0 });
+          
+          // Trigger Shop Overlay after Vendor NPC dialogue completes
+          if (previousLines.some(line => line.speaker === "แม่ค้าตลาด")) {
+            EventBus.emit('open-shop-ui', undefined);
+          }
+
           // Check if we met the objectives already (e.g. if the dialogue completion makes us advance)
           get().checkObjectives();
         }
+      }
+    },
+
+    openSleepChoices: () => {
+      const step = getActiveStep();
+      if (step && step.choices && step.choices.length > 0) {
+        set({ showChoices: true, isDialogueActive: true });
       }
     },
 
@@ -230,6 +252,22 @@ export const useQuestStore = create<QuestState>((set, get) => {
               { speaker: "ผู้ใหญ่บ้านลุงแดง", thai: "ช่วงนี้หมู่บ้านเรามีเรื่องแปลกๆ บ่อย ดูแลตัวเองด้วยนะหลานตาเดช" }
             ];
           }
+        } else if (npcKey === 'monk') {
+          customLines = [
+            { speaker: "หลวงพี่", thai: "เจริญพรโยม... ลานวัดนี้สงบร่มเย็นเสมอ หากจิตใจเหน็ดเหนื่อยหรือเหนื่อยล้า ก็แวะมาเสี่ยงเซียมซีใต้ร่มโพธิ์ได้นะ" },
+            { speaker: "หลวงพี่", thai: "สติและความไม่ประมาทจะเป็นเครื่องคุ้มครองโยมในยามราตรี... หลวงพี่มอบยันต์คุ้มภัยและน้ำมนต์นี้ให้โยมคุ้มครองตัวเถิด" }
+          ];
+          // Restore health and thirst
+          usePlayerStatsStore.setState((_state) => ({
+            thirst: 100,
+            health: 100
+          }));
+          // Give 1 free protective amulet
+          useInventoryStore.getState().add('amulet', 1);
+        } else if (npcKey === 'vendor') {
+          customLines = [
+            { speaker: "แม่ค้าตลาด", thai: "ยินดีต้อนรับสู่ตลาดจ้าหลานตาเดช! สนใจเอาผลผลิตกล้วยน้ำว้ามาแลกเหรียญมู หรือซื้อหาเครื่องรางของชำไปใช้ไหมจ๊ะ?" }
+          ];
         } else if (npcKey === 'golden-goby') { // Nang Tani
           if (step.key === 'day3-lockbox') {
             const hairClipsCount = useInventoryStore.getState().quantities['fallen-fruit'] || 0;
@@ -339,7 +377,7 @@ export const useQuestStore = create<QuestState>((set, get) => {
           const currentQty = getEffectiveQty(obj.targetKey);
           if (currentQty < requiredQty) allMet = false;
         } else if (obj.type === 'CRAFT') {
-          const currentQty = placedBuildings[obj.targetKey] || 0;
+          const currentQty = (inventory[obj.targetKey] ?? 0) + (placedBuildings[obj.targetKey] ?? 0);
           if (currentQty < requiredQty) allMet = false;
         } else if (obj.type === 'REACH_LOCATION') {
           if (!reachedLocations[obj.targetKey]) allMet = false;

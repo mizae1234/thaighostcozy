@@ -9,11 +9,15 @@ export default class ResourceNode {
   readonly shadow: Phaser.GameObjects.Image;
   readonly itemKey: string;
   readonly yieldAmount: number;
+  readonly originalX: number;
+  readonly originalY: number;
   private lastHarvestedAt = -Infinity;
 
   constructor(scene: Phaser.Scene, x: number, y: number, textureKey: string, itemKey: string, yieldAmount = 1) {
     this.itemKey = itemKey;
     this.yieldAmount = yieldAmount;
+    this.originalX = x;
+    this.originalY = y;
 
     // Add a contact shadow beneath the resource to anchor it to the ground
     const shadowY = y + 16;
@@ -82,7 +86,29 @@ export default class ResourceNode {
 
   canHarvest(now: number): boolean {
     const ready = now - this.lastHarvestedAt >= HARVEST_COOLDOWN_MS;
-    if (ready) {
+    if (ready && this.sprite.alpha === 0.0) {
+      // Randomize position within a safe jitter radius around its original spot
+      const rx = this.originalX + (Math.random() - 0.5) * 120;
+      const ry = this.originalY + (Math.random() - 0.5) * 120;
+      
+      this.sprite.setPosition(rx, ry);
+      
+      // Fine-tune shadow Y based on item type (matching constructor logic)
+      let shadowY = ry + 16;
+      if (this.itemKey === 'coconut') {
+        shadowY = ry + 40;
+      } else if (this.itemKey === 'wood') {
+        shadowY = ry + 10;
+      } else if (this.itemKey === 'stone') {
+        shadowY = ry + 12;
+      } else if (this.itemKey === 'fallen-fruit' || this.itemKey === 'sacred-flower' || this.itemKey === 'pearl-shell') {
+        shadowY = ry + 4;
+      } else if (this.itemKey === 'sandalwood') {
+        shadowY = ry + 10;
+      }
+      
+      this.shadow.setPosition(rx, shadowY);
+
       this.sprite.setAlpha(1.0);
       this.shadow.setAlpha(1.0);
     }
@@ -91,7 +117,7 @@ export default class ResourceNode {
 
   harvest(now: number) {
     this.lastHarvestedAt = now;
-    this.sprite.setAlpha(0.3);
-    this.shadow.setAlpha(0.1);
+    this.sprite.setAlpha(0.0); // Hide completely on cooldown
+    this.shadow.setAlpha(0.0);
   }
 }

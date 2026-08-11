@@ -9,12 +9,12 @@ export function createGameConfig(parentId: string): Phaser.Types.Core.GameConfig
   return {
     type: Phaser.AUTO,
     parent: parentId,
-    width: WORLD_WIDTH,
-    height: WORLD_HEIGHT,
+    width: '100%',
+    height: '100%',
     backgroundColor: '#1c4d6b',
     pixelArt: true,
     scale: {
-      mode: Phaser.Scale.FIT,
+      mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     physics: {

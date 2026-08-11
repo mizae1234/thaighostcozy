@@ -15,6 +15,7 @@ const TEXTURE_BY_DIRECTION: Record<Direction, string> = {
 export default class Player {
   readonly sprite: Phaser.Physics.Arcade.Sprite;
   private readonly shadow: Phaser.GameObjects.Image;
+  private warningBubble: Phaser.GameObjects.Text | null = null;
   direction: Direction = 'down';
   isMoving = false;
 
@@ -73,10 +74,23 @@ export default class Player {
       frameRate: 6,
       repeat: -1
     });
+
+    // Create low energy warning bubble
+    this.warningBubble = scene.add.text(x, y - 45, '⚠️ พลังจะหมด!', {
+      fontFamily: 'Inter, Arial, sans-serif',
+      fontSize: '24px',
+      fontStyle: 'bold',
+      color: '#ffdd55', // Nice alert gold/yellow
+    }).setOrigin(0.5).setDepth(3000).setVisible(false);
+    this.warningBubble.setStroke('#000000', 6); // Thick retro outline
+    this.warningBubble.setScale(0.5); // Downscale for crispness on high-dpi mobile screens
   }
 
   private updateShadowPosition() {
     this.shadow.setPosition(this.sprite.x, this.sprite.y + this.sprite.displayHeight * 0.36);
+    if (this.warningBubble) {
+      this.warningBubble.setPosition(this.sprite.x, this.sprite.y - this.sprite.displayHeight * 0.5 - 12);
+    }
   }
 
   update(
@@ -85,7 +99,8 @@ export default class Player {
     isDialogueActive: boolean,
     isEpisodeEnd: boolean,
     isStarving: boolean,
-    speedMultiplier = 1.0
+    speedMultiplier = 1.0,
+    warningText: string | null = null
   ) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
@@ -175,6 +190,23 @@ export default class Player {
 
     this.isMoving = moving;
     this.updateShadowPosition();
+
+
+
+    if (this.warningBubble) {
+      if (warningText && !isEpisodeEnd) {
+        this.warningBubble.setText(warningText);
+        this.warningBubble.setVisible(true);
+        // Floating/bobbing warning bubble
+        const bob = Math.sin(this.sprite.scene.time.now / 150) * 3;
+        this.warningBubble.setPosition(
+          this.sprite.x,
+          this.sprite.y - this.sprite.displayHeight * 0.5 - 12 + bob
+        );
+      } else {
+        this.warningBubble.setVisible(false);
+      }
+    }
   }
 
   get position() {

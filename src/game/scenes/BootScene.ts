@@ -61,9 +61,19 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('golden-goby', `${npcBase}/golden-goby.png`);
     if (slug === 'ghost-whisperer') {
       this.load.image('island-background-night', `${tilesBase}/island-background-night.png`);
+      this.load.image('temple-background', `${tilesBase}/temple-background.png`);
+      this.load.image('temple-background-night', `${tilesBase}/temple-background-night.png`);
+      this.load.image('market-background', `${tilesBase}/market-background.png`);
+      this.load.image('market-background-night', `${tilesBase}/market-background-night.png`);
+      this.load.image('prop-siansi', `${tilesBase}/prop-siansi.png`);
+      this.load.image('npc-lotto-vendor', `${npcBase}/npc-lotto-vendor.png`);
+      this.load.image('npc-monk-down', `${npcBase}/npc-monk-down.png`);
+      this.load.image('npc-vendor-down', `${npcBase}/npc-vendor-down.png`);
       this.load.image('npc-chief-down', `${npcBase}/npc-chief-down.png`);
       this.load.image('npc-chief-walk1', `${npcBase}/npc-chief-walk1.png`);
       this.load.image('npc-tani-angry', `${npcBase}/npc-tani-angry.png`);
+      this.load.image('prop-night-herb', `${tilesBase}/prop-night-herb.png`);
+      this.load.image('npc-shadow-spirit', `${npcBase}/npc-shadow-spirit.png`);
     }
   }
 

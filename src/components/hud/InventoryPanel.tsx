@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { useContentStore } from '@/stores/useContentStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import PanelFrame from './PanelFrame';
@@ -8,13 +9,35 @@ export default function InventoryPanel() {
   const quantities = useInventoryStore((state) => state.quantities);
   const getItem = useContentStore((state) => state.getItem);
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 1024;
+      setIsCollapsed(isMobile);
+    }
+  }, []);
+
   const entries = Object.entries(quantities).filter(([, qty]) => qty > 0);
 
+  if (isCollapsed) {
+    return (
+      <div className="pointer-events-auto absolute right-2 top-[48px] md:top-[68px] z-40 origin-top-right scale-[0.75] md:scale-100 select-none">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="bg-[#2D4B32] hover:bg-[#1E3322] border border-[#2D4B32]/30 rounded-full px-4 py-2 text-xs font-black text-white shadow-lg flex items-center gap-1.5 active:scale-95 transition-all"
+        >
+          🎒 <span>กระเป๋า ({entries.length})</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="pointer-events-auto absolute right-2 top-[55px] md:right-5 md:top-20 w-64 md:w-72 origin-top-right scale-[0.65] md:scale-100">
-      <PanelFrame title="กระเป๋า">
+    <div className="pointer-events-auto absolute right-2 top-[48px] md:right-5 md:top-20 w-64 md:w-72 origin-top-right scale-[0.65] md:scale-100 z-40">
+      <PanelFrame title="กระเป๋า" onClose={() => setIsCollapsed(true)}>
         {entries.length === 0 && <div className="text-xs text-stone-400">ว่างเปล่า</div>}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
           {entries.map(([itemKey, qty]) => (
             <div
               key={itemKey}

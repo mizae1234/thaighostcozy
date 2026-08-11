@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { useQuestStore } from '@/stores/useQuestStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useContentStore } from '@/stores/useContentStore';
@@ -24,6 +25,15 @@ const PLA_BOO_HINTS: Record<string, string> = {
 export default function QuestTracker() {
   const { currentQuestKey, currentStepIndex, quests, reachedLocations, talkedNPCs, placedBuildings, isEpisodeEnd, showChoices } = useQuestStore();
   const { quantities: inventory } = useInventoryStore();
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 1024;
+      setIsCollapsed(isMobile);
+    }
+  }, []);
 
   if (isEpisodeEnd || !currentQuestKey || quests.length === 0) return null;
 
@@ -51,8 +61,27 @@ export default function QuestTracker() {
     ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' 
     : 'bg-purple-500/20 text-purple-300 border-purple-500/30';
 
+  if (isCollapsed) {
+    return (
+      <div className="pointer-events-auto absolute left-2 top-[110px] md:top-[160px] z-40 origin-top-left scale-[0.75] md:scale-100 select-none">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="bg-[#5c3a2a]/95 hover:bg-[#482c1f] border border-[#C96E3A]/45 rounded-full px-4 py-2 text-xs font-black text-[#FCFBF9] shadow-lg flex items-center gap-1.5 active:scale-95 transition-all"
+        >
+          📌 <span>เควสต์</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="absolute left-2 top-[125px] md:left-5 md:top-[245px] z-40 w-64 rounded-xl bg-[#5c3a2a]/95 p-4 text-white shadow-xl backdrop-blur-sm transition-all md:w-72 border border-[#C96E3A]/20 select-none origin-top-left scale-[0.65] md:scale-100">
+    <div className="absolute left-2 top-[110px] md:left-5 md:top-[245px] z-40 w-64 rounded-xl bg-[#5c3a2a]/95 p-4 text-white shadow-xl backdrop-blur-sm transition-all md:w-72 border border-[#C96E3A]/20 select-none origin-top-left scale-[0.65] md:scale-100">
+      <button
+        onClick={() => setIsCollapsed(true)}
+        className="absolute top-2 right-2 text-[#FCFBF9]/60 hover:text-white font-bold text-[9px] p-1 select-none pointer-events-auto"
+      >
+        ➖ ซ่อน
+      </button>
       {/* Header */}
       <div className="mb-2.5 border-b border-[#C96E3A]/20 pb-2 flex flex-col gap-1.5">
         <div className="flex items-center justify-between">

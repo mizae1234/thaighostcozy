@@ -71,17 +71,45 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
 
     setIsRolling(true);
 
-    // Roll logic (probability weights: R=45%, SR=30%, SSR=20%, UR=5%)
-    const rand = Math.random() * 100;
+    // Roll logic with duplicate protection:
+    const lockedGhosts = GHOSTS.filter(g => !unlockedGhosts.includes(g.key));
+    
     let chosen: GhostData;
-    if (rand < 5) {
-      chosen = GHOSTS[3]; // UR Naga
-    } else if (rand < 25) {
-      chosen = GHOSTS[0]; // SSR Tani
-    } else if (rand < 55) {
-      chosen = GHOSTS[1]; // SR Kuman
+    if (lockedGhosts.length > 0) {
+      // Prioritize locked ghosts to prevent duplicates
+      const totalWeight = lockedGhosts.reduce((sum, g) => {
+        if (g.rarity === 'UR') return sum + 5;
+        if (g.rarity === 'SSR') return sum + 20;
+        if (g.rarity === 'SR') return sum + 30;
+        return sum + 45;
+      }, 0);
+      
+      let randVal = Math.random() * totalWeight;
+      chosen = lockedGhosts[0];
+      for (const g of lockedGhosts) {
+        let w = 45;
+        if (g.rarity === 'UR') w = 5;
+        else if (g.rarity === 'SSR') w = 20;
+        else if (g.rarity === 'SR') w = 30;
+        
+        if (randVal < w) {
+          chosen = g;
+          break;
+        }
+        randVal -= w;
+      }
     } else {
-      chosen = GHOSTS[2]; // R Pob
+      // Standard random roll once all are unlocked
+      const rand = Math.random() * 100;
+      if (rand < 5) {
+        chosen = GHOSTS[3]; // UR Naga
+      } else if (rand < 25) {
+        chosen = GHOSTS[0]; // SSR Tani
+      } else if (rand < 55) {
+        chosen = GHOSTS[1]; // SR Kuman
+      } else {
+        chosen = GHOSTS[2]; // R Pob
+      }
     }
 
     // Simulate magic roll animation duration

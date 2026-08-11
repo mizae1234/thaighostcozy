@@ -94,5 +94,13 @@
     "type": "QUEST_ITEM",
     "stackable": false,
     "maxStack": 1
+  },
+  {
+    "key": "night-herb",
+    "name": "ว่านตานีราตรี",
+    "description": "สมุนไพรเรืองแสงมรกตที่พบเฉพาะในป่ากล้วยตอนกลางคืน นำไปขายป้าศรีได้ราคาดี",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
   }
 ]

@@ -82,6 +82,17 @@ export default class MainScene extends Phaser.Scene {
   private maskGraphics: Phaser.GameObjects.Graphics | null = null;
   private chiefNPC: Phaser.GameObjects.Image | null = null;
   private backgroundImage!: Phaser.GameObjects.Image;
+  private currentArea: 'orchard' | 'temple' | 'market' = 'orchard';
+  private isTransitioning = false;
+  private siansiProp: Phaser.GameObjects.Image | null = null;
+  private lottoVendorNPC: Phaser.GameObjects.Image | null = null;
+  private monkNPC: Phaser.GameObjects.Image | null = null;
+  private vendorNPC: Phaser.GameObjects.Image | null = null;
+  private leftAreaSign: Phaser.GameObjects.Text | null = null;
+  private rightAreaSign: Phaser.GameObjects.Text | null = null;
+  private nightHerbs: Phaser.GameObjects.Image[] = [];
+  private shadowGhost: Phaser.Physics.Arcade.Sprite | null = null;
+  private npcHomePositions: Map<Phaser.GameObjects.Image, { x: number; y: number; rangeX: number; rangeY: number }> = new Map();
 
   constructor() {
     super('Main');
@@ -163,6 +174,27 @@ export default class MainScene extends Phaser.Scene {
       EventBus.off('virtual-harvest', handleVirtualHarvest);
     });
 
+    // Create screen boundary signposts
+    this.leftAreaSign = this.add.text(180, 415, '◀ ไปวัด', {
+      fontFamily: 'Inter, Arial, sans-serif',
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      backgroundColor: '#5c3a2acc',
+      padding: { x: 8, y: 4 }
+    }).setOrigin(0.5).setDepth(2000);
+    this.leftAreaSign.setStroke('#c96e3a', 2);
+
+    this.rightAreaSign = this.add.text(1100, 415, 'ไปตลาด ▶', {
+      fontFamily: 'Inter, Arial, sans-serif',
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      backgroundColor: '#5c3a2acc',
+      padding: { x: 8, y: 4 }
+    }).setOrigin(0.5).setDepth(2000);
+    this.rightAreaSign.setStroke('#c96e3a', 2);
+
     // Run once on load to spawn entities for current active step
     const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
     if (currentStep) {
@@ -177,17 +209,39 @@ export default class MainScene extends Phaser.Scene {
     const isEpisodeEnd = useQuestStore.getState().isEpisodeEnd;
     const hunger = usePlayerStatsStore.getState().hunger;
     const thirst = usePlayerStatsStore.getState().thirst;
+    const health = usePlayerStatsStore.getState().health;
     const isStarving = hunger === 0 || thirst === 0;
+    const isLowEnergy = hunger <= 30 || thirst <= 30;
+
+    // Calculate dynamic advice warning text to display above player head in Phaser
+    let warningText: string | null = null;
+    if (health <= 30) {
+      const amuletCount = useInventoryStore.getState().quantities['amulet'] ?? 0;
+      if (amuletCount === 0) {
+        warningText = '🚨 เลือดวิกฤต! (ซื้อยันต์กันผี 🌸 ที่ป้าศรี)';
+      } else {
+        warningText = '🚨 เลือดวิกฤต! (ฟื้นพลังกับหลวงพี่ ⛪)';
+      }
+    } else if (isLowEnergy) {
+      const hasGlasses = (useInventoryStore.getState().quantities['retro-sunglasses'] ?? 0) > 0;
+      if (!hasGlasses) {
+        warningText = '⚠️ พลังจะหมด! (ซื้อแว่น Y2K 🕶️ ที่ป้าศรี)';
+      } else {
+        warningText = '⚠️ พลังจะหมด! (กดกินมะพร้าว/ชา 🥥)';
+      }
+    }
 
     const hasTani = useInventoryStore.getState().unlockedGhosts.includes('tani');
-    const speedMultiplier = hasTani ? 1.2 : 1.0;
+    const hasElephantPants = useInventoryStore.getState().quantities['elephant-pants'] > 0;
+    const speedMultiplier = (hasTani ? 1.2 : 1.0) * (hasElephantPants ? 1.1 : 1.0);
 
-    this.player.update(this.cursors, this.wasd, isDialogueActive, isEpisodeEnd, isStarving, speedMultiplier);
+    this.player.update(this.cursors, this.wasd, isDialogueActive || this.isTransitioning, isEpisodeEnd, isStarving, speedMultiplier, warningText);
     this.clampToIsland();
     this.emitPlayerMovedIfChanged();
     this.tryHarvest();
     this.checkWellDistance();
     this.updateInteractionPrompt();
+    this.checkAreaTransitions();
 
     // Night light cone circle drawing
     const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
@@ -200,6 +254,40 @@ export default class MainScene extends Phaser.Scene {
       this.maskGraphics.fillCircle(this.player.sprite.x, this.player.sprite.y, 110);
     } else if (this.darkOverlay) {
       this.darkOverlay.setVisible(false);
+    }
+
+    // Ghost movement and chasing logic
+    if (this.shadowGhost && this.shadowGhost.active) {
+      const angle = Phaser.Math.Angle.Between(this.shadowGhost.x, this.shadowGhost.y, this.player.sprite.x, this.player.sprite.y);
+      const ghostSpeed = 50; // Slower than player (120) so the player can flee
+      if (this.shadowGhost.body) {
+        (this.shadowGhost.body as Phaser.Physics.Arcade.Body).setVelocity(Math.cos(angle) * ghostSpeed, Math.sin(angle) * ghostSpeed);
+      }
+
+      // Simple bobbing scale/squish for spirit effect
+      const bob = Math.sin(this.time.now / 150) * 0.05;
+      this.shadowGhost.setScale((64 / this.shadowGhost.width) * (1 + bob), (64 / this.shadowGhost.height) * (1 - bob));
+
+      // Overlap damage check
+      const dist = Phaser.Math.Distance.Between(this.shadowGhost.x, this.shadowGhost.y, this.player.sprite.x, this.player.sprite.y);
+      if (dist < 40) {
+        const amuletCount = useInventoryStore.getState().quantities['amulet'] ?? 0;
+        if (amuletCount > 0) {
+          useInventoryStore.getState().remove('amulet', 1);
+          useInteractionStore.getState().setPrompt('🌸 ยันต์แดงคุ้มภัยช่วยบล็อกความเสียหายจากวิญญาณเงาดำ! (เสียยันต์ x1)', 'info');
+        } else {
+          const currentHealth = usePlayerStatsStore.getState().health;
+          if (currentHealth > 0) {
+            usePlayerStatsStore.setState({ health: Math.max(0, currentHealth - 25) });
+            useInteractionStore.getState().setPrompt('❗️ ถูกวิญญาณเงาดำหลอน! เสียพลังชีวิต', 'info');
+          }
+        }
+        // Teleport ghost away slightly to avoid instant death
+        this.shadowGhost.setPosition(
+          this.player.sprite.x + (Math.random() > 0.5 ? 200 : -200),
+          this.player.sprite.y + (Math.random() > 0.5 ? 200 : -200)
+        );
+      }
     }
 
     // Toggle camera zoom with Z key
@@ -221,6 +309,73 @@ export default class MainScene extends Phaser.Scene {
 
     const playerX = this.player.sprite.x;
     const playerY = this.player.sprite.y;
+
+    if (this.currentArea === 'temple') {
+      if (this.siansiProp) {
+        const dist = Phaser.Math.Distance.Between(playerX, playerY, this.siansiProp.x, this.siansiProp.y);
+        if (dist < 50) {
+          useInteractionStore.getState().setPrompt('เสี่ยงเซียมซีทำนายดวง', 'talk');
+          return;
+        }
+      }
+      if (this.monkNPC) {
+        const dist = Phaser.Math.Distance.Between(playerX, playerY, this.monkNPC.x, this.monkNPC.y);
+        if (dist < 50) {
+          useInteractionStore.getState().setPrompt('คุยกับหลวงพี่ เพื่อรับน้ำมนต์ (ฟื้นฟูเลือด & น้ำดื่มฟรี! ⛪)', 'talk');
+          return;
+        }
+      }
+      useInteractionStore.getState().setPrompt(null);
+      return;
+    }
+
+    if (this.currentArea === 'market') {
+      if (this.lottoVendorNPC) {
+        const dist = Phaser.Math.Distance.Between(playerX, playerY, this.lottoVendorNPC.x, this.lottoVendorNPC.y);
+        if (dist < 50) {
+          useInteractionStore.getState().setPrompt('ซื้อสลากกินแบ่งสายมู', 'talk');
+          return;
+        }
+      }
+      if (this.vendorNPC) {
+        const dist = Phaser.Math.Distance.Between(playerX, playerY, this.vendorNPC.x, this.vendorNPC.y);
+        if (dist < 50) {
+          useInteractionStore.getState().setPrompt('คุยกับแม่ค้า เพื่อซื้อขายของ', 'talk');
+          return;
+        }
+      }
+      useInteractionStore.getState().setPrompt(null);
+      return;
+    }
+
+    if (this.currentArea !== 'orchard') {
+      useInteractionStore.getState().setPrompt(null);
+      return;
+    }
+
+    // 0. Night-time specific interactions
+    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
+    const isNight = currentStep?.phase === 'NIGHT';
+
+    if (isNight && this.currentArea === 'orchard') {
+      // 0.1 Check house sleeping trigger
+      const distToHouse = Phaser.Math.Distance.Between(playerX, playerY, 640, 280);
+      if (distToHouse < 60) {
+        useInteractionStore.getState().setPrompt('เข้านอนที่บ้านสวน', 'talk');
+        return;
+      }
+
+      // 0.2 Check night herbs proximity
+      for (const herb of this.nightHerbs) {
+        if (herb.active) {
+          const distToHerb = Phaser.Math.Distance.Between(playerX, playerY, herb.x, herb.y);
+          if (distToHerb < 50) {
+            useInteractionStore.getState().setPrompt('เก็บว่านตานีราตรี', 'harvest');
+            return;
+          }
+        }
+      }
+    }
 
     // Resolve story slug
     const slug = this.registry.get('storySlug') || 'pla-boo-thong';
@@ -318,7 +473,12 @@ export default class MainScene extends Phaser.Scene {
   private spawnResourceNodes() {
     const slug = this.registry.get('storySlug') || 'pla-boo-thong';
     const layout = slug === 'ghost-whisperer' ? GHOST_RESOURCE_LAYOUT : PLABOO_RESOURCE_LAYOUT;
-    this.resourceNodes = layout.map(({ x, y, itemKey, texture }) => new ResourceNode(this, x, y, texture, itemKey));
+    this.resourceNodes = layout.map(({ x, y, itemKey, texture }) => {
+      // Add random starting jitter to x and y coordinates to prevent same spawn location on boot
+      const rx = x + (Math.random() - 0.5) * 120;
+      const ry = y + (Math.random() - 0.5) * 120;
+      return new ResourceNode(this, rx, ry, texture, itemKey);
+    });
   }
 
   private onQuestStepChanged(stepKey: string) {
@@ -327,26 +487,6 @@ export default class MainScene extends Phaser.Scene {
     // Resolve story slug and active step
     const slug = this.registry.get('storySlug') || 'pla-boo-thong';
     const isGhostMode = slug === 'ghost-whisperer';
-    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
-    const isNight = currentStep?.phase === 'NIGHT';
-
-    // Update background texture dynamically
-    if (this.backgroundImage) {
-      if (isNight && this.textures.exists('island-background-night')) {
-        this.backgroundImage.setTexture('island-background-night');
-      } else {
-        this.backgroundImage.setTexture('island-background');
-      }
-    }
-
-    // Toggle resources visibility
-    this.resourceNodes.forEach((node) => {
-      if (isNight) {
-        node.sprite.setVisible(false);
-      } else {
-        node.sprite.setVisible(true);
-      }
-    });
 
     // Clear previous quest items
     this.questNodes.forEach((node) => {
@@ -376,12 +516,14 @@ export default class MainScene extends Phaser.Scene {
         const texture = this.textures.exists('npc-chief-down') ? 'npc-chief-down' : 'golden-goby';
         this.chiefNPC = this.add.image(chiefX, chiefY, texture);
         fitDisplaySize(this.chiefNPC, 64);
+        this.registerNPCWander(this.chiefNPC, chiefX, chiefY, 50, 30);
       } else if (stepKey === 'day5-night') {
         const chiefX = 460;
         const chiefY = 277;
         const texture = this.textures.exists('npc-chief-walk1') ? 'npc-chief-walk1' : 'golden-goby';
         this.chiefNPC = this.add.image(chiefX, chiefY, texture);
         fitDisplaySize(this.chiefNPC, 64);
+        this.registerNPCWander(this.chiefNPC, chiefX, chiefY, 50, 30);
       }
 
       // 2. Spawning Tani NPC (using golden-goby sprite key)
@@ -439,6 +581,7 @@ export default class MainScene extends Phaser.Scene {
         this.spawnGoldenGoby();
       }
     }
+    this.updateAreaEnvironment();
   }
 
   private spawnGoldenGoby(stepKey = '') {
@@ -461,8 +604,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private checkWellDistance() {
-    const isWellStep = this.currentStepKey === 'well-song' || this.currentStepKey === 'day6-covenant' || this.currentStepKey === 'day7-climax';
-    if (isWellStep) {
+    const quests = useQuestStore.getState().quests;
+    const currentQuestKey = useQuestStore.getState().currentQuestKey;
+    const currentStepIndex = useQuestStore.getState().currentStepIndex;
+    const quest = quests.find(q => q.key === currentQuestKey);
+    const step = quest?.steps[currentStepIndex];
+    
+    const hasWellObjective = step?.objectives?.some(
+      obj => obj.type === 'REACH_LOCATION' && obj.targetKey === 'well'
+    ) || this.currentStepKey === 'well-song';
+
+    if (hasWellObjective) {
       const wellX = 640;
       const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
       const wellY = slug === 'ghost-whisperer' ? 460 : 360;
@@ -499,6 +651,75 @@ export default class MainScene extends Phaser.Scene {
 
   private tryHarvest(force = false) {
     if (!force && !Phaser.Input.Keyboard.JustDown(this.harvestKey)) return;
+
+    if (this.currentArea === 'temple') {
+      if (this.siansiProp) {
+        const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, this.siansiProp.x, this.siansiProp.y);
+        if (dist < 50) {
+          EventBus.emit('open-siansi-ui', undefined);
+          return;
+        }
+      }
+      if (this.monkNPC) {
+        const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, this.monkNPC.x, this.monkNPC.y);
+        if (dist < 50) {
+          useQuestStore.getState().triggerTalkToNPC('monk');
+          return;
+        }
+      }
+      return;
+    }
+
+    if (this.currentArea === 'market') {
+      if (this.lottoVendorNPC) {
+        const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, this.lottoVendorNPC.x, this.lottoVendorNPC.y);
+        if (dist < 50) {
+          EventBus.emit('open-lotto-ui', undefined);
+          return;
+        }
+      }
+      if (this.vendorNPC) {
+        const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, this.vendorNPC.x, this.vendorNPC.y);
+        if (dist < 50) {
+          useQuestStore.getState().triggerTalkToNPC('vendor');
+          return;
+        }
+      }
+      return;
+    }
+
+    if (this.currentArea !== 'orchard') return;
+
+    // 0. Night-time specific interactions
+    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
+    const isNight = currentStep?.phase === 'NIGHT';
+
+    if (isNight) {
+      // 0.1 Check house sleeping interaction
+      const distToHouse = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, 640, 280);
+      if (distToHouse < 60) {
+        useQuestStore.getState().openSleepChoices();
+        return;
+      }
+
+      // 0.2 Check night herbs harvesting interaction
+      for (let i = 0; i < this.nightHerbs.length; i++) {
+        const herb = this.nightHerbs[i];
+        if (herb && herb.active) {
+          const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, herb.x, herb.y);
+          if (dist < 50) {
+            herb.destroy();
+            this.nightHerbs.splice(i, 1);
+            useInventoryStore.getState().add('night-herb', 1);
+            useInteractionStore.getState().setPrompt('เก็บว่านตานีราตรีสำเร็จ! 🌿', 'info');
+            setTimeout(() => {
+              useInteractionStore.getState().setPrompt(null);
+            }, 2000);
+            return;
+          }
+        }
+      }
+    }
 
     const now = this.time.now;
     const playerBounds = this.player.sprite.getBounds();
@@ -651,5 +872,228 @@ export default class MainScene extends Phaser.Scene {
       this.lastEmitted = payload;
       EventBus.emit('player-moved', payload);
     }
+  }
+
+  private checkAreaTransitions() {
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    if (slug !== 'ghost-whisperer') return;
+    if (this.isTransitioning) return;
+
+    const sprite = this.player.sprite;
+
+    if (this.currentArea === 'orchard') {
+      if (sprite.x <= 25) {
+        this.transitionToArea('temple', 1200, sprite.y);
+      } else if (sprite.x >= 1255) {
+        this.transitionToArea('market', 80, sprite.y);
+      }
+    } else if (this.currentArea === 'temple') {
+      if (sprite.x >= 1255) {
+        this.transitionToArea('orchard', 80, sprite.y);
+      }
+    } else if (this.currentArea === 'market') {
+      if (sprite.x <= 25) {
+        this.transitionToArea('orchard', 1200, sprite.y);
+      }
+    }
+  }
+
+  private transitionToArea(newArea: 'orchard' | 'temple' | 'market', spawnX: number, spawnY: number) {
+    this.isTransitioning = true;
+    this.cameras.main.fadeOut(250, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.currentArea = newArea;
+      this.player.sprite.setPosition(spawnX, spawnY);
+      this.updateAreaEnvironment();
+      this.cameras.main.fadeIn(250, 0, 0, 0);
+      this.cameras.main.once('camerafadeincomplete', () => {
+        this.isTransitioning = false;
+      });
+    });
+  }
+
+  private updateAreaEnvironment() {
+    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
+    const isNight = currentStep?.phase === 'NIGHT';
+
+    if (this.backgroundImage) {
+      if (this.currentArea === 'orchard') {
+        if (isNight && this.textures.exists('island-background-night')) {
+          this.backgroundImage.setTexture('island-background-night');
+        } else {
+          this.backgroundImage.setTexture('island-background');
+        }
+      } else if (this.currentArea === 'temple') {
+        if (isNight && this.textures.exists('temple-background-night')) {
+          this.backgroundImage.setTexture('temple-background-night');
+        } else if (this.textures.exists('temple-background')) {
+          this.backgroundImage.setTexture('temple-background');
+        }
+      } else if (this.currentArea === 'market') {
+        if (isNight && this.textures.exists('market-background-night')) {
+          this.backgroundImage.setTexture('market-background-night');
+        } else if (this.textures.exists('market-background')) {
+          this.backgroundImage.setTexture('market-background');
+        }
+      }
+    }
+
+    const showResources = this.currentArea === 'orchard' && !isNight;
+    this.resourceNodes.forEach((node) => {
+      node.sprite.setVisible(showResources);
+      if (node.shadow) {
+        node.shadow.setVisible(showResources);
+      }
+    });
+
+    const isOrchard = this.currentArea === 'orchard';
+    if (this.goldenGobySprite) {
+      this.goldenGobySprite.setVisible(isOrchard);
+    }
+    if (this.chiefNPC) {
+      this.chiefNPC.setVisible(isOrchard);
+    }
+    if (this.shopBuilding) {
+      this.shopBuilding.setVisible(isOrchard);
+    }
+    this.questNodes.forEach((node) => {
+      node.sprite.setVisible(isOrchard);
+      if (node.shadow) {
+        node.shadow.setVisible(isOrchard);
+      }
+    });
+
+    // Spawn or hide Temple/Market specific interactive elements
+    const isTemple = this.currentArea === 'temple';
+    if (isTemple) {
+      if (!this.siansiProp && this.textures.exists('prop-siansi')) {
+        this.siansiProp = this.add.image(780, 520, 'prop-siansi');
+        fitDisplaySize(this.siansiProp, 64);
+      }
+      if (!isNight && !this.monkNPC && this.textures.exists('npc-monk-down')) {
+        this.monkNPC = this.add.image(980, 520, 'npc-monk-down');
+        fitDisplaySize(this.monkNPC, 64);
+        this.registerNPCWander(this.monkNPC, 980, 520, 60, 40);
+      } else if (isNight && this.monkNPC) {
+        this.monkNPC.destroy();
+        this.monkNPC = null;
+      }
+    } else {
+      if (this.siansiProp) {
+        this.siansiProp.destroy();
+        this.siansiProp = null;
+      }
+      if (this.monkNPC) {
+        this.monkNPC.destroy();
+        this.monkNPC = null;
+      }
+    }
+
+    const isMarket = this.currentArea === 'market';
+    if (isMarket) {
+      if (!this.lottoVendorNPC && this.textures.exists('npc-lotto-vendor')) {
+        this.lottoVendorNPC = this.add.image(750, 200, 'npc-lotto-vendor');
+        fitDisplaySize(this.lottoVendorNPC, 64);
+        this.registerNPCWander(this.lottoVendorNPC, 750, 200, 45, 20);
+      }
+      if (!isNight && !this.vendorNPC && this.textures.exists('npc-vendor-down')) {
+        this.vendorNPC = this.add.image(420, 195, 'npc-vendor-down');
+        fitDisplaySize(this.vendorNPC, 64);
+        this.registerNPCWander(this.vendorNPC, 420, 195, 30, 0); // Only wanders left/right behind counter
+      } else if (isNight && this.vendorNPC) {
+        this.vendorNPC.destroy();
+        this.vendorNPC = null;
+      }
+    } else {
+      if (this.lottoVendorNPC) {
+        this.lottoVendorNPC.destroy();
+        this.lottoVendorNPC = null;
+      }
+      if (this.vendorNPC) {
+        this.vendorNPC.destroy();
+        this.vendorNPC = null;
+      }
+    }
+
+    // Spawn or hide Night specific items (Orchard at night)
+    if (isNight && this.currentArea === 'orchard') {
+      if (this.nightHerbs.length === 0 && this.textures.exists('prop-night-herb')) {
+        const coords = [
+          { x: 300, y: 450 },
+          { x: 900, y: 320 },
+          { x: 750, y: 500 }
+        ];
+        coords.forEach((c) => {
+          const herb = this.add.image(c.x, c.y, 'prop-night-herb');
+          fitDisplaySize(herb, 64);
+          this.nightHerbs.push(herb);
+        });
+      }
+      if (!this.shadowGhost && this.textures.exists('npc-shadow-spirit')) {
+        this.shadowGhost = this.physics.add.sprite(200, 200, 'npc-shadow-spirit');
+        fitDisplaySize(this.shadowGhost, 64);
+        if (this.shadowGhost.body) {
+          (this.shadowGhost.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
+        }
+      }
+    } else {
+      this.nightHerbs.forEach((h) => h.destroy());
+      this.nightHerbs = [];
+      if (this.shadowGhost) {
+        this.shadowGhost.destroy();
+        this.shadowGhost = null;
+      }
+    }
+
+    // Update travel signposts based on the current area
+    if (this.leftAreaSign && this.rightAreaSign) {
+      if (this.currentArea === 'orchard') {
+        this.leftAreaSign.setPosition(180, 415).setText('◀ ไปวัด').setVisible(true);
+        this.rightAreaSign.setPosition(1100, 415).setText('ไปตลาด ▶').setVisible(true);
+      } else if (this.currentArea === 'temple') {
+        this.leftAreaSign.setVisible(false);
+        this.rightAreaSign.setPosition(1100, 415).setText('กลับบ้านสวน ▶').setVisible(true);
+      } else if (this.currentArea === 'market') {
+        this.leftAreaSign.setPosition(180, 415).setText('◀ กลับบ้านสวน').setVisible(true);
+        this.rightAreaSign.setVisible(false);
+      }
+    }
+  }
+
+  private registerNPCWander(npc: Phaser.GameObjects.Image, homeX: number, homeY: number, rangeX = 65, rangeY = 40) {
+    this.npcHomePositions.set(npc, { x: homeX, y: homeY, rangeX, rangeY });
+    this.triggerNPCNextWander(npc);
+  }
+
+  private triggerNPCNextWander(npc: Phaser.GameObjects.Image) {
+    if (!npc || !npc.active) return;
+
+    const delay = Phaser.Math.Between(4000, 8000);
+    this.time.delayedCall(delay, () => {
+      if (!npc || !npc.active) return;
+      
+      const home = this.npcHomePositions.get(npc);
+      if (!home) return;
+
+      const targetX = home.x + Phaser.Math.Between(-home.rangeX, home.rangeX);
+      const targetY = home.y + Phaser.Math.Between(-home.rangeY, home.rangeY);
+
+      const dx = targetX - npc.x;
+      if (Math.abs(dx) > 5) {
+        npc.setFlipX(dx < 0);
+      }
+
+      const duration = Phaser.Math.Between(1500, 2500);
+      this.tweens.add({
+        targets: npc,
+        x: targetX,
+        y: targetY,
+        duration: duration,
+        ease: 'Power1',
+        onComplete: () => {
+          this.triggerNPCNextWander(npc);
+        }
+      });
+    });
   }
 }

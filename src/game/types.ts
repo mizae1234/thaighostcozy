@@ -33,4 +33,6 @@ export type GameEvents = {
   'toggle-camera-zoom': undefined | void;
   'quest-step-changed': { questKey: string | null; stepKey: string; stepIndex: number };
   'virtual-harvest': undefined | void;
+  'open-siansi-ui': undefined | void;
+  'open-lotto-ui': undefined | void;
 };

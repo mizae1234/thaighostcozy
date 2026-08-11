@@ -50,6 +50,50 @@ const ADVENTURE_CARDS: AdventureCard[] = [
     bgColor: 'from-emerald-600 to-teal-500',
     img: '/assets/stories/ghost-whisperer/cards/card-tani-cozy.png',
   },
+  {
+    key: 'tani',
+    name: 'นางตานีสายแฟ',
+    category: 'CHARACTER',
+    categoryName: 'วิญญาณคู่หู',
+    desc: 'วิญญาณผีสาวต้นกล้วยสายแฟชั่น อัญเชิญมาช่วยรดน้ำแปลงผักด้วยใจรักษ์โลก',
+    buff: '⚡ พรตานีรักษ์โลก: เพิ่มความเร็วการโตของพืชผล 20%',
+    emoji: '💚',
+    bgColor: 'from-emerald-500 to-teal-400',
+    img: '/assets/stories/ghost-whisperer/gacha/card-tani.png',
+  },
+  {
+    key: 'kuman',
+    name: 'กุมารทองติดแท็บเล็ต',
+    category: 'CHARACTER',
+    categoryName: 'วิญญาณคู่หู',
+    desc: 'กุมารทองยุคดิจิทัลที่ติดการเล่นเกมแท็บเล็ตเป็นชีวิตจิตใจ ช่วยอำนวยความสะดวกเก็บของอัตโนมัติ',
+    buff: '🎮 พรกุมารเจมเมอร์: แฮกเก็บกล่องไม้/หินอัตโนมัติ',
+    emoji: '👶',
+    bgColor: 'from-amber-500 to-orange-400',
+    img: '/assets/stories/ghost-whisperer/gacha/card-kuman.png',
+  },
+  {
+    key: 'pob',
+    name: 'ปอบออฟฟิศซินโดรม',
+    category: 'CHARACTER',
+    categoryName: 'วิญญาณคู่หู',
+    desc: 'ผีปอบที่ต้องทนทำงานออฟฟิศจนปวดหลังและคอบ่าไหล่ อัญเชิญมาช่วยฟาร์มวัสดุ',
+    buff: '☕ พรปอบเบิร์นเอาท์: เพิ่มจำนวนไม้ที่ขุดได้ 15%',
+    emoji: '🧛',
+    bgColor: 'from-blue-500 to-indigo-400',
+    img: '/assets/stories/ghost-whisperer/gacha/card-pob.png',
+  },
+  {
+    key: 'naga',
+    name: 'พญานาคน้อย',
+    category: 'CHARACTER',
+    categoryName: 'วิญญาณคู่หู',
+    desc: 'พญานาครุ่นเยาว์ผู้มีอิทธิฤทธิ์ด้านวารี ช่วยพัดพาความเย็นชุ่มชื้น ลดความเหนื่อยล้าดับกระหาย',
+    buff: '🌊 พรวารีเทพ: ค่าความกระหายลดช้าลง 30%',
+    emoji: '🐉',
+    bgColor: 'from-cyan-500 to-blue-400',
+    img: '/assets/stories/ghost-whisperer/gacha/card-naga.png',
+  },
 
   // Clues
   {
@@ -402,7 +446,7 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
             ไขปริศนาความลับของคุณตาและหมู่บ้านผ่านเบาะแส การตัดสินใจ และตัวละครที่คุณรวบรวมได้
           </p>
           <div className="inline-block mt-2 bg-[#2D4B32]/15 border border-[#2D4B32]/35 rounded-full px-4.5 py-1 text-xs font-black text-[#2D4B32]">
-            ปลดล็อกแล้ว: <span className="font-extrabold text-[#C96E3A]">{unlockedGhosts.filter(g => g.startsWith('card-')).length}</span> / {ADVENTURE_CARDS.length} ใบ
+            ปลดล็อกแล้ว: <span className="font-extrabold text-[#C96E3A]">{ADVENTURE_CARDS.filter(c => unlockedGhosts.includes(c.key)).length}</span> / {ADVENTURE_CARDS.length} ใบ
           </div>
         </div>
 

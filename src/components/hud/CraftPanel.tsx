@@ -68,10 +68,10 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
                 type="button"
                 onClick={() => handleCraft(recipe.key)}
                 disabled={!affordable}
-                className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
+                className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-all ${
                   affordable
-                    ? 'bg-emerald-100/50 hover:bg-emerald-100 text-emerald-800'
-                    : 'bg-stone-100 opacity-60'
+                    ? 'bg-emerald-100/60 hover:bg-emerald-200 text-emerald-900 border-2 border-emerald-500 animate-pulse font-black'
+                    : 'bg-stone-100 opacity-60 border-2 border-transparent'
                 }`}
               >
                 <span className="text-base leading-none">{ICON_BY_RECIPE[recipe.key] ?? '🛠️'}</span>
