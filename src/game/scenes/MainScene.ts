@@ -508,16 +508,16 @@ export default class MainScene extends Phaser.Scene {
 
     this.rareNodes = [
       // Orchard Map Drops (Chest and Golden Tani Herb)
-      Object.assign(new ResourceNode(this, 940, 250, 'prop-grandpa-box', 'coin-sack'), { area: 'orchard' }),
+      Object.assign(new ResourceNode(this, 940, 250, 'node-wood', 'coin-sack'), { area: 'orchard' }),
       Object.assign(new ResourceNode(this, 740, 480, 'prop-flower', 'golden-herb'), { area: 'orchard' }),
 
       // Temple Map Drops (Sacred Amulet and Chest)
       Object.assign(new ResourceNode(this, 220, 280, 'prop-shell', 'sacred-amulet'), { area: 'temple' }),
-      Object.assign(new ResourceNode(this, 960, 480, 'prop-grandpa-box', 'coin-sack'), { area: 'temple' }),
+      Object.assign(new ResourceNode(this, 960, 480, 'node-wood', 'coin-sack'), { area: 'temple' }),
 
       // Market Map Drops (Chests)
-      Object.assign(new ResourceNode(this, 420, 220, 'prop-grandpa-box', 'coin-sack'), { area: 'market' }),
-      Object.assign(new ResourceNode(this, 880, 520, 'prop-grandpa-box', 'coin-sack'), { area: 'market' }),
+      Object.assign(new ResourceNode(this, 420, 220, 'node-wood', 'coin-sack'), { area: 'market' }),
+      Object.assign(new ResourceNode(this, 880, 520, 'node-wood', 'coin-sack'), { area: 'market' }),
     ];
   }
 
