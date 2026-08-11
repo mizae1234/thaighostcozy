@@ -86,7 +86,7 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
         
         {/* New Player Badge overlaying the top-right */}
         <div className="absolute -top-3 right-8 bg-[#C96E3A] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1 rounded-full shadow-md">
-          New Player
+          ผู้สื่อวิญญาณใหม่
         </div>
 
         {/* Close Button */}
@@ -99,13 +99,13 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
         </button>
 
         {/* Header Title */}
-        <h2 className="text-2xl font-black text-[#1E2922] mt-4 mb-2">
-          Name Your Spirit
+        <h2 className="text-xl font-black text-[#1E2922] mt-4 mb-2">
+          ตั้งชื่อผู้สื่อวิญญาณของคุณ
         </h2>
 
         {/* Subtitle */}
         <p className="text-xs font-bold text-stone-500 mb-8 leading-relaxed max-w-xs">
-          Enter the name you will be known by in the whispers of the plantation.
+          ตั้งชื่อเล่นของคุณเพื่อก้าวเข้าสู่ความลี้ลับแห่งสวนกล้วยพนมสารคาม
         </p>
 
         {/* Error message */}
@@ -125,7 +125,7 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
             maxLength={20}
             value={nickname}
             onChange={(e) => setNicknameState(e.target.value)}
-            placeholder="Enter Name..."
+            placeholder="กรอกชื่อเล่นของคุณ..."
             className="w-full bg-[#FCFBF9] border-b-2 border-stone-200 py-3 text-center text-lg font-bold text-[#1E2922] placeholder-stone-400 outline-none transition-all focus:border-[#2D4B32] text-center"
           />
 
@@ -136,13 +136,13 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
             className="mt-8 w-full bg-[#C96E3A] hover:bg-[#b55c2b] text-white font-black uppercase tracking-widest text-xs py-3.5 px-8 rounded-full shadow-[0_4px_12px_rgba(201,110,58,0.2)] transition-all hover:scale-[1.01] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
           >
             <span className="text-sm">🍃</span>
-            <span>{loading ? 'BEGINNING JOURNEY...' : 'BEGIN JOURNEY'}</span>
+            <span>{loading ? 'กำลังเริ่มการเดินทาง...' : 'เริ่มการเดินทาง'}</span>
           </button>
         </form>
 
         {/* Footer info text */}
         <p className="mt-8 text-[9px] font-black text-stone-400 uppercase tracking-widest leading-relaxed">
-          GUEST PLAYER – PROGRESS SAVED LOCALLY AND SYNCED ONLINE
+          ผู้เล่นรับเชิญ – ข้อมูลสถิติจะถูกบันทึกบนเบราว์เซอร์นี้และซิงค์ออนไลน์
         </p>
       </div>
     </div>

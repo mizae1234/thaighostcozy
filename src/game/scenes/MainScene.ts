@@ -77,19 +77,37 @@ export default class MainScene extends Phaser.Scene {
   private currentStepKey: string | null = null;
   private lastEmitted: PlayerMovedPayload | null = null;
   private zoomKey!: Phaser.Input.Keyboard.Key;
+  
+  private darkOverlay: Phaser.GameObjects.Graphics | null = null;
+  private maskGraphics: Phaser.GameObjects.Graphics | null = null;
+  private chiefNPC: Phaser.GameObjects.Image | null = null;
+  private backgroundImage!: Phaser.GameObjects.Image;
 
   constructor() {
     super('Main');
   }
 
   create() {
-    this.add.image(0, 0, 'island-background').setOrigin(0, 0).setDisplaySize(WORLD_WIDTH, WORLD_HEIGHT);
+    this.backgroundImage = this.add.image(0, 0, 'island-background').setOrigin(0, 0).setDisplaySize(WORLD_WIDTH, WORLD_HEIGHT);
     this.spawnResourceNodes();
 
     const slug = this.registry.get('storySlug') || 'pla-boo-thong';
-    if (slug === 'ghost-whisperer') {
+    const isGhostMode = slug === 'ghost-whisperer';
+    if (isGhostMode) {
       this.shopBuilding = this.add.image(340, 520, 'building-shop');
       fitDisplaySize(this.shopBuilding, 88);
+
+      // Setup Night Overlay and Light mask
+      this.maskGraphics = this.make.graphics({ x: 0, y: 0 }, false);
+      this.darkOverlay = this.add.graphics();
+      this.darkOverlay.fillStyle(0x05070a, 0.86);
+      this.darkOverlay.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+      this.darkOverlay.setDepth(20);
+
+      const mask = this.maskGraphics.createGeometryMask();
+      mask.setInvertAlpha(true);
+      this.darkOverlay.setMask(mask);
+      this.darkOverlay.setVisible(false);
     }
 
     this.player = new Player(this, ISLAND_BOUNDS.centerX, ISLAND_BOUNDS.centerY);
@@ -171,6 +189,19 @@ export default class MainScene extends Phaser.Scene {
     this.checkWellDistance();
     this.updateInteractionPrompt();
 
+    // Night light cone circle drawing
+    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
+    const isNight = currentStep?.phase === 'NIGHT';
+
+    if (isNight && this.maskGraphics && this.darkOverlay) {
+      this.darkOverlay.setVisible(true);
+      this.maskGraphics.clear();
+      this.maskGraphics.fillStyle(0xffffff);
+      this.maskGraphics.fillCircle(this.player.sprite.x, this.player.sprite.y, 110);
+    } else if (this.darkOverlay) {
+      this.darkOverlay.setVisible(false);
+    }
+
     // Toggle camera zoom with Z key
     if (Phaser.Input.Keyboard.JustDown(this.zoomKey)) {
       const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
@@ -199,14 +230,23 @@ export default class MainScene extends Phaser.Scene {
       const dist = Phaser.Math.Distance.Between(playerX, playerY, this.goldenGobySprite.x, this.goldenGobySprite.y);
       if (dist < 45) {
         const npcName = slug === 'ghost-whisperer' ? 'แม่นางตานี' : 'ปลาบู่ทอง';
-        const actionSuffix = slug === 'ghost-whisperer' ? 'เพื่อบำบัดจิตใจ' : 'เพื่อปลดคำสาป';
-        if (this.currentStepKey === 'goby-revealed') {
+        if (slug === 'ghost-whisperer') {
           useInteractionStore.getState().setPrompt(`คุยกับ ${npcName}`, 'talk');
           return;
-        } else if (this.currentStepKey === 'lift-the-curse') {
+        } else {
+          const actionSuffix = this.currentStepKey === 'lift-the-curse' ? 'เพื่อปลดคำสาป' : '';
           useInteractionStore.getState().setPrompt(`คุยกับ ${npcName} ${actionSuffix}`, 'talk');
           return;
         }
+      }
+    }
+
+    // 1.2. Check Chief NPC proximity
+    if (this.chiefNPC) {
+      const dist = Phaser.Math.Distance.Between(playerX, playerY, this.chiefNPC.x, this.chiefNPC.y);
+      if (dist < 45) {
+        useInteractionStore.getState().setPrompt('คุยกับ ผู้ใหญ่บ้านลุงแดง', 'talk');
+        return;
       }
     }
 
@@ -214,19 +254,20 @@ export default class MainScene extends Phaser.Scene {
     if (this.shopBuilding) {
       const dist = Phaser.Math.Distance.Between(playerX, playerY, this.shopBuilding.x, this.shopBuilding.y);
       if (dist < 45) {
-        useInteractionStore.getState().setPrompt('เปิดร้านค้าสายมู', 'talk');
+        useInteractionStore.getState().setPrompt('เปิดร้านค้าสายมูของป้าศรี', 'talk');
         return;
       }
     }
 
-    // 2. Check well proximity (Step 2 well-song)
-    if (this.currentStepKey === 'well-song') {
+    // 2. Check well proximity (Step 2 well-song or Day 6/7)
+    const isWellStep = this.currentStepKey === 'well-song' || this.currentStepKey === 'day6-covenant' || this.currentStepKey === 'day7-climax';
+    if (isWellStep) {
       const wellX = 640;
       const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
       const wellY = slug === 'ghost-whisperer' ? 460 : 360;
       const dist = Phaser.Math.Distance.Between(playerX, playerY, wellX, wellY);
       if (dist < 100 && !useQuestStore.getState().reachedLocations['well']) {
-        useInteractionStore.getState().setPrompt('เดินเข้าไปใกล้บ่อน้ำโบราณเพื่อฟังเพลง', 'info');
+        useInteractionStore.getState().setPrompt(slug === 'ghost-whisperer' ? 'เดินเข้าไปใกล้บ่อน้ำโบราณท้ายสวน' : 'เดินเข้าไปใกล้บ่อน้ำโบราณเพื่อฟังเพลง', 'info');
         return;
       }
     }
@@ -283,6 +324,30 @@ export default class MainScene extends Phaser.Scene {
   private onQuestStepChanged(stepKey: string) {
     this.currentStepKey = stepKey;
 
+    // Resolve story slug and active step
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+    const isGhostMode = slug === 'ghost-whisperer';
+    const currentStep = useQuestStore.getState().quests[0]?.steps[useQuestStore.getState().currentStepIndex];
+    const isNight = currentStep?.phase === 'NIGHT';
+
+    // Update background texture dynamically
+    if (this.backgroundImage) {
+      if (isNight && this.textures.exists('island-background-night')) {
+        this.backgroundImage.setTexture('island-background-night');
+      } else {
+        this.backgroundImage.setTexture('island-background');
+      }
+    }
+
+    // Toggle resources visibility
+    this.resourceNodes.forEach((node) => {
+      if (isNight) {
+        node.sprite.setVisible(false);
+      } else {
+        node.sprite.setVisible(true);
+      }
+    });
+
     // Clear previous quest items
     this.questNodes.forEach((node) => {
       node.sprite.destroy();
@@ -292,55 +357,97 @@ export default class MainScene extends Phaser.Scene {
     });
     this.questNodes = [];
 
-    // Clear Goby NPC
+    // Clear NPC sprites
     if (this.goldenGobySprite) {
       this.goldenGobySprite.destroy();
       this.goldenGobySprite = null;
     }
+    if (this.chiefNPC) {
+      this.chiefNPC.destroy();
+      this.chiefNPC = null;
+    }
 
     // Step-specific spawns
-    if (stepKey === 'well-song') {
-      // Spawn 3 fallen fruit nodes in randomized, hidden locations around the well (640, 360)
-      const fruitLocs: Array<{ x: number; y: number }> = [];
-      for (let i = 0; i < 3; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 80 + Math.random() * 140; // 80px to 220px away from the well
-        const x = 640 + Math.cos(angle) * dist;
-        const y = 360 + Math.sin(angle) * dist * 0.54; // Match island shape ratio
-        fruitLocs.push({ x, y });
+    if (isGhostMode) {
+      // 1. Spawning Chief NPC (ลุงแดง)
+      if (stepKey === 'day1-arrival') {
+        const chiefX = ISLAND_BOUNDS.centerX + 120;
+        const chiefY = ISLAND_BOUNDS.centerY;
+        const texture = this.textures.exists('npc-chief-down') ? 'npc-chief-down' : 'golden-goby';
+        this.chiefNPC = this.add.image(chiefX, chiefY, texture);
+        fitDisplaySize(this.chiefNPC, 64);
+      } else if (stepKey === 'day5-night') {
+        const chiefX = 460;
+        const chiefY = 277;
+        const texture = this.textures.exists('npc-chief-walk1') ? 'npc-chief-walk1' : 'golden-goby';
+        this.chiefNPC = this.add.image(chiefX, chiefY, texture);
+        fitDisplaySize(this.chiefNPC, 64);
       }
-      this.questNodes = fruitLocs.map(
-        (loc) => new ResourceNode(this, loc.x, loc.y, 'prop-fallen-fruit', 'fallen-fruit'),
-      );
-    } else if (stepKey === 'goby-revealed') {
-      this.spawnGoldenGoby();
-    } else if (stepKey === 'collect-three-treasures') {
-      this.spawnGoldenGoby();
 
-      // Randomized regional treasures to keep the search engaging
-      // 1. Sacred flower (North grasslands with random jitter)
-      const flowerX = 640 + (Math.random() - 0.5) * 180;
-      const flowerY = 160 + Math.random() * 60;
-      this.questNodes.push(new ResourceNode(this, flowerX, flowerY, 'prop-flower', 'sacred-flower'));
+      // 2. Spawning Tani NPC (using golden-goby sprite key)
+      const taniSteps = ['day3-lockbox', 'day3-night', 'day6-covenant', 'day6-night', 'day7-climax', 'day7-night'];
+      if (taniSteps.includes(stepKey)) {
+        this.spawnGoldenGoby(stepKey);
+      }
 
-      // 2. Pearl shell (West Beach sand with random jitter)
-      const shellX = 220 + Math.random() * 80;
-      const shellY = 350 + (Math.random() - 0.5) * 100;
-      this.questNodes.push(new ResourceNode(this, shellX, shellY, 'prop-shell', 'pearl-shell'));
+      // 3. Spawning 3 hair clips around the well on Day 3
+      if (stepKey === 'day3-lockbox') {
+        const wellX = 640;
+        const wellY = 460; // well y is 460 in ghost mode
+        const fruitLocs: Array<{ x: number; y: number }> = [];
+        for (let i = 0; i < 3; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 80 + Math.random() * 140;
+          const x = wellX + Math.cos(angle) * dist;
+          const y = wellY + Math.sin(angle) * dist * 0.54;
+          fruitLocs.push({ x, y });
+        }
+        this.questNodes = fruitLocs.map(
+          (loc) => new ResourceNode(this, loc.x, loc.y, 'prop-fallen-fruit', 'fallen-fruit'),
+        );
+      }
+    } else {
+      // Classic Pla Boo Thong steps
+      if (stepKey === 'well-song') {
+        const fruitLocs: Array<{ x: number; y: number }> = [];
+        for (let i = 0; i < 3; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 80 + Math.random() * 140;
+          const x = 640 + Math.cos(angle) * dist;
+          const y = 360 + Math.sin(angle) * dist * 0.54;
+          fruitLocs.push({ x, y });
+        }
+        this.questNodes = fruitLocs.map(
+          (loc) => new ResourceNode(this, loc.x, loc.y, 'prop-fallen-fruit', 'fallen-fruit'),
+        );
+      } else if (stepKey === 'goby-revealed') {
+        this.spawnGoldenGoby();
+      } else if (stepKey === 'collect-three-treasures') {
+        this.spawnGoldenGoby();
+        const flowerX = 640 + (Math.random() - 0.5) * 180;
+        const flowerY = 160 + Math.random() * 60;
+        this.questNodes.push(new ResourceNode(this, flowerX, flowerY, 'prop-flower', 'sacred-flower'));
 
-      // 3. Sandalwood log (South forest tree-line with random jitter)
-      const woodX = 520 + Math.random() * 160;
-      const woodY = 490 + Math.random() * 50;
-      this.questNodes.push(new ResourceNode(this, woodX, woodY, 'prop-sandalwood', 'sandalwood'));
-    } else if (stepKey === 'lift-the-curse') {
-      this.spawnGoldenGoby();
+        const shellX = 220 + Math.random() * 80;
+        const shellY = 350 + (Math.random() - 0.5) * 100;
+        this.questNodes.push(new ResourceNode(this, shellX, shellY, 'prop-shell', 'pearl-shell'));
+
+        const woodX = 520 + Math.random() * 160;
+        const woodY = 490 + Math.random() * 50;
+        this.questNodes.push(new ResourceNode(this, woodX, woodY, 'prop-sandalwood', 'sandalwood'));
+      } else if (stepKey === 'lift-the-curse') {
+        this.spawnGoldenGoby();
+      }
     }
   }
 
-  private spawnGoldenGoby() {
+  private spawnGoldenGoby(stepKey = '') {
     const gobyX = 640;
     const gobyY = 330;
-    this.goldenGobySprite = this.add.image(gobyX, gobyY, 'golden-goby');
+    const isScary = stepKey === 'day6-night' || stepKey === 'day7-night';
+    const texture = isScary && this.textures.exists('npc-tani-angry') ? 'npc-tani-angry' : 'golden-goby';
+
+    this.goldenGobySprite = this.add.image(gobyX, gobyY, texture);
     fitDisplaySize(this.goldenGobySprite, 64);
 
     this.tweens.add({
@@ -354,7 +461,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private checkWellDistance() {
-    if (this.currentStepKey === 'well-song') {
+    const isWellStep = this.currentStepKey === 'well-song' || this.currentStepKey === 'day6-covenant' || this.currentStepKey === 'day7-climax';
+    if (isWellStep) {
       const wellX = 640;
       const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
       const wellY = slug === 'ghost-whisperer' ? 460 : 360;
@@ -404,10 +512,28 @@ export default class MainScene extends Phaser.Scene {
         this.goldenGobySprite.y
       );
       if (dist < 45) {
-        if (this.currentStepKey === 'goby-revealed' || this.currentStepKey === 'lift-the-curse') {
+        const slug = this.registry.get('storySlug') || 'pla-boo-thong';
+        if (slug === 'ghost-whisperer') {
+          useQuestStore.getState().triggerTalkToNPC('golden-goby');
+          return;
+        } else if (this.currentStepKey === 'goby-revealed' || this.currentStepKey === 'lift-the-curse') {
           useQuestStore.getState().triggerTalkToNPC('golden-goby');
           return;
         }
+      }
+    }
+
+    // 1.2. Prioritize talking to Chief if nearby
+    if (this.chiefNPC) {
+      const dist = Phaser.Math.Distance.Between(
+        this.player.sprite.x,
+        this.player.sprite.y,
+        this.chiefNPC.x,
+        this.chiefNPC.y
+      );
+      if (dist < 45) {
+        useQuestStore.getState().triggerTalkToNPC('chief');
+        return;
       }
     }
 

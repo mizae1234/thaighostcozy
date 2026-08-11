@@ -34,9 +34,19 @@ export interface RewardSpec {
   quantity: number;
 }
 
+export interface ChoiceContent {
+  key: string;
+  text: string;
+  cardKey: string;
+  cardName: string;
+  cardDesc: string;
+  itemReward?: string;
+}
+
 export interface QuestStepContent {
   key: string;
   title: string;
+  phase?: 'DAY' | 'NIGHT';
   scene?: {
     background?: string;
     sceneListRef?: string;
@@ -44,6 +54,7 @@ export interface QuestStepContent {
   dialogue: DialogueLine[];
   objectives: Objective[];
   rewards: RewardSpec[];
+  choices?: ChoiceContent[];
   isEpisodeEnd?: boolean;
 }
 

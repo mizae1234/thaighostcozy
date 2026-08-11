@@ -83,6 +83,24 @@ async function main() {
       });
     }
 
+    // Clean up stale quests and steps for this story
+    const activeQuestKeys = quests.map((q) => q.key);
+    const staleQuests = await prisma.quest.findMany({
+      where: {
+        storyId: storyRow.id,
+        key: { notIn: activeQuestKeys },
+      },
+    });
+    for (const sq of staleQuests) {
+      await prisma.questStep.deleteMany({ where: { questId: sq.id } });
+    }
+    await prisma.quest.deleteMany({
+      where: {
+        storyId: storyRow.id,
+        key: { notIn: activeQuestKeys },
+      },
+    });
+
     for (const quest of quests) {
       const questRow = await prisma.quest.upsert({
         where: { storyId_key: { storyId: storyRow.id, key: quest.key } },
@@ -93,7 +111,7 @@ async function main() {
       let previousStepId: string | null = null;
 
       for (const [order, step] of quest.steps.entries()) {
-        for (const reward of step.rewards) {
+        for (const reward of (step.rewards || [])) {
           if (!itemIdByKey.has(reward.itemKey)) {
             throw new Error(
               `Quest step "${step.key}" references unknown reward item "${reward.itemKey}"`,
@@ -106,7 +124,7 @@ async function main() {
           update: {
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards } as any,
+            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as any,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },
@@ -115,7 +133,7 @@ async function main() {
             key: step.key,
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives, rewards: step.rewards } as any,
+            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as any,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },

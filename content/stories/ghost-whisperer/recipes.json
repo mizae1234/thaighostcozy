@@ -1,7 +1,7 @@
 [
   {
     "key": "knife",
-    "name": "มีดหมอมัสตาร์ด",
+    "name": "มีดพร้าทำสวน",
     "outputItemKey": "knife",
     "outputQty": 1,
     "ingredients": [
@@ -17,6 +17,26 @@
     "ingredients": [
       { "itemKey": "wood", "quantity": 5 },
       { "itemKey": "coconut", "quantity": 2 }
+    ]
+  },
+  {
+    "key": "flashlight",
+    "name": "ไฟฉายตราเสือ",
+    "outputItemKey": "flashlight",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "wood", "quantity": 3 },
+      { "itemKey": "stone", "quantity": 2 }
+    ]
+  },
+  {
+    "key": "amulet",
+    "name": "ยันต์แดงกันผี",
+    "outputItemKey": "amulet",
+    "outputQty": 1,
+    "ingredients": [
+      { "itemKey": "stone", "quantity": 2 },
+      { "itemKey": "coconut", "quantity": 1 }
     ]
   }
 ]

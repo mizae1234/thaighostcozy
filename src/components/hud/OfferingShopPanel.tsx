@@ -43,9 +43,11 @@ const SHOP_ITEMS: ShopItem[] = [
 ];
 
 export default function OfferingShopPanel({ onClose }: { onClose: () => void }) {
-  const { coins, deductCoins, add } = useInventoryStore();
+  const { coins, deductCoins, add, quantities, remove, addCoins } = useInventoryStore();
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const bananaQty = quantities['coconut'] ?? 0;
 
   const handleBuy = (item: ShopItem) => {
     setSuccessMsg(null);
@@ -67,6 +69,45 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
     }, 2500);
   };
 
+  const handleSellBanana = () => {
+    setSuccessMsg(null);
+    setErrorMsg(null);
+
+    if (bananaQty <= 0) {
+      setErrorMsg('คุณไม่มี ผลกล้วยน้ำว้า ในกระเป๋าสำหรับขาย!');
+      return;
+    }
+
+    const success = remove('coconut', 1);
+    if (success) {
+      addCoins(20); // Earn 20 coins per banana
+      setSuccessMsg('ขายผลกล้วยน้ำว้า 1 ผลสำเร็จ! ได้รับ 20 🪙');
+      setTimeout(() => {
+        setSuccessMsg(null);
+      }, 2500);
+    }
+  };
+
+  const handleSellAllBananas = () => {
+    setSuccessMsg(null);
+    setErrorMsg(null);
+
+    if (bananaQty <= 0) {
+      setErrorMsg('คุณไม่มี ผลกล้วยน้ำว้า ในกระเป๋าสำหรับขาย!');
+      return;
+    }
+
+    const totalEarned = bananaQty * 20;
+    const success = remove('coconut', bananaQty);
+    if (success) {
+      addCoins(totalEarned);
+      setSuccessMsg(`ขายกล้วยทั้งหมด ${bananaQty} ผลสำเร็จ! ได้รับ ${totalEarned} 🪙`);
+      setTimeout(() => {
+        setSuccessMsg(null);
+      }, 2500);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto">
       <div className="relative w-full max-w-lg rounded-3xl border border-stone-200 bg-[#FCFBF9] p-6 shadow-2xl text-stone-800">
@@ -74,8 +115,8 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200 pb-3">
           <div>
-            <h2 className="text-xl font-black uppercase tracking-wider text-[#2D4B32]">🛒 ร้านค้าสายมูสตรีทแวร์</h2>
-            <p className="text-[10px] uppercase tracking-widest text-[#2D4B32]/70 mt-0.5">Shop Daily Offerings & Customizations</p>
+            <h2 className="text-xl font-black uppercase tracking-wider text-[#2D4B32]">🛒 ร้านขายของมูของป้าศรี</h2>
+            <p className="text-[10px] uppercase tracking-widest text-[#2D4B32]/70 mt-0.5">Shop Daily Offerings & Trade Crops</p>
           </div>
           <button 
             onClick={onClose} 
@@ -85,14 +126,44 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
           </button>
         </div>
 
-        {/* Currency Display */}
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-white border border-stone-200 px-4 py-2.5 shadow-sm">
-          <span className="text-xs font-black uppercase tracking-widest text-stone-500">เหรียญในกระเป๋าของคุณ</span>
-          <span className="font-mono text-sm font-extrabold text-[#C96E3A]">{coins} 🪙</span>
+        {/* Currency Display & Sell Section */}
+        <div className="mt-4 flex flex-col gap-2.5 rounded-2xl bg-white border border-stone-200 p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-widest text-stone-500">เหรียญในกระเป๋าของคุณ</span>
+            <span className="font-mono text-sm font-extrabold text-[#C96E3A]">{coins} 🪙</span>
+          </div>
+
+          <div className="border-t border-stone-100 pt-3 flex items-center justify-between">
+            <div className="text-left">
+              <span className="text-xs font-black text-stone-700">ขายผลผลิตกล้วยน้ำว้า</span>
+              <p className="text-[10px] text-stone-400 font-bold">มีอยู่ในกระเป๋า: {bananaQty} ผล (ผลละ 20 🪙)</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSellBanana}
+                disabled={bananaQty <= 0}
+                className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 disabled:text-stone-400 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white shadow-sm transition-all"
+              >
+                ขาย 1 ผล
+              </button>
+              <button
+                onClick={handleSellAllBananas}
+                disabled={bananaQty <= 0}
+                className="rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:bg-stone-200 disabled:text-stone-400 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white shadow-sm transition-all"
+              >
+                ขายทั้งหมด
+              </button>
+            </div>
+          </div>
         </div>
 
+        {/* Item List Header */}
+        <h3 className="mt-5 text-[10px] font-black uppercase tracking-widest text-[#2D4B32] text-left">
+          สินค้ามูเตลูที่มีจำหน่าย:
+        </h3>
+
         {/* Item List */}
-        <div className="mt-5 space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
+        <div className="mt-2 space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
           {SHOP_ITEMS.map((item) => (
             <div 
               key={item.key} 
@@ -119,7 +190,7 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
         </div>
 
         {/* Status Messages */}
-        <div className="mt-5 min-h-[20px]">
+        <div className="mt-4 min-h-[20px]">
           {successMsg && (
             <p className="text-center text-xs font-bold text-emerald-700 animate-pulse">{successMsg}</p>
           )}

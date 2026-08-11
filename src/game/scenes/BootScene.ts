@@ -59,6 +59,12 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('player-right-walk1', `${playerBase}/player-right-walk1.png`);
 
     this.load.image('golden-goby', `${npcBase}/golden-goby.png`);
+    if (slug === 'ghost-whisperer') {
+      this.load.image('island-background-night', `${tilesBase}/island-background-night.png`);
+      this.load.image('npc-chief-down', `${npcBase}/npc-chief-down.png`);
+      this.load.image('npc-chief-walk1', `${npcBase}/npc-chief-walk1.png`);
+      this.load.image('npc-tani-angry', `${npcBase}/npc-tani-angry.png`);
+    }
   }
 
   create() {

@@ -5,6 +5,7 @@ import { usePlayerStatsStore } from '@/stores/usePlayerStatsStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useParams } from 'next/navigation';
 import { EventBus } from '@/game/EventBus';
+import { useQuestStore } from '@/stores/useQuestStore';
 import StatBar from './StatBar';
 import PanelFrame from './PanelFrame';
 
@@ -15,6 +16,9 @@ export default function StatsBar() {
   const setNickname = usePlayerStatsStore((state) => state.setNickname);
   const eatCoconut = usePlayerStatsStore((state) => state.eatCoconut);
   const coconutCount = useInventoryStore((state) => state.quantities.coconut ?? 0);
+
+  const currentStepIndex = useQuestStore((state) => state.currentStepIndex);
+  const level = Math.floor(currentStepIndex / 2) + 1;
 
   const params = useParams();
   const slug = params?.slug;
@@ -34,12 +38,13 @@ export default function StatsBar() {
     : `🥥 กินมะพร้าว (${coconutCount})`;
 
   return (
-    <div className="pointer-events-auto absolute left-5 top-5 w-56">
+    <div className="pointer-events-auto absolute left-2 top-2 md:left-5 md:top-5 w-64 md:w-72 origin-top-left scale-[0.65] md:scale-100">
       <PanelFrame>
         <div className="flex flex-col gap-2">
           {nickname && (
-            <div className="text-stone-800 text-xs font-black border-b border-stone-150 pb-1 mb-0.5 tracking-wider">
-              👤 ผู้รอดชีวิต: {nickname}
+            <div className="text-stone-800 text-xs font-black border-b border-stone-150 pb-1 mb-0.5 tracking-wider flex justify-between items-center">
+              <span>👤 ผู้รอดชีวิต: {nickname}</span>
+              <span className="text-[#C96E3A] font-extrabold bg-[#C96E3A]/10 px-2 py-0.5 rounded-full text-[9px] border border-[#C96E3A]/20">Lv.{level}</span>
             </div>
           )}
           <StatBar type="hunger" value={hunger} />

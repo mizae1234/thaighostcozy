@@ -65,6 +65,8 @@ export async function getStoryContentBySlug(slug: string): Promise<StoryContentR
         dialogue: content.dialogue || [],
         objectives: content.objectives || [],
         rewards: content.rewards || [],
+        choices: content.choices || [],
+        phase: content.phase || 'DAY',
         isEpisodeEnd: step.isEpisodeEnd,
       };
     }),

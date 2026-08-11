@@ -1,32 +1,32 @@
 [
   {
     "key": "wood",
-    "name": "ไม้บอร์ดมูจิ",
-    "description": "แผ่นไม้สไตล์นอร์ดิกสหรับประกอบศาลพระภูมิ",
+    "name": "ไม้กระดานเก่า",
+    "description": "แผ่นไม้จากรั้วและบ้านเก่าคุณตา สำหรับประกอบสิ่งก่อสร้าง",
     "type": "RESOURCE",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "coconut",
-    "name": "ชาใบตอง",
-    "description": "ชาใบตองหอมฟุ้งสไตล์ออร์แกนิก",
+    "name": "ผลกล้วยน้ำว้า",
+    "description": "ผลผลิตรสหวานหอมจากสวน สามารถทานกินแก้หิวหรือนำไปขายร้านป้าศรีได้",
     "type": "RESOURCE",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "stone",
-    "name": "หินสไตล์มูจิ",
-    "description": "หินแม่น้ำขัดเรียบสลับการจัดวางศาล",
+    "name": "หินกรวดสวนกล้วย",
+    "description": "หินแม่น้ำสีดำเรียบขัดมัน สำหรับคราฟต์ของแต่งสวนหรือศาลพระภูมิ",
     "type": "RESOURCE",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "knife",
-    "name": "มีดหมอมัสตาร์ด",
-    "description": "มีดหมอสีเหลืองพาสเทลลงอักขระสตรีทแฟชั่น",
+    "name": "มีดพร้าทำสวน",
+    "description": "มีดพร้าเหล็กโบราณของคุณตา ใช้ฟันตัดหญ้าและตัดไม้จันทน์มงคล",
     "type": "TOOL",
     "stackable": false,
     "maxStack": 1
@@ -34,55 +34,63 @@
   {
     "key": "campfire",
     "name": "ศาลพระภูมิมูจิ",
-    "description": "ศาลพระภูมิสไตล์นอร์ดิกอุ่นใจมินิมอล",
+    "description": "ศาลพระภูมิสไตล์นอร์ดิกมินิมอลสีขาว สำหรับอัญเชิญและคุ้มครองบ้านสวน",
     "type": "BUILDING",
     "stackable": false,
     "maxStack": 1
   },
   {
+    "key": "flashlight",
+    "name": "ไฟฉายตราเสือ",
+    "description": "ไฟฉายสังกะสีสไตล์เรโทร ให้แสงสว่างนำทางเพื่อความปลอดภัยในยามวิกาล",
+    "type": "TOOL",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "amulet",
+    "name": "ยันต์แดงป้องภัย",
+    "description": "ผ้ายันต์ลงอักขระกันผีแดงเก่า ช่วยเพิ่มพลังป้องกันของประตูหน้าต่างบ้าน",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
     "key": "fallen-fruit",
-    "name": "กิ๊บหนีบผมตานี",
-    "description": "กิ๊บหนีบผมใบตองสีพาสเทลที่นางตานีทำตกไว้",
+    "name": "กิ๊บใบตองเรืองแสง",
+    "description": "กิ๊บหนีบผมใบตองสีพาสเทลที่เรืองแสงสีเขียวอ่อนในความมืด",
     "type": "QUEST_ITEM",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "sacred-flower",
-    "name": "ดอกไม้แก้เครียด",
-    "description": "ดอกไม้ศักดิ์สิทธิ์ที่ช่วยบำบัดอาการเครียดสะสม",
+    "name": "เศษบันทึกของคุณตา",
+    "description": "เศษหน้าสมุดบันทึกที่ขาดหายไปของคุณตา พูดถึงความลับสัญญาป่ากล้วย",
     "type": "QUEST_ITEM",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "pearl-shell",
-    "name": "เปลือกหอยเรโทร",
-    "description": "เปลือกหอยมุกสีพาสเทลสไตล์ Y2K",
+    "name": "สัญญาลับของหมู่บ้าน",
+    "description": "เอกสารโบราณที่ลงลายมือชื่อผู้ใหญ่บ้านกับคุณตาเรื่องการมอบสวนกล้วย",
     "type": "QUEST_ITEM",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "sandalwood",
-    "name": "ไม้จันทน์มูเตลู",
-    "description": "ไม้จันทน์วิเศษที่ผ่านการปลุกเสกมาแล้ว",
-    "type": "QUEST_ITEM",
-    "stackable": true,
-    "maxStack": 99
-  },
-  {
-    "key": "goby-bone-fragment",
-    "name": "ชาสมุนไพรตานี",
-    "description": "ชาสมุนไพรช่วยปรับสมดุลวิญญาณ",
+    "name": "น้ำมันตานีขวดจิ๋ว",
+    "description": "ขวดน้ำมันสีเขียวมรกตอัญมณีอุดมด้วยเวทมนตร์อารักษ์ป่ากล้วย",
     "type": "QUEST_ITEM",
     "stackable": true,
     "maxStack": 99
   },
   {
     "key": "magic-ring",
-    "name": "แหวนสายมูทองคำ",
-    "description": "แหวนทองคำลงอักขระเพื่อมิตรภาพที่ยั่งยืน",
+    "name": "แหวนทองอักขระคุณตา",
+    "description": "แหวนมรดกตกทอดลงยันต์เพื่อปกป้องหลานชายยามภัยพิบัติมาเยือน",
     "type": "QUEST_ITEM",
     "stackable": false,
     "maxStack": 1

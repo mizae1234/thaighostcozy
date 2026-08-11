@@ -21,25 +21,8 @@ const PLA_BOO_HINTS: Record<string, string> = {
   'lift-the-curse': '💡 คำแนะนำ: นำของวิเศษทั้ง 3 อย่างไปคุยกับปลาบู่ทองที่บ่อน้ำโบราณเพื่อปลดคำสาป!',
 };
 
-// Ghost Whisperer static fallback dictionaries
-const GHOST_STEP_TITLES: Record<string, string> = {
-  'washed-ashore': 'ภารกิจที่ 1: อัญเชิญศาลพระภูมิมินิมอล',
-  'well-song': 'ภารกิจที่ 2: ตามหากิ๊บหนีบผมตานี',
-  'goby-revealed': 'ภารกิจที่ 3: บำบัดจิตใจนางตานี',
-  'collect-three-treasures': 'ภารกิจที่ 4: ตามหาของมงคล 3 อย่าง',
-  'lift-the-curse': 'ภารกิจที่ 5: ผูกมิตรภาพนิรันดร์',
-};
-
-const GHOST_HINTS: Record<string, string> = {
-  'washed-ashore': '💡 คำแนะนำ: เดินเก็บไม้บอร์ดมูจิ 5 ชิ้น และชาใบตอง 2 ถ้วย จากนั้นเปิดเมนูคราฟต์ด้านซ้ายเพื่อสร้างศาลพระภูมิมูจิ',
-  'well-song': '💡 คำแนะนำ: เดินไปทางขวาบนเพื่อตามหาบ่อน้ำโบราณในป่ากล้วย และเก็บกิ๊บหนีบผมใบตอง 3 อันที่ร่วงอยู่รอบบ่อน้ำ',
-  'goby-revealed': '💡 คำแนะนำ: ยืนใกล้บ่อน้ำโบราณ แล้วกดปุ่ม Space เพื่อพูดคุยช่วยเหลือระบายความเครียดให้นางตานี',
-  'collect-three-treasures': '💡 คำแนะนำ: คราฟต์มีดหมอมัสตาร์ดจากเมนูซ้ายล่าง จากนั้นเดินหาของมงคล 3 อย่าง: ดอกไม้บำบัดทางเหนือ, เปลือกหอยเรโทรทางหาดซ้าย, และสับไม้จันทน์มูเตลูทางทิศใต้ (ต้องใช้มีดหมอ)',
-  'lift-the-curse': '💡 คำแนะนำ: นำของมงคลทั้ง 3 อย่างไปคุยพิธีกับนางตานีที่บ่อน้ำโบราณเพื่อปลดล็อกมิตรภาพนิรันดร์!',
-};
-
 export default function QuestTracker() {
-  const { currentQuestKey, currentStepIndex, quests, reachedLocations, talkedNPCs, placedBuildings, isEpisodeEnd } = useQuestStore();
+  const { currentQuestKey, currentStepIndex, quests, reachedLocations, talkedNPCs, placedBuildings, isEpisodeEnd, showChoices } = useQuestStore();
   const { quantities: inventory } = useInventoryStore();
 
   if (isEpisodeEnd || !currentQuestKey || quests.length === 0) return null;
@@ -55,85 +38,114 @@ export default function QuestTracker() {
   const isGhostMode = slug === 'ghost-whisperer';
 
   // Get localized step titles and hints
-  const stepTitle = isGhostMode 
-    ? (GHOST_STEP_TITLES[activeStep.key] || activeStep.title || activeStep.key)
-    : (PLA_BOO_STEP_TITLES[activeStep.key] || activeStep.title || activeStep.key);
-    
+  const stepTitle = activeStep.title || activeStep.key;
+  
   const stepHint = isGhostMode
-    ? (GHOST_HINTS[activeStep.key] || '')
+    ? (activeStep.phase === 'NIGHT' 
+        ? '💡 คำแนะนำ: จบการพูดคุยหน้าต่างขวาเพื่อเลือกเส้นทางการตัดสินใจในค่ำคืนนี้' 
+        : '💡 คำแนะนำ: ทำภารกิจการจัดการสวนด้านล่างให้ครบเพื่อจบวัน')
     : (PLA_BOO_HINTS[activeStep.key] || '');
 
+  const phaseBadgeText = activeStep.phase === 'DAY' ? '☀️ กลางวัน' : '🌙 กลางคืน';
+  const phaseBadgeColor = activeStep.phase === 'DAY' 
+    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' 
+    : 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+
   return (
-    <div className="absolute left-4 top-[195px] z-40 w-64 rounded-xl bg-[#5c3a2a] p-4 text-white shadow-xl backdrop-blur-sm transition-all md:w-72 border border-[#C96E3A]/20 select-none">
+    <div className="absolute left-2 top-[125px] md:left-5 md:top-[245px] z-40 w-64 rounded-xl bg-[#5c3a2a]/95 p-4 text-white shadow-xl backdrop-blur-sm transition-all md:w-72 border border-[#C96E3A]/20 select-none origin-top-left scale-[0.65] md:scale-100">
       {/* Header */}
-      <div className="mb-2.5 border-b border-[#C96E3A]/20 pb-2 flex flex-col">
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-[#FCFBF9]/90 flex items-center gap-1">
-          🔖 Current Objective
-        </h3>
-        <p className="text-xs font-bold text-[#FCFBF9]/80 mt-1 leading-snug">{stepTitle}</p>
+      <div className="mb-2.5 border-b border-[#C96E3A]/20 pb-2 flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#FCFBF9]/90 flex items-center gap-1">
+            🔖 Current Objective
+          </h3>
+          {isGhostMode ? (
+            <div className="flex items-center gap-1 flex-wrap justify-end">
+              <span className="text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-500/20 bg-emerald-950/60 text-emerald-300 uppercase tracking-wider select-none">
+                📅 วันที่ {Math.floor(currentStepIndex / 2) + 1}/7
+              </span>
+              {activeStep.phase && (
+                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider ${phaseBadgeColor}`}>
+                  {phaseBadgeText}
+                </span>
+              )}
+            </div>
+          ) : null}
+        </div>
+        <p className="text-xs font-bold text-[#FCFBF9]/80 leading-snug">{stepTitle}</p>
       </div>
 
       {/* Objectives List */}
-      <ul className="space-y-2">
-        {activeStep.objectives.map((obj, i) => {
-          let currentVal = 0;
-          const targetVal = obj.quantity ?? 1;
-          let label = '';
-          let isDone = false;
+      {activeStep.objectives && activeStep.objectives.length > 0 ? (
+        <ul className="space-y-2">
+          {activeStep.objectives.map((obj, i) => {
+            let currentVal = 0;
+            const targetVal = obj.quantity ?? 1;
+            let label = '';
+            let isDone = false;
 
-          // Resolve target name dynamically from database items
-          const dbItem = useContentStore.getState().getItem(obj.targetKey);
-          let targetName = dbItem ? dbItem.name : obj.targetKey;
+            // Resolve target name dynamically from database items
+            const dbItem = useContentStore.getState().getItem(obj.targetKey);
+            let targetName = dbItem ? dbItem.name : obj.targetKey;
 
-          // If it is not an item, fallback to custom localization
-          if (!dbItem) {
-            if (obj.targetKey === 'well') {
-              targetName = isGhostMode ? 'บ่อน้ำโบราณท้ายสวน' : 'บ่อน้ำโบราณ';
-            } else if (obj.targetKey === 'golden-goby') {
-              targetName = isGhostMode ? 'นางตานี' : 'แม่ปลาบู่ทอง';
+            // If it is not an item, fallback to custom localization
+            if (!dbItem) {
+              if (obj.targetKey === 'well') {
+                targetName = isGhostMode ? 'บ่อน้ำโบราณท้ายสวน' : 'บ่อน้ำโบราณ';
+              } else if (obj.targetKey === 'golden-goby') {
+                targetName = isGhostMode ? 'นางตานี' : 'แม่ปลาบู่ทอง';
+              }
             }
-          }
 
-          if (obj.type === 'COLLECT') {
-            currentVal = inventory[obj.targetKey] || 0;
-            isDone = currentVal >= targetVal;
-            label = `เก็บ ${targetName}`;
-          } else if (obj.type === 'CRAFT') {
-            currentVal = placedBuildings[obj.targetKey] || 0;
-            isDone = currentVal >= targetVal;
-            label = `สร้าง ${targetName}`;
-          } else if (obj.type === 'REACH_LOCATION') {
-            isDone = !!reachedLocations[obj.targetKey];
-            label = `เดินทางไปที่ ${targetName}`;
-          } else if (obj.type === 'TALK_TO') {
-            isDone = !!talkedNPCs[obj.targetKey];
-            label = `พูดคุยกับ ${targetName}`;
-          }
+            if (obj.type === 'COLLECT') {
+              currentVal = inventory[obj.targetKey] || 0;
+              isDone = currentVal >= targetVal;
+              label = `เก็บ ${targetName}`;
+            } else if (obj.type === 'CRAFT') {
+              currentVal = placedBuildings[obj.targetKey] || 0;
+              isDone = currentVal >= targetVal;
+              label = `สร้าง ${targetName}`;
+            } else if (obj.type === 'REACH_LOCATION') {
+              isDone = !!reachedLocations[obj.targetKey];
+              label = `เดินทางไปที่ ${targetName}`;
+            } else if (obj.type === 'TALK_TO') {
+              isDone = !!talkedNPCs[obj.targetKey];
+              label = `พูดคุยกับ ${targetName}`;
+            }
 
-          return (
-            <li 
-              key={i} 
-              className={`flex items-start justify-between text-xs transition-colors ${
-                isDone ? 'text-[#FCFBF9]/40 line-through' : 'text-[#FCFBF9]/90'
-              }`}
-            >
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-xs select-none">
-                  {isDone ? '✅' : '⚪'}
-                </span>
-                <span className="font-semibold">{label}</span>
-              </div>
-              
-              {/* Show quantity only for COLLECT and CRAFT */}
-              {(obj.type === 'COLLECT' || obj.type === 'CRAFT') && (
-                <span className={`font-mono text-xs ${isDone ? 'text-[#FCFBF9]/40' : 'text-[#C96E3A] font-black'}`}>
-                  {currentVal}/{targetVal}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+            return (
+              <li 
+                key={i} 
+                className={`flex items-start justify-between text-xs transition-colors ${
+                  isDone ? 'text-[#FCFBF9]/40 line-through' : 'text-[#FCFBF9]/90'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <span className="mt-0.5 text-xs select-none">
+                    {isDone ? '✅' : '⚪'}
+                  </span>
+                  <span className="font-semibold">{label}</span>
+                </div>
+                
+                {/* Show quantity only for COLLECT and CRAFT */}
+                {(obj.type === 'COLLECT' || obj.type === 'CRAFT') && (
+                  <span className={`font-mono text-xs ${isDone ? 'text-[#FCFBF9]/40' : 'text-[#C96E3A] font-black'}`}>
+                    {currentVal}/{targetVal}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div className="py-1 text-xs font-semibold text-[#FCFBF9]/90 text-left">
+          {showChoices ? (
+            <span className="text-amber-400">🔮 กรุณาตัดสินใจเลือกทางเลือกบนจอ</span>
+          ) : (
+            <span>📢 รออ่านบทสนทนาขวาล่าง...</span>
+          )}
+        </div>
+      )}
 
       {/* Guidance / Hint Box */}
       {stepHint && (

@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, use, useState } from 'react';
+import { useEffect, use, useState, useRef } from 'react';
 import { EventBus } from '@/game/EventBus';
 import type { PlayerMovedPayload, ResourceCollectedPayload } from '@/game/types';
 import { usePlayerStore } from '@/stores/usePlayerStore';
@@ -43,6 +43,32 @@ export default function PlayPage({ params }: PlayPageProps) {
   const [showCardAlbum, setShowCardAlbum] = useState(false);
   const { coins } = useInventoryStore();
 
+  // Tutorial Alert States
+  const [tutorialTip, setTutorialTip] = useState<string | null>(null);
+  const shownTipsRef = useRef<Set<string>>(new Set());
+
+  const showTipOnce = (tipId: string, text: string) => {
+    if (shownTipsRef.current.has(tipId)) return;
+    shownTipsRef.current.add(tipId);
+    setTutorialTip(text);
+    setTimeout(() => {
+      setTutorialTip(current => current === text ? null : current);
+    }, 8500);
+  };
+
+  // Prologue State
+  const [showPrologue, setShowPrologue] = useState(false);
+  const currentStepIndex = useQuestStore((state) => state.currentStepIndex);
+
+  // Mobile menu dropdown state
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  useEffect(() => {
+    if (slug === 'ghost-whisperer' && currentStepIndex === 0) {
+      setShowPrologue(true);
+    }
+  }, [slug, currentStepIndex]);
+
   // Fainting Respawn States
   const [showFaintOverlay, setShowFaintOverlay] = useState(false);
   const [faintPenaltyText, setFaintPenaltyText] = useState('');
@@ -56,6 +82,85 @@ export default function PlayPage({ params }: PlayPageProps) {
     left: false,
     right: false
   });
+
+  // Joystick states
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const [joystickOffset, setJoystickOffset] = useState({ x: 0, y: 0 });
+
+  const handleJoystickTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!joystickRef.current) return;
+    const rect = joystickRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    let dx = touch.clientX - centerX;
+    let dy = touch.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const maxRadius = 45; // Max visual offset in pixels
+
+    if (distance > maxRadius) {
+      dx = (dx / distance) * maxRadius;
+      dy = (dy / distance) * maxRadius;
+    }
+
+    setJoystickOffset({ x: dx, y: dy });
+
+    // Thresholds for diagonal movement
+    const threshold = 15;
+    setVirtualKeys({
+      up: dy < -threshold,
+      down: dy > threshold,
+      left: dx < -threshold,
+      right: dx > threshold
+    });
+  };
+
+  const handleJoystickEnd = () => {
+    setJoystickOffset({ x: 0, y: 0 });
+    setVirtualKeys({ up: false, down: false, left: false, right: false });
+  };
+
+  const handleJoystickMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!joystickRef.current) return;
+      const rect = joystickRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      let dx = moveEvent.clientX - centerX;
+      let dy = moveEvent.clientY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const maxRadius = 45;
+
+      if (distance > maxRadius) {
+        dx = (dx / distance) * maxRadius;
+        dy = (dy / distance) * maxRadius;
+      }
+
+      setJoystickOffset({ x: dx, y: dy });
+
+      const threshold = 15;
+      setVirtualKeys({
+        up: dy < -threshold,
+        down: dy > threshold,
+        left: dx < -threshold,
+        right: dx > threshold
+      });
+    };
+
+    const handleMouseUp = () => {
+      setJoystickOffset({ x: 0, y: 0 });
+      setVirtualKeys({ up: false, down: false, left: false, right: false });
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -100,6 +205,9 @@ export default function PlayPage({ params }: PlayPageProps) {
     useContentStore.getState().load(slug).then(() => {
       const quests = useContentStore.getState().quests;
       useQuestStore.getState().initQuests(quests);
+      if (slug === 'ghost-whisperer') {
+        showTipOnce('welcome-tip', "💡 ยินดีต้อนรับสู่ป่ากล้วยคุณตา! กลางวันแนะนำให้คุณฟาร์มของและคราฟต์ศาลพระภูมิตามเป้าหมายเควสต์ด้านซ้าย ส่วนผลผลิตกล้วยน้ำว้าสามารถนำไปคุยขายให้ป้าศรีที่ร้านค้าเพื่อแลกเหรียญมูเตลูได้ครับ");
+      }
     });
 
     const handlePlayerMoved = (payload: PlayerMovedPayload) => {
@@ -116,6 +224,12 @@ export default function PlayPage({ params }: PlayPageProps) {
       // Cozy Mode Reward: Give 10 coins for every item harvested!
       if (slug === 'ghost-whisperer') {
         useInventoryStore.getState().addCoins(10);
+        
+        if (payload.itemKey === 'coconut') {
+          showTipOnce('banana-eat', "🍌 ผลกล้วยน้ำว้า: กดปุ่ม 'ดื่มชาใบตอง' ในหน้าจอซ้ายบนเพื่อรับประทานและฟื้นฟูค่าพลังงาน Hunger/Thirst ไม่ให้ตัวละครหมดสติ!");
+        } else if (payload.itemKey === 'wood') {
+          showTipOnce('wood-craft', "🪵 แผ่นไม้กระดาน: สะสมแผ่นไม้และเศษหินเพื่อคราฟต์อุปกรณ์ต่างๆ ในปุ่มคราฟต์ซ้ายล่าง เช่น มีดพร้าทำสวน หรือ ศาลพระภูมิมูจิ!");
+        }
       }
     };
     
@@ -215,62 +329,110 @@ export default function PlayPage({ params }: PlayPageProps) {
         {slug === 'ghost-whisperer' && (
           <>
             {/* Top Right Control bar */}
-            <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+            <div className="absolute top-2 right-2 md:top-4 md:right-4 z-40 flex items-center gap-1.5 md:gap-2 origin-top-right scale-[0.75] md:scale-100">
               {/* Coin Counter */}
-              <div className="flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-black/60 px-3 py-1.5 shadow-md backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-black/60 px-3 py-1.5 shadow-md backdrop-blur-sm select-none">
                 <span className="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Mutelu 🪙</span>
                 <span className="font-mono text-xs font-black text-amber-400">{coins}</span>
               </div>
 
-              {/* Gacha button */}
-              <button
-                onClick={() => setShowGacha(true)}
-                className="rounded-full border border-purple-500/30 bg-purple-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-purple-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-              >
-                🔮 สุ่มกาชา
-              </button>
+              {!isMobile ? (
+                <>
+                  {/* Gacha button */}
+                  <button
+                    onClick={() => setShowGacha(true)}
+                    className="rounded-full border border-purple-500/30 bg-purple-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-purple-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    🔮 สุ่มกาชา
+                  </button>
 
-              {/* Card Album button */}
-              <button
-                onClick={() => setShowCardAlbum(true)}
-                className="rounded-full border border-sky-500/30 bg-sky-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-sky-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-              >
-                📖 สมุดการ์ด
-              </button>
+                  {/* Card Album button */}
+                  <button
+                    onClick={() => {
+                      setShowCardAlbum(true);
+                      showTipOnce('album-buff', "💡 สมุดบันทึกการ์ด: การ์ดแต่ละใบที่คุณสะสมจากการตัดสินใจคืนก่อน จะมอบพรอวยพร (Buff) เช่น เพิ่มความเร็วเดิน หรือลดอัตราการหิวระบายได้ช้าลง!");
+                    }}
+                    className="rounded-full border border-sky-500/30 bg-sky-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-sky-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    📖 สมุดการ์ด
+                  </button>
 
-              {/* Pass button */}
-              <button
-                onClick={() => setShowPass(true)}
-                className="rounded-full border border-emerald-500/30 bg-emerald-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-              >
-                🎫 บัตรผ่านมู
-              </button>
+                  {/* Pass button */}
+                  <button
+                    onClick={() => setShowPass(true)}
+                    className="rounded-full border border-emerald-500/30 bg-emerald-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    🎫 บัตรผ่านมู
+                  </button>
 
-              {/* Shop button */}
-              <button
-                onClick={() => setShowShop(true)}
-                className="rounded-full border border-amber-500/30 bg-stone-900/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-              >
-                🛒 ร้านค้า
-              </button>
+                  {/* Shop button */}
+                  <button
+                    onClick={() => setShowShop(true)}
+                    className="rounded-full border border-amber-500/30 bg-stone-900/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    🛒 ร้านค้า
+                  </button>
 
-              {/* Mobile Craft button */}
-              {isMobile && (
-                <button
-                  onClick={() => setShowCraftModal(true)}
-                  className="rounded-full border border-amber-500/30 bg-stone-900/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-                >
-                  🛠️ คราฟต์
-                </button>
+                  {/* Ad Reward Button */}
+                  <button
+                    onClick={() => setShowAd(true)}
+                    className="rounded-full border border-rose-500/30 bg-rose-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    📺 รับโบนัสฟรี
+                  </button>
+                </>
+              ) : (
+                /* Mobile Menu Dropdown Wrapper */
+                <div className="relative">
+                  <button
+                    onClick={() => setShowMobileMenu(!showMobileMenu)}
+                    className="rounded-full border border-amber-500/40 bg-[#2D4B32] px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-200 shadow-md active:scale-90 transition-all flex items-center gap-1"
+                  >
+                    {showMobileMenu ? '✕ ปิด' : '🔮 เมนูมู'}
+                  </button>
+
+                  {showMobileMenu && (
+                    <div className="absolute right-0 mt-2.5 z-50 w-32 rounded-2xl border-2 border-[#C96E3A]/40 bg-[#FCFBF9] p-2 shadow-2xl flex flex-col gap-1 text-stone-850 animate-slide-up">
+                      <button
+                        onClick={() => { setShowGacha(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-purple-50 px-2.5 py-2 text-[9px] font-black text-purple-700 uppercase tracking-widest border border-transparent hover:border-purple-200"
+                      >
+                        🔮 สุ่มกาชา
+                      </button>
+                      <button
+                        onClick={() => { setShowCardAlbum(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-sky-50 px-2.5 py-2 text-[9px] font-black text-sky-700 uppercase tracking-widest border border-transparent hover:border-sky-200"
+                      >
+                        📖 สมุดการ์ด
+                      </button>
+                      <button
+                        onClick={() => { setShowPass(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-emerald-50 px-2.5 py-2 text-[9px] font-black text-emerald-700 uppercase tracking-widest border border-transparent hover:border-emerald-200"
+                      >
+                        🎫 บัตรผ่านมู
+                      </button>
+                      <button
+                        onClick={() => { setShowShop(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-amber-50 px-2.5 py-2 text-[9px] font-black text-amber-700 uppercase tracking-widest border border-transparent hover:border-amber-200"
+                      >
+                        🛒 ร้านค้า
+                      </button>
+                      <button
+                        onClick={() => { setShowCraftModal(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-stone-100 px-2.5 py-2 text-[9px] font-black text-stone-750 uppercase tracking-widest border border-transparent hover:border-stone-200"
+                      >
+                        🛠️ คราฟต์ของ
+                      </button>
+                      <button
+                        onClick={() => { setShowAd(true); setShowMobileMenu(false); }}
+                        className="w-full text-left rounded-xl hover:bg-rose-50 px-2.5 py-2 text-[9px] font-black text-rose-700 uppercase tracking-widest border border-transparent hover:border-rose-200"
+                      >
+                        📺 โบนัสฟรี
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
-
-              {/* Ad Reward Button */}
-              <button
-                onClick={() => setShowAd(true)}
-                className="rounded-full border border-rose-500/30 bg-rose-950/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-200 shadow-md backdrop-blur-sm hover:brightness-110 active:scale-95 transition-all"
-              >
-                📺 รับโบนัสฟรี
-              </button>
             </div>
           </>
         )}
@@ -294,59 +456,34 @@ export default function PlayPage({ params }: PlayPageProps) {
         {/* Virtual Mobile Controls */}
         {isMobile && slug === 'ghost-whisperer' && (
           <>
-            {/* D-Pad bottom-left */}
+            {/* Virtual Joystick bottom-left */}
             <div className="absolute bottom-6 left-6 z-40 select-none touch-none">
-              <div className="relative w-36 h-36 bg-stone-950/50 border border-stone-800/40 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
-                {/* UP */}
-                <button
-                  type="button"
-                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, up: true }))}
-                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
-                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, up: true }))}
-                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
-                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, up: false }))}
-                  className="absolute top-1 w-12 h-10 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-t-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
+              <div 
+                ref={joystickRef}
+                onTouchStart={handleJoystickTouch}
+                onTouchMove={handleJoystickTouch}
+                onTouchEnd={handleJoystickEnd}
+                onMouseDown={handleJoystickMouseDown}
+                className="relative w-32 h-32 bg-stone-950/60 border-2 border-amber-500/20 rounded-full flex items-center justify-center backdrop-blur-md shadow-2xl cursor-grab active:cursor-grabbing select-none"
+              >
+                {/* Visual Guide Directions */}
+                <span className="absolute top-1.5 text-[8px] font-black text-stone-500 select-none">▲</span>
+                <span className="absolute bottom-1.5 text-[8px] font-black text-stone-500 select-none">▼</span>
+                <span className="absolute left-1.5 text-[8px] font-black text-stone-500 select-none">◀</span>
+                <span className="absolute right-1.5 text-[8px] font-black text-stone-500 select-none">▶</span>
+
+                {/* Joystick Knob (Analog Stick Handle) */}
+                <div 
+                  style={{
+                    transform: `translate(${joystickOffset.x}px, ${joystickOffset.y}px)`,
+                    transition: joystickOffset.x === 0 && joystickOffset.y === 0 ? 'transform 0.15s ease-out' : 'none'
+                  }}
+                  className="w-14 h-14 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full border-2 border-amber-400 shadow-lg flex items-center justify-center pointer-events-none select-none"
                 >
-                  ▲
-                </button>
-                {/* DOWN */}
-                <button
-                  type="button"
-                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, down: true }))}
-                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
-                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, down: true }))}
-                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
-                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, down: false }))}
-                  className="absolute bottom-1 w-12 h-10 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-b-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
-                >
-                  ▼
-                </button>
-                {/* LEFT */}
-                <button
-                  type="button"
-                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, left: true }))}
-                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
-                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, left: true }))}
-                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
-                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, left: false }))}
-                  className="absolute left-1 w-10 h-12 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-l-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
-                >
-                  ◀
-                </button>
-                {/* RIGHT */}
-                <button
-                  type="button"
-                  onTouchStart={() => setVirtualKeys(prev => ({ ...prev, right: true }))}
-                  onTouchEnd={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
-                  onMouseDown={() => setVirtualKeys(prev => ({ ...prev, right: true }))}
-                  onMouseUp={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
-                  onMouseLeave={() => setVirtualKeys(prev => ({ ...prev, right: false }))}
-                  className="absolute right-1 w-10 h-12 bg-stone-900/70 border border-stone-800/50 active:bg-amber-600 active:text-black rounded-r-xl flex items-center justify-center text-stone-400 hover:text-white text-lg font-bold select-none"
-                >
-                  ▶
-                </button>
-                {/* CENTER DECORATION */}
-                <div className="w-10 h-10 bg-amber-500/10 rounded-full border border-amber-500/5 pointer-events-none" />
+                  <div className="w-8 h-8 bg-amber-600/30 rounded-full border border-amber-400/20 flex items-center justify-center">
+                    <span className="text-xs">🕹️</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -363,6 +500,91 @@ export default function PlayPage({ params }: PlayPageProps) {
               </button>
             </div>
           </>
+        )}
+
+        {/* Tutorial Tip Box */}
+        {tutorialTip && (
+          <div className="absolute bottom-24 left-1/2 z-40 w-full max-w-sm -translate-x-1/2 px-4 animate-fade-in pointer-events-auto">
+            <div className="rounded-2xl border border-amber-500/30 bg-black/90 p-4 shadow-xl backdrop-blur-md text-stone-200 text-[10px] font-bold leading-relaxed flex items-start gap-2.5 relative">
+              <span className="text-sm select-none">💡</span>
+              <div className="flex-grow pr-4">
+                <span className="text-amber-400 font-extrabold uppercase tracking-wider block mb-1">แนะนำ/เคล็ดลับ</span>
+                {tutorialTip}
+              </div>
+              <button 
+                onClick={() => setTutorialTip(null)}
+                className="absolute top-2 right-2 text-stone-500 hover:text-stone-300 font-black text-[9px] px-1 select-none"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Story Prologue Intro Overlay */}
+        {showPrologue && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-6 md:p-8 animate-fade-in pointer-events-auto select-none text-[#1E2922]">
+            <div className="mx-auto w-full max-w-xl rounded-3xl border-2 border-amber-500/30 bg-[#FCFBF9] p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center text-center">
+              {/* Inner border decoration */}
+              <div className="absolute inset-2.5 rounded-[22px] border border-amber-500/10 pointer-events-none" />
+
+              {/* Header Title */}
+              <span className="text-[10px] font-black text-[#C96E3A] uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-250 animate-pulse">
+                📖 ปฐมบทเนื้อเรื่อง (Story Prologue)
+              </span>
+              <h2 className="mt-4 text-base md:text-lg font-black text-[#2D4B32] uppercase tracking-wider">
+                มูเตลูทาวน์: ความลับสวนกล้วยคุณตา
+              </h2>
+              
+              {/* Scroll paper divider */}
+              <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent my-3.5" />
+
+              {/* Story scroll description */}
+              <div className="max-h-[220px] overflow-y-auto px-2 text-left space-y-4 mt-3 scrollbar-thin scrollbar-thumb-stone-200">
+                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                  คุณได้รับจดหมายมรดกจาก <strong className="text-[#C96E3A] font-black">"ตาเดช"</strong> คุณตาผู้ล่วงลับ ทิ้งมรดกชิ้นสุดท้ายเป็นบ้านไม้และสวนกล้วยน้ำว้าโบราณในหมู่บ้านชนบทอันเงียบสงบ
+                </p>
+                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                  เมื่อคุณก้าวเท้าเข้าสู่หมู่บ้านนี้ กลับมีผู้ใหญ่บ้านเข้ามาทักทายพร้อมเอ่ยเตือนกฎเหล็กด้วยท่าทางมีพิรุธ: 
+                  <span className="italic block mt-1 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl text-rose-800 font-extrabold text-xs md:text-sm">
+                    "หลังพระอาทิตย์ตกดิน... อย่าริอ่านก้าวเท้าออกจากบ้านสวนป่ากล้วยเด็ดขาด!"
+                  </span>
+                </p>
+                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                  ตกดึก... กลิ่นอายความลี้ลับเริ่มปกคลุม แสงสีเขียวอ่อนวูบวาบ และเสียงกระซิบคร่ำครวญเรียกชื่อคุณจากกลางดงกล้วยยามค่ำคืน พร้อมกล่องล็อกโบราณปริศนาที่คุณตาฝังทิ้งไว้ในดิน...
+                </p>
+              </div>
+
+              {/* Quest goals bullet summary */}
+              <div className="mt-5 w-full bg-stone-50 border border-stone-200 rounded-2xl p-4 text-left">
+                <h4 className="text-xs font-black text-[#2D4B32] uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+                  🎯 เป้าหมายหลัก (Core Missions):
+                </h4>
+                <ul className="space-y-2.5 text-[11px] md:text-xs text-stone-500 font-bold">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#C96E3A]">➔</span>
+                    <span>เอาชีวิตรอดให้ครบ <strong className="text-[#C96E3A] font-black">7 วัน 7 คืน</strong> (กลางวันเตรียมตัว / กลางคืนตัดสินใจสืบคดี)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#C96E3A]">➔</span>
+                    <span>สะสม <strong className="text-[#C96E3A] font-black">การ์ดเบาะแสความลับ</strong> จากการเลือกการตัดสินใจเพื่อเปิดความจริงหักมุม</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#C96E3A]">➔</span>
+                    <span>คราฟต์ศาลพระภูมิ อุปกรณ์ไฟฉาย เครื่องราง เพื่อคุ้มครองและฟื้นฟูพลังชีวิต</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Start Adventure button */}
+              <button
+                onClick={() => setShowPrologue(false)}
+                className="mt-6 w-full rounded-full bg-gradient-to-r from-[#2D4B32] to-[#1E3322] hover:brightness-110 py-3.5 text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg active:scale-95 transition-all select-none"
+              >
+                เริ่มการผจญภัยเอาชีวิตรอด ➔
+              </button>
+            </div>
+          </div>
         )}
 
       </div>

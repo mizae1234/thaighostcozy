@@ -57,7 +57,7 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
 
   const content = (
     <PanelFrame title="คราฟต์">
-      {!loaded && <div className="text-xs text-white/50">กำลังโหลด...</div>}
+      {!loaded && <div className="text-xs text-stone-400">กำลังโหลด...</div>}
       <div className="flex flex-col gap-1.5">
         {loaded &&
           recipes.map((recipe) => {
@@ -70,14 +70,14 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
                 disabled={!affordable}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
                   affordable
-                    ? 'bg-emerald-500/20 hover:bg-emerald-500/30'
-                    : 'bg-white/5 opacity-50'
+                    ? 'bg-emerald-100/50 hover:bg-emerald-100 text-emerald-800'
+                    : 'bg-stone-100 opacity-60'
                 }`}
               >
                 <span className="text-base leading-none">{ICON_BY_RECIPE[recipe.key] ?? '🛠️'}</span>
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white">{recipe.name}</span>
-                  <span className="text-[10px] text-white/60">
+                  <span className="text-xs font-bold text-stone-800">{recipe.name}</span>
+                  <span className="text-[10px] text-stone-500 font-medium">
                     {recipe.ingredients.map((i) => `${i.itemKey} x${i.quantity}`).join(' · ')}
                   </span>
                 </div>
@@ -85,18 +85,18 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
             );
           })}
       </div>
-      {message && <div className="mt-2 text-[11px] text-emerald-300">{message}</div>}
+      {message && <div className="mt-2 text-[11px] text-emerald-700 font-bold">{message}</div>}
     </PanelFrame>
   );
 
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm pointer-events-auto animate-fade-in">
-        <div className="relative w-full max-w-sm rounded-3xl border border-stone-850 bg-stone-950/90 p-6 shadow-2xl backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto animate-fade-in">
+        <div className="relative w-full max-w-sm rounded-3xl border border-stone-200 bg-[#FCFBF9] p-6 shadow-2xl">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-stone-400 hover:text-white text-base font-bold transition-colors p-1"
+            className="absolute top-4 right-4 text-stone-400 hover:text-stone-700 text-base font-bold transition-colors p-1"
           >
             ✕
           </button>
@@ -109,7 +109,7 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
   }
 
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 w-60 hidden lg:block">
+    <div className="pointer-events-auto absolute bottom-5 left-5 w-64 md:w-72 hidden lg:block">
       {content}
     </div>
   );
