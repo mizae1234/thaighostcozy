@@ -884,18 +884,18 @@ export default class MainScene extends Phaser.Scene {
     const sprite = this.player.sprite;
 
     if (this.currentArea === 'orchard') {
-      if (sprite.x <= 25) {
-        this.transitionToArea('temple', 1200, sprite.y);
-      } else if (sprite.x >= 1255) {
-        this.transitionToArea('market', 80, sprite.y);
+      if (sprite.x <= 45) {
+        this.transitionToArea('temple', 1180, sprite.y);
+      } else if (sprite.x >= 1235) {
+        this.transitionToArea('market', 100, sprite.y);
       }
     } else if (this.currentArea === 'temple') {
-      if (sprite.x >= 1255) {
-        this.transitionToArea('orchard', 80, sprite.y);
+      if (sprite.x >= 1235) {
+        this.transitionToArea('orchard', 100, sprite.y);
       }
     } else if (this.currentArea === 'market') {
-      if (sprite.x <= 25) {
-        this.transitionToArea('orchard', 1200, sprite.y);
+      if (sprite.x <= 45) {
+        this.transitionToArea('orchard', 1180, sprite.y);
       }
     }
   }
