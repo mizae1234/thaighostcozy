@@ -63,7 +63,7 @@ sleep 10
 
 # Run database seeding
 echo "🗄️ Seeding database content inside the container..."
-docker exec "$CONTAINER" npx prisma db seed || true
+docker exec "$CONTAINER" npx tsx prisma/seed.ts || true
 
 # ── Nginx reverse proxy setup ──────────────────────────────
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN"
