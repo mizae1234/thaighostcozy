@@ -588,6 +588,13 @@ export default class MainScene extends Phaser.Scene {
           (loc) => new ResourceNode(this, loc.x, loc.y, 'prop-fallen-fruit', 'fallen-fruit'),
         );
       }
+
+      // 4. Spawning sandalwood (Tani oil bottle) on Day 6
+      if (stepKey === 'day6-covenant') {
+        const woodX = 640 + (Math.random() - 0.5) * 160;
+        const woodY = 460 + (Math.random() - 0.5) * 100;
+        this.questNodes.push(new ResourceNode(this, woodX, woodY, 'prop-sandalwood', 'sandalwood'));
+      }
     } else {
       // Classic Pla Boo Thong steps
       if (stepKey === 'well-song') {
