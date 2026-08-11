@@ -80,63 +80,66 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      {/* Modal Card */}
-      <div className="relative w-full max-w-xl bg-[#fdf4e3] border-[3px] border-[#e3cb9f] rounded-[32px] p-8 shadow-2xl text-center flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in pointer-events-auto">
+      {/* Modal Card - Cozy Glassmorphism */}
+      <div className="relative w-full max-w-md bg-stone-950/80 border border-amber-500/30 rounded-3xl p-8 shadow-2xl backdrop-blur-md text-stone-200 text-center flex flex-col items-center">
         
+        {/* Glow effect inside modal */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-amber-500/10 blur-[50px] pointer-events-none" />
+
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-amber-950/20 bg-white text-amber-950 font-bold transition-all hover:bg-amber-100 hover:scale-105 active:scale-95"
+          className="absolute top-5 right-5 text-stone-400 hover:text-white text-lg font-bold transition-colors p-1"
         >
           ✕
         </button>
 
         {/* Header Title */}
-        <h2 className="text-3xl font-extrabold text-[#78350f] mt-4 mb-2 tracking-wide font-sans">
-          ตั้งชื่อเล่น
+        <h2 className="text-2xl font-black uppercase tracking-widest text-amber-400 mt-4 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+          ตั้งชื่อเล่นตัวละคร
         </h2>
 
         {/* Subtitle */}
-        <p className="text-sm font-semibold text-[#854d0e]/85 mb-8 leading-relaxed max-w-sm">
-          ตั้งชื่อเล่นเพื่อบันทึกความคืบหน้าและขึ้นกระดานผู้รอดชีวิต
+        <p className="text-xs font-semibold text-stone-400 mb-8 leading-relaxed max-w-xs">
+          ตั้งชื่อเล่นเพื่อใช้สำหรับบันทึกความคืบหน้าและประดับบนบอร์ดผู้สื่อวิญญาณ
         </p>
 
         {/* Error message */}
         {errorMsg && (
-          <p className="text-xs font-bold text-red-600 mb-4 bg-red-100/50 py-1.5 px-4 rounded-full">
+          <p className="text-xs font-bold text-rose-400 mb-4 bg-rose-950/40 border border-rose-900/30 py-1.5 px-4 rounded-full animate-pulse">
             ⚠️ {errorMsg}
           </p>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col items-center">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
           
           {/* Input Box */}
           <input
             type="text"
             required
-            maxLength={25}
+            maxLength={20}
             value={nickname}
             onChange={(e) => setNicknameState(e.target.value)}
-            placeholder="ชื่อเล่นของคุณ"
-            className="w-full bg-[#fdfaf2] border-2 border-[#e6d0a7] rounded-2xl px-6 py-4 text-center text-lg font-bold text-[#451a03] placeholder-amber-900/30 outline-none transition-all focus:border-[#d97706] focus:ring-4 focus:ring-[#f59e0b]/20 shadow-inner"
+            placeholder="กรอกชื่อเล่นของคุณ..."
+            className="w-full bg-stone-900/60 border border-stone-750/50 rounded-xl px-5 py-3.5 text-center text-base font-bold text-white placeholder-stone-600 outline-none transition-all focus:border-amber-500/70 focus:ring-4 focus:ring-amber-500/10 shadow-inner"
           />
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading || !nickname.trim()}
-            className="mt-6 w-full max-w-xs bg-gradient-to-b from-[#fcd34d] to-[#d97706] border-b-4 border-[#b45309] hover:from-[#fde047] hover:to-[#f59e0b] text-[#5c2d0b] font-extrabold text-lg py-3 px-8 rounded-full shadow-lg transition-all hover:scale-102 active:translate-y-0.5 active:border-b-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-6 w-full bg-gradient-to-r from-amber-500 via-yellow-450 to-amber-500 hover:brightness-110 text-black font-black uppercase tracking-widest text-xs py-3.5 px-8 rounded-xl shadow-[0_4px_20px_rgba(245,158,11,0.25)] transition-all hover:scale-[1.02] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'กำลังเชื่อมต่อ...' : 'เริ่มเลย'}
+            {loading ? 'กำลังบันทึกสถิติ...' : '🎮 เริ่มการเดินทาง'}
           </button>
         </form>
 
         {/* Footer info text */}
-        <p className="mt-8 text-xs font-semibold text-[#78350f]/60 max-w-sm leading-normal">
-          บัญชีผู้เล่นรับเชิญ – ความคืบหน้าจะถูกบันทึกในเบราว์เซอร์นี้และซิงค์ขึ้นออนไลน์
+        <p className="mt-8 text-[10px] font-bold text-stone-500 uppercase tracking-wider leading-relaxed">
+          บัญชีผู้เล่นรับเชิญ – ความคืบหน้าจะบันทึกในเบราว์เซอร์นี้และซิงค์ขึ้นออนไลน์
         </p>
       </div>
     </div>

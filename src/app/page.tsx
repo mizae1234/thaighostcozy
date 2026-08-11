@@ -140,36 +140,36 @@ export default function HomePage() {
 
       {/* How to Play Modal */}
       {showHowToPlay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-[28px] border-2 border-[#e6d0a7] bg-[#fdf4e3] p-6 shadow-2xl text-stone-800">
-            <h3 className="text-lg font-black uppercase tracking-wider text-[#78350f] border-b border-[#e3cb9f] pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm pointer-events-auto">
+          <div className="relative w-full max-w-md rounded-3xl border border-stone-850 bg-stone-950/80 p-6 shadow-2xl backdrop-blur-md text-stone-200">
+            <h3 className="text-lg font-black uppercase tracking-wider text-amber-400 border-b border-stone-800 pb-3">
               📖 วิธีการเล่นบอร์ดเกมปราบผี
             </h3>
-            <ul className="mt-4 space-y-3.5 text-xs text-[#5c2d0b] leading-relaxed font-semibold">
+            <ul className="mt-4 space-y-3.5 text-xs text-stone-355 leading-relaxed font-medium">
               <li className="flex items-start gap-2.5">
-                <span className="text-amber-600">🚶‍♂️</span>
+                <span className="text-amber-500">🚶‍♂️</span>
                 <span><strong>ควบคุมตัวละคร:</strong> ใช้ปุ่มลูกศร (Arrow Keys) หรือปุ่ม <strong>W A S D</strong> ในการเดินสำรวจรอบเกาะ</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="text-amber-600">🌌</span>
+                <span className="text-amber-500">🌌</span>
                 <span><strong>เก็บกู้ทรัพยากร:</strong> กดปุ่ม <strong>Spacebar</strong> หรือเดินชน เพื่อเก็บวัตถุดิบในสวน (ไม้, ใบตอง, หิน) หรือพูดคุยสนทนากับวิญญาณ</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="text-amber-600">🛠️</span>
+                <span className="text-amber-500">🛠️</span>
                 <span><strong>เมนูคราฟต์ของ:</strong> ดูรายการวัตถุดิบที่ต้องการแล้วคราฟต์สร้างไอเทม เช่น <strong>มีด</strong> หรือ <strong>ศาลพระภูมิมูจิ</strong> ในแท็บคราฟต์ด้านล่าง</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="text-amber-600">❤️</span>
+                <span className="text-amber-500">❤️</span>
                 <span><strong>เอาชีวิตรอด:</strong> ระวังเกจค่าความหิวความกระหายทางซ้ายบนให้ดี หากหมดเกจพลังจะลดฮวบลงเรื่อยๆ</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="text-amber-600">🔍</span>
+                <span className="text-amber-500">🔍</span>
                 <span><strong>ปรับมุมกล้อง:</strong> กดปุ่มซูมมุมกล้องใน HUD เพื่อสลับระยะกว้างและแคบได้ทันที</span>
               </li>
             </ul>
             <button
               onClick={() => setShowHowToPlay(false)}
-              className="mt-6 w-full rounded-full bg-gradient-to-b from-[#fcd34d] to-[#d97706] text-[#5c2d0b] py-2.5 text-xs font-bold uppercase tracking-widest hover:brightness-105 active:translate-y-0.5"
+              className="mt-6 w-full rounded-xl bg-amber-500 py-2.5 text-xs font-bold uppercase tracking-widest text-black hover:bg-yellow-400 transition-all hover:scale-[1.01]"
             >
               ปิดหน้าต่าง
             </button>
@@ -179,29 +179,29 @@ export default function HomePage() {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-[28px] border-2 border-[#e6d0a7] bg-[#fdf4e3] p-6 shadow-2xl text-stone-800">
-            <h3 className="text-lg font-black uppercase tracking-wider text-[#78350f] border-b border-[#e3cb9f] pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm pointer-events-auto">
+          <div className="relative w-full max-w-md rounded-3xl border border-stone-850 bg-stone-950/80 p-6 shadow-2xl backdrop-blur-md text-stone-200">
+            <h3 className="text-lg font-black uppercase tracking-wider text-amber-400 border-b border-stone-800 pb-3">
               ⚙️ ตั้งค่าระบบเสียงเกม
             </h3>
             <div className="mt-5 space-y-4">
-              <div className="flex items-center justify-between text-xs font-bold text-[#5c2d0b]">
+              <div className="flex items-center justify-between text-xs font-bold text-stone-300">
                 <span>เอฟเฟกต์เสียง (Sound Effects)</span>
                 <button
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`rounded-full px-4 py-1 text-[10px] font-black ${
-                    soundEnabled ? 'bg-emerald-600 text-white' : 'bg-stone-300 text-stone-600'
+                  className={`rounded-lg px-3 py-1.5 text-[10px] font-black ${
+                    soundEnabled ? 'bg-emerald-600 text-white' : 'bg-stone-800 text-stone-500'
                   }`}
                 >
                   {soundEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                 </button>
               </div>
-              <div className="flex items-center justify-between text-xs font-bold text-[#5c2d0b]">
+              <div className="flex items-center justify-between text-xs font-bold text-stone-300">
                 <span>ดนตรีประกอบ (Background Music)</span>
                 <button
                   onClick={() => setMusicEnabled(!musicEnabled)}
-                  className={`rounded-full px-4 py-1 text-[10px] font-black ${
-                    musicEnabled ? 'bg-emerald-600 text-white' : 'bg-stone-300 text-stone-600'
+                  className={`rounded-lg px-3 py-1.5 text-[10px] font-black ${
+                    musicEnabled ? 'bg-emerald-600 text-white' : 'bg-stone-800 text-stone-500'
                   }`}
                 >
                   {musicEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
@@ -210,7 +210,7 @@ export default function HomePage() {
             </div>
             <button
               onClick={() => setShowSettings(false)}
-              className="mt-6 w-full rounded-full bg-gradient-to-b from-[#fcd34d] to-[#d97706] text-[#5c2d0b] py-2.5 text-xs font-bold uppercase tracking-widest hover:brightness-105 active:translate-y-0.5"
+              className="mt-6 w-full rounded-xl bg-amber-500 py-2.5 text-xs font-bold uppercase tracking-widest text-black hover:bg-yellow-400 transition-all hover:scale-[1.01]"
             >
               บันทึกการตั้งค่า
             </button>
