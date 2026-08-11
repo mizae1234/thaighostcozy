@@ -102,5 +102,29 @@
     "type": "RESOURCE",
     "stackable": true,
     "maxStack": 99
+  },
+  {
+    "key": "boba-tea",
+    "name": "ชานมไข่มุกพาสเทล",
+    "description": "ชานมไข่มุกหวานร้อยของโปรดตานีและกุมารทอง ถวายแล้วเพิ่มความสนิทสนม",
+    "type": "CONSUMABLE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "elephant-pants",
+    "name": "กางเกงช้างสตรีทแวร์",
+    "description": "กางเกงลายช้างสุดฮิต ใส่เพิ่มความเร็ววิ่ง +10% ถาวร",
+    "type": "CLOTHING",
+    "stackable": false,
+    "maxStack": 1
+  },
+  {
+    "key": "retro-sunglasses",
+    "name": "แว่นตากันแดด Y2K",
+    "description": "แว่นกันแดดเลนส์ใสช่วยชะลออัตราลดความหิว/กระหายน้ำลง 20%",
+    "type": "CLOTHING",
+    "stackable": false,
+    "maxStack": 1
   }
 ]
