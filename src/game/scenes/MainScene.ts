@@ -424,7 +424,7 @@ export default class MainScene extends Phaser.Scene {
     const isWellStep = this.currentStepKey === 'well-song' || this.currentStepKey === 'day6-covenant' || this.currentStepKey === 'day7-climax';
     if (isWellStep) {
       const wellX = 640;
-      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const slug = this.registry.get('storySlug') || 'pla-boo-thong';
       const wellY = slug === 'ghost-whisperer' ? 460 : 360;
       const dist = Phaser.Math.Distance.Between(playerX, playerY, wellX, wellY);
       if (dist < 100 && !useQuestStore.getState().reachedLocations['well']) {
@@ -664,7 +664,7 @@ export default class MainScene extends Phaser.Scene {
 
     if (hasWellObjective) {
       const wellX = 640;
-      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+      const slug = this.registry.get('storySlug') || 'pla-boo-thong';
       const wellY = slug === 'ghost-whisperer' ? 460 : 360;
       const dist = Phaser.Math.Distance.Between(
         this.player.sprite.x,
@@ -680,9 +680,7 @@ export default class MainScene extends Phaser.Scene {
 
   // Clamping to island boundary ellipse
   private clampToIsland() {
-    const slug = typeof window !== 'undefined' 
-      ? window.location.pathname.split('/').pop() 
-      : 'pla-boo-thong';
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
     if (slug === 'ghost-whisperer') return;
 
     const sprite = this.player.sprite;
@@ -1175,7 +1173,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private toggleZoom() {
-    const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+    const slug = this.registry.get('storySlug') || 'pla-boo-thong';
     const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
     
     const minZoomToCover = Math.max(this.scale.width / WORLD_WIDTH, this.scale.height / WORLD_HEIGHT);
