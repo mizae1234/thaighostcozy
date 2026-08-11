@@ -27,41 +27,40 @@ export default function DialogueOverlay() {
   const currentLine = dialogueLines[dialogueIndex];
   if (!currentLine) return null;
 
-  // Decide speaker styling
-  const isPlayer = currentLine.speaker === 'เรา';
-  const speakerColor = isPlayer ? 'text-amber-300' : 'text-yellow-400 font-extrabold drop-shadow';
-
   return (
-    <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/45 p-6 md:p-8 animate-fade-in">
+    <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/45 p-6 md:p-8 animate-fade-in pointer-events-auto">
       {/* Dialogue box */}
       <div 
         onClick={nextDialogue}
-        className="mx-auto w-full max-w-3xl cursor-pointer rounded-2xl border-4 border-amber-900 bg-amber-950/90 p-5 shadow-2xl backdrop-blur-md transition-all hover:border-amber-700 hover:bg-amber-950/95"
-        style={{
-          boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.7), inset 0 2px 4px 0 rgb(255 255 255 / 0.1)',
-        }}
+        className="mx-auto w-full max-w-2xl cursor-pointer rounded-2xl border border-stone-200 bg-[#FCFBF9] p-5 shadow-xl flex gap-4 transition-all hover:bg-stone-50 text-[#1E2922] select-none"
       >
-        {/* Speaker Name Tag */}
-        <div className="mb-2 flex items-center justify-between border-b-2 border-amber-900/50 pb-2">
-          <span className={`text-lg font-bold tracking-wide uppercase ${speakerColor}`}>
-            {currentLine.speaker}
-          </span>
-          <span className="text-xs text-amber-500/80 uppercase tracking-widest font-mono">
-            {dialogueIndex + 1} / {dialogueLines.length}
-          </span>
+        {/* Avatar Portrait Bubble */}
+        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-xl overflow-hidden shadow-inner">
+          {currentLine.speaker === 'เรา' ? '👤' : '👻'}
         </div>
 
-        {/* Message Content */}
-        <div className="min-h-16 text-base md:text-lg leading-relaxed text-amber-100 font-normal">
-          {currentLine.thai}
-        </div>
+        {/* Text Container */}
+        <div className="flex-grow flex flex-col justify-center">
+          {/* Header/Speaker name */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black text-[#C96E3A] uppercase tracking-widest">
+              {currentLine.speaker}
+            </span>
+            <span className="text-[10px] text-stone-400 uppercase tracking-widest font-mono">
+              {dialogueIndex + 1} / {dialogueLines.length}
+            </span>
+          </div>
 
-        {/* Next Indicator */}
-        <div className="mt-3 flex justify-end">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-500 animate-pulse">
-            <span>กด Spacebar หรือคลิกเพื่ออ่านต่อ</span>
+          {/* Thai Dialogue Message */}
+          <p className="mt-1 text-xs font-bold text-[#1E2922] leading-relaxed min-h-[32px]">
+            &ldquo;{currentLine.thai}&rdquo;
+          </p>
+
+          {/* Press to continue notice */}
+          <div className="mt-2 flex justify-end items-center gap-1 text-[9px] font-black text-stone-400 uppercase tracking-widest">
+            <span>PRESS SPACEBAR OR CLICK TO CONTINUE</span>
             <svg 
-              className="h-3 w-3 fill-current transform translate-y-0.5" 
+              className="h-2 w-2 fill-current transform translate-y-0.5" 
               viewBox="0 0 24 24"
             >
               <path d="M12 21l-12-18h24z" />

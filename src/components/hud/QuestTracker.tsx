@@ -64,13 +64,13 @@ export default function QuestTracker() {
     : (PLA_BOO_HINTS[activeStep.key] || '');
 
   return (
-    <div className="absolute left-4 top-[195px] z-40 w-64 rounded-2xl border-2 border-amber-900/60 bg-amber-950/80 p-4 text-amber-100 shadow-xl backdrop-blur-md transition-all md:w-72">
+    <div className="absolute left-4 top-[195px] z-40 w-64 rounded-xl bg-[#5c3a2a] p-4 text-white shadow-xl backdrop-blur-sm transition-all md:w-72 border border-[#C96E3A]/20 select-none">
       {/* Header */}
-      <div className="mb-2.5 border-b border-amber-800/60 pb-2">
-        <h3 className="text-xs font-extrabold uppercase tracking-widest text-amber-400">
-          ภารกิจหลัก: {quest.name}
+      <div className="mb-2.5 border-b border-[#C96E3A]/20 pb-2 flex flex-col">
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-[#FCFBF9]/90 flex items-center gap-1">
+          🔖 Current Objective
         </h3>
-        <p className="text-sm font-bold text-amber-200 mt-0.5">{stepTitle}</p>
+        <p className="text-xs font-bold text-[#FCFBF9]/80 mt-1 leading-snug">{stepTitle}</p>
       </div>
 
       {/* Objectives List */}
@@ -114,19 +114,19 @@ export default function QuestTracker() {
             <li 
               key={i} 
               className={`flex items-start justify-between text-xs transition-colors ${
-                isDone ? 'text-amber-500/60 line-through' : 'text-amber-200'
+                isDone ? 'text-[#FCFBF9]/40 line-through' : 'text-[#FCFBF9]/90'
               }`}
             >
               <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-xs">
+                <span className="mt-0.5 text-xs select-none">
                   {isDone ? '✅' : '⚪'}
                 </span>
-                <span className="font-medium">{label}</span>
+                <span className="font-semibold">{label}</span>
               </div>
               
               {/* Show quantity only for COLLECT and CRAFT */}
               {(obj.type === 'COLLECT' || obj.type === 'CRAFT') && (
-                <span className={`font-mono text-xs ${isDone ? 'text-amber-500/60' : 'text-amber-300 font-bold'}`}>
+                <span className={`font-mono text-xs ${isDone ? 'text-[#FCFBF9]/40' : 'text-[#C96E3A] font-black'}`}>
                   {currentVal}/{targetVal}
                 </span>
               )}
@@ -137,7 +137,7 @@ export default function QuestTracker() {
 
       {/* Guidance / Hint Box */}
       {stepHint && (
-        <div className="mt-3 border-t border-amber-900/50 pt-2 text-[10px] md:text-xs leading-relaxed text-yellow-400/90 font-medium">
+        <div className="mt-3 border-t border-[#C96E3A]/20 pt-2 text-[10px] leading-relaxed text-[#FCFBF9]/70 font-semibold italic">
           {stepHint}
         </div>
       )}

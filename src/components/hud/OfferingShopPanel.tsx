@@ -68,27 +68,27 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-      <div className="relative w-full max-w-lg rounded-3xl border-2 border-amber-500/20 bg-stone-950 p-6 shadow-2xl backdrop-blur-xl text-stone-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto">
+      <div className="relative w-full max-w-lg rounded-3xl border border-stone-200 bg-[#FCFBF9] p-6 shadow-2xl text-stone-800">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-800/80 pb-3">
+        <div className="flex items-center justify-between border-b border-stone-200 pb-3">
           <div>
-            <h2 className="text-xl font-black uppercase tracking-wider text-amber-400">🛒 ร้านค้าสายมูสตรีทแวร์</h2>
-            <p className="text-[10px] uppercase tracking-widest text-stone-500 mt-0.5">Shop Daily Offerings & Customizations</p>
+            <h2 className="text-xl font-black uppercase tracking-wider text-[#2D4B32]">🛒 ร้านค้าสายมูสตรีทแวร์</h2>
+            <p className="text-[10px] uppercase tracking-widest text-[#2D4B32]/70 mt-0.5">Shop Daily Offerings & Customizations</p>
           </div>
           <button 
             onClick={onClose} 
-            className="text-stone-400 hover:text-white text-lg font-bold p-1"
+            className="text-stone-400 hover:text-stone-700 text-lg font-bold p-1"
           >
             ✕
           </button>
         </div>
 
         {/* Currency Display */}
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-amber-500/5 border border-amber-500/10 px-4 py-2.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-stone-400">เหรียญในกระเป๋าของคุณ</span>
-          <span className="font-mono text-sm font-extrabold text-amber-400">{coins} 🪙</span>
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-white border border-stone-200 px-4 py-2.5 shadow-sm">
+          <span className="text-xs font-black uppercase tracking-widest text-stone-500">เหรียญในกระเป๋าของคุณ</span>
+          <span className="font-mono text-sm font-extrabold text-[#C96E3A]">{coins} 🪙</span>
         </div>
 
         {/* Item List */}
@@ -96,20 +96,20 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
           {SHOP_ITEMS.map((item) => (
             <div 
               key={item.key} 
-              className="flex items-center justify-between rounded-2xl border border-stone-800 bg-stone-900/30 p-3 hover:border-stone-700/80 transition-colors"
+              className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-3 hover:border-stone-300 transition-colors shadow-sm"
             >
               <div className="flex items-center gap-3.5">
                 <span className="text-3xl filter drop-shadow-md">{item.icon}</span>
                 <div className="text-left">
-                  <h4 className="text-xs font-black text-white">{item.name}</h4>
-                  <p className="text-[10px] text-stone-400 mt-0.5 leading-relaxed font-semibold max-w-[240px]">
+                  <h4 className="text-xs font-black text-[#1E2922]">{item.name}</h4>
+                  <p className="text-[10px] text-stone-500 mt-0.5 leading-relaxed font-bold max-w-[240px]">
                     {item.desc}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => handleBuy(item)}
-                className="rounded-xl bg-amber-500 hover:bg-yellow-400 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-black shadow-md active:scale-95 transition-all flex flex-col items-center"
+                className="rounded-xl bg-[#C96E3A] hover:bg-[#b55c2b] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-sm active:scale-95 transition-all flex flex-col items-center"
               >
                 <span>ซื้อ</span>
                 <span className="font-mono text-[9px] mt-0.5">{item.price} 🪙</span>
@@ -121,10 +121,10 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
         {/* Status Messages */}
         <div className="mt-5 min-h-[20px]">
           {successMsg && (
-            <p className="text-center text-xs font-bold text-emerald-400 animate-pulse">{successMsg}</p>
+            <p className="text-center text-xs font-bold text-emerald-700 animate-pulse">{successMsg}</p>
           )}
           {errorMsg && (
-            <p className="text-center text-xs font-bold text-rose-400 animate-bounce">{errorMsg}</p>
+            <p className="text-center text-xs font-bold text-rose-600 animate-bounce">{errorMsg}</p>
           )}
         </div>
       </div>

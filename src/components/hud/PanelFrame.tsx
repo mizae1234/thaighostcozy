@@ -11,10 +11,10 @@ export default function PanelFrame({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/15 bg-slate-900/80 p-3 shadow-lg backdrop-blur-sm ${className}`}
+      className={`rounded-2xl border border-stone-200 bg-[#FCFBF9] p-3.5 shadow-md ${className}`}
     >
       {title && (
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-emerald-300/90">
+        <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-[#2D4B32] border-b border-stone-150 pb-1">
           {title}
         </div>
       )}

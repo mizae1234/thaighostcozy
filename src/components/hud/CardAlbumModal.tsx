@@ -58,30 +58,27 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md pointer-events-auto">
-      <div className="relative w-full max-w-4xl rounded-3xl border border-purple-500/30 bg-stone-950/95 p-8 shadow-2xl text-stone-200 max-h-[90vh] overflow-y-auto backdrop-blur-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto">
+      <div className="relative w-full max-w-4xl rounded-3xl border border-stone-200 bg-[#FCFBF9] p-8 shadow-2xl text-stone-800 max-h-[90vh] overflow-y-auto">
         
-        {/* Glow effect inside modal */}
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-purple-500/10 blur-[100px] pointer-events-none" />
-
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-stone-400 hover:text-white text-lg font-bold transition-colors p-1"
+          className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 text-lg font-bold transition-colors p-1"
         >
           ✕
         </button>
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-black uppercase tracking-wider text-purple-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-            🔮 สมุดสะสมการ์ดวิญญาณอารักษ์
+          <h2 className="text-3xl font-black uppercase tracking-wider text-[#2D4B32]">
+            📖 สมุดสะสมการ์ดวิญญาณอารักษ์
           </h2>
-          <p className="text-xs font-semibold text-purple-400/90 mt-1 uppercase tracking-wider">
+          <p className="text-xs font-bold text-stone-500 mt-1 uppercase tracking-wider">
             รวบรวมเพื่ออัญเชิญผีไทยและรับพรบัฟสเตตัสช่วยเหลือพิเศษ
           </p>
-          <div className="inline-block mt-3 bg-purple-950/40 border border-purple-900/30 rounded-full px-4 py-1 text-xs font-bold text-purple-300">
-            ปลดล็อกแล้ว: <span className="text-amber-400 font-extrabold">{unlockedGhosts.length}</span> / {GHOST_CARDS.length} ใบ
+          <div className="inline-block mt-3 bg-[#2D4B32]/10 border border-[#2D4B32]/20 rounded-full px-4 py-1 text-xs font-bold text-[#2D4B32]">
+            ปลดล็อกแล้ว: <span className="font-extrabold">{unlockedGhosts.length}</span> / {GHOST_CARDS.length} ใบ
           </div>
         </div>
 
@@ -93,21 +90,21 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
             return (
               <div
                 key={card.key}
-                className={`relative flex flex-col items-center rounded-2xl border p-4 text-center transition-all bg-stone-900/60 ${
+                className={`relative flex flex-col items-center rounded-2xl border p-4 text-center transition-all bg-[#FCFBF9] ${
                   isUnlocked
-                    ? 'border-purple-500/50 shadow-lg shadow-purple-950/30 scale-100 hover:scale-[1.02] hover:border-purple-400'
-                    : 'border-stone-850 opacity-40 grayscale filter'
+                    ? 'border-[#2D4B32]/30 shadow-md scale-100 hover:scale-[1.02]'
+                    : 'border-stone-200 opacity-45 grayscale filter'
                 }`}
               >
                 {/* Image display */}
-                <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-stone-950 border border-stone-800/40">
+                <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
                   <img
                     src={card.img}
                     alt={card.name}
                     className="w-full h-full object-cover"
                   />
                   {!isUnlocked && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white">
+                    <div className="absolute inset-0 bg-black/35 flex items-center justify-center text-white">
                       <span className="text-3xl">🔒</span>
                     </div>
                   )}
@@ -120,16 +117,16 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
                   >
                     {card.rarity}
                   </span>
-                  <h3 className="text-sm font-black text-amber-400 mt-1">
+                  <h3 className="text-sm font-black text-[#1E2922] mt-1">
                     {card.name}
                   </h3>
                   
                   {isUnlocked ? (
-                    <p className="mt-2 text-[10.5px] font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-900/30 rounded-lg p-2 leading-relaxed w-full">
+                    <p className="mt-2 text-[10.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-250/50 rounded-lg p-2 leading-relaxed w-full">
                       {card.buff}
                     </p>
                   ) : (
-                    <p className="mt-2 text-[11px] font-medium text-stone-500 leading-relaxed italic">
+                    <p className="mt-2 text-[11px] font-bold text-stone-400 leading-relaxed italic">
                       สุ่มหาได้จากตู้สุ่มสายมู
                     </p>
                   )}
@@ -140,31 +137,31 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
         </div>
 
         {/* Dynamic Passive Buff Info */}
-        <div className="mt-8 bg-purple-950/20 border border-purple-900/20 rounded-2xl p-5 text-left">
-          <h4 className="text-xs font-black uppercase tracking-wider text-purple-300 mb-3">
+        <div className="mt-8 bg-stone-50 border border-stone-200 rounded-2xl p-5 text-left">
+          <h4 className="text-xs font-black uppercase tracking-wider text-[#2D4B32] mb-3">
             🔮 สิทธิประโยชน์บัฟจากการเปิดใช้งานการ์ด (Active Passive Buffs):
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold text-stone-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold text-stone-600">
             <div className="flex items-center gap-2">
-              <span className={unlockedGhosts.includes('tani') ? 'text-emerald-400' : 'text-stone-600'}>
+              <span className={unlockedGhosts.includes('tani') ? 'text-[#2D4B32]' : 'text-stone-300'}>
                 {unlockedGhosts.includes('tani') ? '✅' : '❌'}
               </span>
               <span>วิ่งเร็วขึ้น 20% (นางตานี)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={unlockedGhosts.includes('kuman') ? 'text-emerald-400' : 'text-stone-600'}>
+              <span className={unlockedGhosts.includes('kuman') ? 'text-[#2D4B32]' : 'text-stone-300'}>
                 {unlockedGhosts.includes('kuman') ? '✅' : '❌'}
               </span>
               <span>ลดอัตราหิวช้าลง 20% (กุมารทอง)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={unlockedGhosts.includes('pob') ? 'text-emerald-400' : 'text-stone-600'}>
+              <span className={unlockedGhosts.includes('pob') ? 'text-[#2D4B32]' : 'text-stone-300'}>
                 {unlockedGhosts.includes('pob') ? '✅' : '❌'}
               </span>
               <span>ฟาร์มผลผลิตขุดได้ +1 ชิ้น (ปอบ)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={unlockedGhosts.includes('naga') ? 'text-emerald-400' : 'text-stone-600'}>
+              <span className={unlockedGhosts.includes('naga') ? 'text-[#2D4B32]' : 'text-stone-300'}>
                 {unlockedGhosts.includes('naga') ? '✅' : '❌'}
               </span>
               <span>ลดอัตรากระหายน้ำช้าลง 30% (พญานาค)</span>

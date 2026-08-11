@@ -93,18 +93,18 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-      <div className="relative w-full max-w-lg rounded-3xl border-2 border-purple-500/30 bg-purple-950/20 p-6 shadow-2xl backdrop-blur-xl text-stone-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto">
+      <div className="relative w-full max-w-lg rounded-3xl border border-stone-200 bg-[#FCFBF9] p-6 shadow-2xl text-stone-800">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-purple-800/40 pb-3">
+        <div className="flex items-center justify-between border-b border-stone-200 pb-3">
           <div>
-            <h2 className="text-xl font-black uppercase tracking-wider text-purple-300">🔮 ตู้สุ่มอาร์ตทอยสายมู</h2>
-            <p className="text-[10px] uppercase tracking-widest text-purple-400 mt-0.5">Summon Cute Thai Ghosts & Spirits</p>
+            <h2 className="text-xl font-black uppercase tracking-wider text-[#2D4B32]">🔮 ตู้สุ่มอาร์ตทอยสายมู</h2>
+            <p className="text-[10px] uppercase tracking-widest text-[#2D4B32]/70 mt-0.5">Summon Cute Thai Ghosts & Spirits</p>
           </div>
           <button 
             onClick={onClose} 
-            className="text-stone-400 hover:text-white text-lg font-bold p-1"
+            className="text-stone-400 hover:text-stone-700 text-lg font-bold p-1"
           >
             ✕
           </button>
@@ -115,13 +115,13 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
           {isRolling ? (
             <div className="flex flex-col items-center gap-4">
               {/* Spinning crystal ball */}
-              <div className="h-28 w-28 rounded-full bg-gradient-to-tr from-purple-600 via-pink-500 to-indigo-600 animate-spin blur-[3px]" />
-              <p className="text-sm font-black text-purple-300 animate-pulse tracking-widest">กำลังทำพิธีปลุกเสกสุ่มอาร์ตทอย...</p>
+              <div className="h-28 w-28 rounded-full bg-gradient-to-tr from-[#2D4B32] via-[#C96E3A] to-yellow-500 animate-spin blur-[2px]" />
+              <p className="text-sm font-black text-[#C96E3A] animate-pulse tracking-widest">กำลังทำพิธีปลุกเสกสุ่มอาร์ตทอย...</p>
             </div>
           ) : summonedGhost ? (
             <div className="flex flex-col items-center gap-4 animate-scaleUp">
               {/* Summoned Ghost Card Display */}
-              <div className="relative group max-w-[200px] overflow-hidden rounded-2xl border-4 border-amber-400 shadow-2xl transition-transform duration-300 hover:scale-105">
+              <div className="relative group max-w-[200px] overflow-hidden rounded-2xl border-4 border-[#C96E3A] shadow-2xl transition-transform duration-300 hover:scale-105">
                 <img 
                   src={summonedGhost.img} 
                   alt={summonedGhost.name} 
@@ -134,18 +134,18 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
                 <span className={`inline-block rounded-full border px-3 py-0.5 text-[10px] font-extrabold tracking-wider ${summonedGhost.rarityColor} mb-1`}>
                   {summonedGhost.rarity} Companion
                 </span>
-                <h3 className="text-lg font-black text-yellow-300">{summonedGhost.name}</h3>
-                <p className="mt-1 text-xs text-purple-200/90 max-w-xs font-semibold leading-relaxed">
+                <h3 className="text-lg font-black text-[#2D4B32]">{summonedGhost.name}</h3>
+                <p className="mt-1 text-xs text-stone-600 max-w-xs font-bold leading-relaxed">
                   {summonedGhost.buff}
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center text-center gap-6">
-              <span className="text-7xl filter drop-shadow-[0_5px_15px_rgba(147,51,234,0.5)]">🔮</span>
+              <span className="text-7xl filter drop-shadow-[0_5px_15px_rgba(201,110,58,0.2)]">🔮</span>
               <div>
-                <p className="text-sm font-bold text-purple-300">หม้อปรุงยาวิเศษของสตรีมเมอร์สายมู</p>
-                <p className="text-xs text-stone-400 mt-1 max-w-xs font-medium leading-relaxed">
+                <p className="text-sm font-bold text-[#2D4B32]">หม้อปรุงยาวิเศษของสตรีมเมอร์สายมู</p>
+                <p className="text-xs text-stone-500 mt-1 max-w-xs font-bold leading-relaxed">
                   ใช้ 100 เหรียญสายมู เพื่อสุ่มกุญแจปลุกเสกอัญเชิญวิญญาณมาช่วยเฝ้าและรดน้ำแปลงผักของคุณ!
                 </p>
               </div>
@@ -157,16 +157,16 @@ export default function GachaPanel({ onClose }: GachaPanelProps) {
         {!isRolling && (
           <div className="flex flex-col gap-3">
             {errorMsg && (
-              <p className="text-center text-xs font-bold text-rose-400 animate-bounce">{errorMsg}</p>
+              <p className="text-center text-xs font-bold text-rose-600 animate-bounce">{errorMsg}</p>
             )}
             <button
               onClick={handleRoll}
-              className="w-full rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-purple-950/40 hover:brightness-110 active:scale-95 transition-all"
+              className="w-full rounded-full bg-gradient-to-r from-[#C96E3A] via-[#d67b45] to-[#C96E3A] py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:brightness-110 active:scale-95 transition-all"
             >
               🪙 อัญเชิญกล่องสุ่ม (100 เหรียญ)
             </button>
-            <div className="text-center text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-              เหรียญของคุณในกระเป๋า: <span className="font-mono text-amber-400 font-extrabold">{coins} 🪙</span>
+            <div className="text-center text-[10px] font-black text-stone-500 uppercase tracking-widest">
+              เหรียญของคุณในกระเป๋า: <span className="font-mono text-[#C96E3A] font-extrabold">{coins} 🪙</span>
             </div>
           </div>
         )}

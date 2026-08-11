@@ -38,7 +38,7 @@ export default function StatsBar() {
       <PanelFrame>
         <div className="flex flex-col gap-2">
           {nickname && (
-            <div className="text-amber-200 text-xs font-black border-b border-amber-900/20 pb-1 mb-0.5 tracking-wider">
+            <div className="text-stone-800 text-xs font-black border-b border-stone-150 pb-1 mb-0.5 tracking-wider">
               👤 ผู้รอดชีวิต: {nickname}
             </div>
           )}
@@ -51,7 +51,7 @@ export default function StatsBar() {
               e.currentTarget.blur();
             }}
             disabled={coconutCount <= 0}
-            className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-500/90 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+            className="flex items-center justify-center gap-1.5 rounded-lg bg-[#2D4B32] hover:bg-[#1E3322] px-3 py-1.5 text-xs font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-stone-150 disabled:text-stone-400"
           >
             {buttonLabel}
           </button>
@@ -63,7 +63,7 @@ export default function StatsBar() {
                 EventBus.emit('toggle-camera-zoom', undefined);
                 e.currentTarget.blur();
               }}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-yellow-600/35 bg-slate-900/60 px-3 py-1.5 text-xs font-semibold text-amber-200 transition-colors hover:bg-slate-800"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-stone-300 bg-[#FCFBF9] hover:bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-800 transition-colors"
             >
               🔍 ซูมกล้อง (2 ระยะ)
             </button>

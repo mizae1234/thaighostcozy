@@ -80,35 +80,37 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in pointer-events-auto">
-      {/* Modal Card - Cozy Glassmorphism */}
-      <div className="relative w-full max-w-md bg-stone-950/80 border border-amber-500/30 rounded-3xl p-8 shadow-2xl backdrop-blur-md text-stone-200 text-center flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fade-in pointer-events-auto">
+      {/* Modal Card - Forest Noir Cream Theme */}
+      <div className="relative w-full max-w-md bg-[#FCFBF9] border border-stone-200 rounded-3xl p-8 shadow-2xl text-[#1E2922] text-center flex flex-col items-center">
         
-        {/* Glow effect inside modal */}
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-amber-500/10 blur-[50px] pointer-events-none" />
+        {/* New Player Badge overlaying the top-right */}
+        <div className="absolute -top-3 right-8 bg-[#C96E3A] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1 rounded-full shadow-md">
+          New Player
+        </div>
 
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 text-stone-400 hover:text-white text-lg font-bold transition-colors p-1"
+          className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 text-lg font-bold transition-colors p-1"
         >
           ✕
         </button>
 
         {/* Header Title */}
-        <h2 className="text-2xl font-black uppercase tracking-widest text-amber-400 mt-4 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-          ตั้งชื่อเล่นตัวละคร
+        <h2 className="text-2xl font-black text-[#1E2922] mt-4 mb-2">
+          Name Your Spirit
         </h2>
 
         {/* Subtitle */}
-        <p className="text-xs font-semibold text-stone-400 mb-8 leading-relaxed max-w-xs">
-          ตั้งชื่อเล่นเพื่อใช้สำหรับบันทึกความคืบหน้าและประดับบนบอร์ดผู้สื่อวิญญาณ
+        <p className="text-xs font-bold text-stone-500 mb-8 leading-relaxed max-w-xs">
+          Enter the name you will be known by in the whispers of the plantation.
         </p>
 
         {/* Error message */}
         {errorMsg && (
-          <p className="text-xs font-bold text-rose-400 mb-4 bg-rose-950/40 border border-rose-900/30 py-1.5 px-4 rounded-full animate-pulse">
+          <p className="text-xs font-bold text-[#C96E3A] mb-4 bg-[#C96E3A]/10 border border-[#C96E3A]/20 py-1.5 px-4 rounded-full animate-pulse">
             ⚠️ {errorMsg}
           </p>
         )}
@@ -116,30 +118,31 @@ export default function NicknameModal({ isOpen, onClose }: NicknameModalProps) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
           
-          {/* Input Box */}
+          {/* Input Box - Underlined only */}
           <input
             type="text"
             required
             maxLength={20}
             value={nickname}
             onChange={(e) => setNicknameState(e.target.value)}
-            placeholder="กรอกชื่อเล่นของคุณ..."
-            className="w-full bg-stone-900/60 border border-stone-750/50 rounded-xl px-5 py-3.5 text-center text-base font-bold text-white placeholder-stone-600 outline-none transition-all focus:border-amber-500/70 focus:ring-4 focus:ring-amber-500/10 shadow-inner"
+            placeholder="Enter Name..."
+            className="w-full bg-[#FCFBF9] border-b-2 border-stone-200 py-3 text-center text-lg font-bold text-[#1E2922] placeholder-stone-400 outline-none transition-all focus:border-[#2D4B32] text-center"
           />
 
-          {/* Submit Button */}
+          {/* Submit Button - Terracotta Pill */}
           <button
             type="submit"
             disabled={loading || !nickname.trim()}
-            className="mt-6 w-full bg-gradient-to-r from-amber-500 via-yellow-450 to-amber-500 hover:brightness-110 text-black font-black uppercase tracking-widest text-xs py-3.5 px-8 rounded-xl shadow-[0_4px_20px_rgba(245,158,11,0.25)] transition-all hover:scale-[1.02] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-8 w-full bg-[#C96E3A] hover:bg-[#b55c2b] text-white font-black uppercase tracking-widest text-xs py-3.5 px-8 rounded-full shadow-[0_4px_12px_rgba(201,110,58,0.2)] transition-all hover:scale-[1.01] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
           >
-            {loading ? 'กำลังบันทึกสถิติ...' : '🎮 เริ่มการเดินทาง'}
+            <span className="text-sm">🍃</span>
+            <span>{loading ? 'BEGINNING JOURNEY...' : 'BEGIN JOURNEY'}</span>
           </button>
         </form>
 
         {/* Footer info text */}
-        <p className="mt-8 text-[10px] font-bold text-stone-500 uppercase tracking-wider leading-relaxed">
-          บัญชีผู้เล่นรับเชิญ – ความคืบหน้าจะบันทึกในเบราว์เซอร์นี้และซิงค์ขึ้นออนไลน์
+        <p className="mt-8 text-[9px] font-black text-stone-400 uppercase tracking-widest leading-relaxed">
+          GUEST PLAYER – PROGRESS SAVED LOCALLY AND SYNCED ONLINE
         </p>
       </div>
     </div>
