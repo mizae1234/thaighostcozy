@@ -223,7 +223,7 @@ export default class MainScene extends Phaser.Scene {
         warningText = '🚨 เลือดวิกฤต! (ฟื้นพลังกับหลวงพี่ ⛪)';
       }
     } else if (isLowEnergy) {
-      const hasGlasses = (useInventoryStore.getState().quantities['retro-sunglasses'] ?? 0) > 0;
+      const hasGlasses = useInventoryStore.getState().equippedItems['retro-sunglasses'] === true;
       if (!hasGlasses) {
         warningText = '⚠️ พลังจะหมด! (ซื้อแว่น Y2K 🕶️ ที่ป้าศรี)';
       } else {
@@ -232,7 +232,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     const hasTani = useInventoryStore.getState().unlockedGhosts.includes('tani');
-    const hasElephantPants = useInventoryStore.getState().quantities['elephant-pants'] > 0;
+    const hasElephantPants = useInventoryStore.getState().equippedItems['elephant-pants'] === true;
     const speedMultiplier = (hasTani ? 1.2 : 1.0) * (hasElephantPants ? 1.1 : 1.0);
 
     this.player.update(this.cursors, this.wasd, isDialogueActive || this.isTransitioning, isEpisodeEnd, isStarving, speedMultiplier, warningText);

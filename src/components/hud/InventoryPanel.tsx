@@ -27,6 +27,8 @@ const ITEM_EMOJIS: Record<string, string> = {
 
 export default function InventoryPanel() {
   const quantities = useInventoryStore((state) => state.quantities);
+  const equippedItems = useInventoryStore((state) => state.equippedItems);
+  const toggleEquip = useInventoryStore((state) => state.toggleEquip);
   const getItem = useContentStore((state) => state.getItem);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -68,9 +70,13 @@ export default function InventoryPanel() {
       }));
       triggerToast('🧋 ดื่มชานมไข่มุกพาสเทลแล้ว! (+50 หิว, +50 น้ำ, +25 เลือด)');
     } else if (itemKey === 'retro-sunglasses') {
-      triggerToast('🕶️ สวมใส่แว่น Y2K แล้ว! ชะลอหิว 20% อัตโนมัติ');
+      toggleEquip(itemKey);
+      const isNowEquipped = !equippedItems[itemKey];
+      triggerToast(isNowEquipped ? '🕶️ สวมใส่แว่น Y2K แล้ว! ชะลอหิว 20% อัตโนมัติ' : '🕶️ ถอดแว่น Y2K ออกแล้ว');
     } else if (itemKey === 'elephant-pants') {
-      triggerToast('🐘 สวมใส่กางเกงช้างแล้ว! วิ่งเร็วขึ้น +10% อัตโนมัติ');
+      toggleEquip(itemKey);
+      const isNowEquipped = !equippedItems[itemKey];
+      triggerToast(isNowEquipped ? '🐘 สวมใส่กางเกงช้างแล้ว! วิ่งเร็วขึ้น +10% อัตโนมัติ' : '🐘 ถอดกางเกงช้างออกแล้ว');
     } else if (itemKey === 'flashlight') {
       triggerToast('🔦 ไฟฉายตราเสือจะเปิดใช้ยามค่ำคืนเพื่อขยายการมองเห็น');
     } else if (itemKey === 'amulet') {
@@ -111,6 +117,7 @@ export default function InventoryPanel() {
         <div className="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1">
           {entries.map(([itemKey, qty]) => {
             const isSelected = selectedKey === itemKey;
+            const isEquipped = equippedItems[itemKey] === true;
             const emoji = ITEM_EMOJIS[itemKey] || '📦';
             return (
               <div
@@ -124,7 +131,12 @@ export default function InventoryPanel() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base leading-none">{emoji}</span>
-                  <span>{getItem(itemKey)?.name ?? itemKey}</span>
+                  <span className="truncate max-w-[120px]">{getItem(itemKey)?.name ?? itemKey}</span>
+                  {isEquipped && (
+                    <span className="text-[7px] bg-[#2D4B32] text-white px-1.5 py-0.5 rounded font-black scale-90 tracking-wider">
+                      สวมใส่
+                    </span>
+                  )}
                 </div>
                 <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[9px] font-black text-emerald-800">
                   {qty}
@@ -140,6 +152,7 @@ export default function InventoryPanel() {
           const emoji = ITEM_EMOJIS[selectedKey] || '📦';
           const isUseable = ['coconut', 'boba-tea', 'retro-sunglasses', 'elephant-pants', 'flashlight', 'amulet'].includes(selectedKey);
           const isClothing = ['retro-sunglasses', 'elephant-pants'].includes(selectedKey);
+          const isCurrentlyEquipped = equippedItems[selectedKey] === true;
 
           return (
             <div className="mt-3 p-2.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-800 text-left animate-slide-up">
@@ -154,9 +167,15 @@ export default function InventoryPanel() {
                 <button
                   type="button"
                   onClick={() => handleUseItem(selectedKey)}
-                  className="w-full py-1.5 rounded-lg bg-[#2D4B32] hover:bg-[#1E3322] text-white text-[9px] font-black tracking-wider uppercase shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1"
+                  className={`w-full py-1.5 rounded-lg text-white text-[9px] font-black tracking-wider uppercase shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 ${
+                    isCurrentlyEquipped 
+                      ? 'bg-[#b37d4e] hover:bg-[#a66a39]'
+                      : 'bg-[#2D4B32] hover:bg-[#1E3322]'
+                  }`}
                 >
-                  {isClothing ? '🕶️ สวมใส่ (Wear)' : '⚡ กดใช้งาน (Use)'}
+                  {isClothing 
+                    ? (isCurrentlyEquipped ? '❌ ถอดออก (Unequip)' : '🕶️ กดสวมใส่ (Wear)') 
+                    : '⚡ กดใช้งาน (Use)'}
                 </button>
               )}
             </div>

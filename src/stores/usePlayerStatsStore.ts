@@ -40,10 +40,10 @@ export const usePlayerStatsStore = create<PlayerStatsState>((set) => ({
   tickDecay: () => {
     set((state) => {
       const unlockedGhosts = useInventoryStore.getState().unlockedGhosts;
-      const quantities = useInventoryStore.getState().quantities;
+      const equippedItems = useInventoryStore.getState().equippedItems;
       const hasNaga = unlockedGhosts.includes('naga');
       const hasKuman = unlockedGhosts.includes('kuman');
-      const hasGlasses = (quantities['retro-sunglasses'] ?? 0) > 0;
+      const hasGlasses = equippedItems['retro-sunglasses'] === true;
       const multiplier = hasGlasses ? 0.8 : 1.0;
 
       const hungerDecay = (hasKuman ? DECAY_PER_TICK * 0.8 : DECAY_PER_TICK) * multiplier;

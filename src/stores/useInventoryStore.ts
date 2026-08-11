@@ -10,6 +10,7 @@ export interface CraftResult {
 
 interface InventoryState {
   quantities: Record<string, number>;
+  equippedItems: Record<string, boolean>;
   coins: number;
   unlockedGhosts: string[];
   passPoints: number;
@@ -25,15 +26,29 @@ interface InventoryState {
   unlockGhost: (ghostKey: string) => void;
   addPassPoints: (amount: number) => void;
   upgradePremiumPass: () => void;
+  toggleEquip: (itemKey: string) => void;
 }
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
   quantities: {},
+  equippedItems: {},
   coins: 500, // 500 default coins to allow instant testing
   unlockedGhosts: [],
   passPoints: 0,
   passLevel: 1,
   isPremiumPass: false,
+
+  toggleEquip: (itemKey) => {
+    set((state) => {
+      const isEquipped = !state.equippedItems[itemKey];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`thaighost_equipped_${itemKey}`, String(isEquipped));
+      }
+      return {
+        equippedItems: { ...state.equippedItems, [itemKey]: isEquipped }
+      };
+    });
+  },
 
   add: (itemKey, amount) => {
     set((state) => ({
