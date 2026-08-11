@@ -223,11 +223,12 @@ export default class MainScene extends Phaser.Scene {
         warningText = '🚨 เลือดวิกฤต! (ฟื้นพลังกับหลวงพี่ ⛪)';
       }
     } else if (isLowEnergy) {
-      const hasGlasses = useInventoryStore.getState().equippedItems['retro-sunglasses'] === true;
-      if (!hasGlasses) {
-        warningText = '⚠️ พลังจะหมด! (ซื้อแว่น Y2K 🕶️ ที่ป้าศรี)';
+      const quantities = useInventoryStore.getState().quantities;
+      const hasFood = (quantities['coconut'] ?? 0) > 0 || (quantities['boba-tea'] ?? 0) > 0 || (quantities['herbal-tonic'] ?? 0) > 0;
+      if (hasFood) {
+        warningText = '⚠️ พลังจะหมด! (เปิดกระเป๋า 🎒 เพื่อกดกินกล้วย/ชานม)';
       } else {
-        warningText = '⚠️ พลังจะหมด! (กดกินมะพร้าว/ชา 🥥)';
+        warningText = '⚠️ พลังจะหมด! (ซื้อชานม 🧋 หรือ ยาหอม 🍶 ที่ป้าศรี)';
       }
     }
 

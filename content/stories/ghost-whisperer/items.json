@@ -134,5 +134,29 @@
     "type": "CONSUMABLE",
     "stackable": true,
     "maxStack": 99
+  },
+  {
+    "key": "coin-sack",
+    "name": "หีบเหรียญทองเก่า",
+    "description": "หีบไม้ผุพังโบราณของคุณตาที่ตกอยู่ตามพื้น เปิดใช้งานเพื่อรับ 150 เหรียญทองทันที!",
+    "type": "CONSUMABLE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "sacred-amulet",
+    "name": "เครื่องรางเปลือกหอยมงคล",
+    "description": "เครื่องรางนำโชคจากวัดโบราณ นำไปขายที่ร้านป้าศรีเพื่อรับเหรียญทองราคาสูง (200 🪙)",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
+  },
+  {
+    "key": "golden-herb",
+    "name": "ว่านตานีทองคำ",
+    "description": "สมุนไพรศักดิ์สิทธิ์เรืองแสงสีทองมงคลหายากสุด ๆ นำไปขายป้าศรีรับเหรียญทองก้อนโต (300 🪙)",
+    "type": "RESOURCE",
+    "stackable": true,
+    "maxStack": 99
   }
 ]

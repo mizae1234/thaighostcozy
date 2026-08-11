@@ -63,6 +63,8 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
 
   const bananaQty = quantities['coconut'] ?? 0;
   const herbQty = quantities['night-herb'] ?? 0;
+  const amuletQty = quantities['sacred-amulet'] ?? 0;
+  const goldenHerbQty = quantities['golden-herb'] ?? 0;
 
   const handleBuy = (item: ShopItem) => {
     setSuccessMsg(null);
@@ -159,6 +161,36 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
       setTimeout(() => {
         setSuccessMsg(null);
       }, 2500);
+    }
+  };
+
+  const handleSellAmulet = () => {
+    setSuccessMsg(null);
+    setErrorMsg(null);
+    if (amuletQty <= 0) {
+      setErrorMsg('คุณไม่มี เครื่องรางเปลือกหอยมงคล ในกระเป๋าสำหรับขาย!');
+      return;
+    }
+    const success = remove('sacred-amulet', 1);
+    if (success) {
+      addCoins(200);
+      setSuccessMsg('ขายเครื่องรางหอยมงคลสำเร็จ! ได้รับ 200 🪙');
+      setTimeout(() => setSuccessMsg(null), 2500);
+    }
+  };
+
+  const handleSellGoldenHerb = () => {
+    setSuccessMsg(null);
+    setErrorMsg(null);
+    if (goldenHerbQty <= 0) {
+      setErrorMsg('คุณไม่มี ว่านตานีทองคำ ในกระเป๋าสำหรับขาย!');
+      return;
+    }
+    const success = remove('golden-herb', 1);
+    if (success) {
+      addCoins(300);
+      setSuccessMsg('ขายว่านตานีทองคำสำเร็จ! ได้รับ 300 🪙');
+      setTimeout(() => setSuccessMsg(null), 2500);
     }
   };
 
@@ -332,6 +364,50 @@ export default function OfferingShopPanel({ onClose }: { onClose: () => void }) 
                       className="flex-1 rounded-lg bg-purple-750 hover:bg-purple-850 disabled:bg-stone-200 disabled:text-stone-400 py-1.5 text-[9px] font-black uppercase tracking-widest text-white transition-all"
                     >
                       ขายหมด
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sacred Amulet Sale */}
+                <div className="flex flex-col gap-2 p-3 rounded-xl bg-amber-50 border border-amber-100 text-left">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-black text-stone-850">🧿 เครื่องรางหอยมงคล</h4>
+                      <p className="text-[9px] text-amber-700 font-black mt-0.5">ราคาขาย: 200 🪙 / ชิ้น</p>
+                    </div>
+                    <span className="text-[10px] font-black text-stone-500 bg-white border border-stone-200 px-2 py-0.5 rounded">
+                      มี: {amuletQty}
+                    </span>
+                  </div>
+                  <div className="flex gap-2.5 mt-1">
+                    <button
+                      onClick={handleSellAmulet}
+                      disabled={amuletQty <= 0}
+                      className="w-full rounded-lg bg-amber-600 hover:bg-amber-700 disabled:bg-stone-200 disabled:text-stone-400 py-1.5 text-[9px] font-black uppercase tracking-widest text-white transition-all"
+                    >
+                      ขายเครื่องราง
+                    </button>
+                  </div>
+                </div>
+
+                {/* Golden Herb Sale */}
+                <div className="flex flex-col gap-2 p-3 rounded-xl bg-yellow-55 border border-yellow-150 text-left">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-black text-stone-850">🌟 ว่านตานีทองคำ</h4>
+                      <p className="text-[9px] text-yellow-750 font-black mt-0.5">ราคาขาย: 300 🪙 / ต้น</p>
+                    </div>
+                    <span className="text-[10px] font-black text-stone-500 bg-white border border-stone-200 px-2 py-0.5 rounded">
+                      มี: {goldenHerbQty}
+                    </span>
+                  </div>
+                  <div className="flex gap-2.5 mt-1">
+                    <button
+                      onClick={handleSellGoldenHerb}
+                      disabled={goldenHerbQty <= 0}
+                      className="w-full rounded-lg bg-yellow-600 hover:bg-yellow-700 disabled:bg-stone-200 disabled:text-stone-400 py-1.5 text-[9px] font-black uppercase tracking-widest text-white transition-all"
+                    >
+                      ขายว่านทองคำ
                     </button>
                   </div>
                 </div>

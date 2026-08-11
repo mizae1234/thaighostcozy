@@ -496,7 +496,7 @@ export default function PlayPage({ params }: PlayPageProps) {
         {isMobile && slug === 'ghost-whisperer' && (
           <>
             {/* Virtual Joystick bottom-left */}
-            <div className="absolute bottom-6 left-6 z-40 select-none touch-none">
+            <div className="absolute bottom-16 left-6 z-40 select-none touch-none">
               <div 
                 ref={joystickRef}
                 onTouchStart={handleJoystickTouch}
@@ -527,7 +527,7 @@ export default function PlayPage({ params }: PlayPageProps) {
             </div>
 
             {/* Action button bottom-right */}
-            <div className="absolute bottom-6 right-6 z-40 select-none touch-none">
+            <div className="absolute bottom-16 right-6 z-40 select-none touch-none">
               <button
                 type="button"
                 onTouchStart={() => EventBus.emit('virtual-harvest', undefined)}
@@ -543,7 +543,7 @@ export default function PlayPage({ params }: PlayPageProps) {
 
         {/* Tutorial Tip Box */}
         {tutorialTip && (
-          <div className="absolute bottom-24 left-1/2 z-40 w-full max-w-sm -translate-x-1/2 px-4 animate-fade-in pointer-events-auto">
+          <div className="absolute bottom-32 left-1/2 z-40 w-full max-w-sm -translate-x-1/2 px-4 animate-fade-in pointer-events-auto">
             <div className="rounded-2xl border border-amber-500/30 bg-black/90 p-4 shadow-xl backdrop-blur-md text-stone-200 text-[10px] font-bold leading-relaxed flex items-start gap-2.5 relative">
               <span className="text-sm select-none">💡</span>
               <div className="flex-grow pr-4">

@@ -22,7 +22,10 @@ const ITEM_EMOJIS: Record<string, string> = {
   'night-herb': '🌿',
   'boba-tea': '🧋',
   'elephant-pants': '🐘',
-  'retro-sunglasses': '🕶️'
+  'retro-sunglasses': '🕶️',
+  'coin-sack': '🎁',
+  'sacred-amulet': '🧿',
+  'golden-herb': '🌟'
 };
 
 export default function InventoryPanel() {
@@ -68,6 +71,10 @@ export default function InventoryPanel() {
         thirst: Math.min(100, state.thirst + 30),
       }));
       triggerToast('🍶 ดื่มยาหอมห้าเจดีย์ป้าศรีแล้ว! ชื่นใจนักแล (+50 เลือด, +30 น้ำ)');
+    } else if (itemKey === 'coin-sack') {
+      useInventoryStore.getState().remove('coin-sack', 1);
+      useInventoryStore.getState().addCoins(150);
+      triggerToast('🪙 เปิดหีบสมบัติเก่าสำเร็จ! ได้รับ 150 เหรียญทอง!');
     } else if (itemKey === 'boba-tea') {
       useInventoryStore.getState().remove('boba-tea', 1);
       usePlayerStatsStore.setState((state) => ({
@@ -157,7 +164,7 @@ export default function InventoryPanel() {
         {selectedKey && (quantities[selectedKey] ?? 0) > 0 && (() => {
           const item = getItem(selectedKey);
           const emoji = ITEM_EMOJIS[selectedKey] || '📦';
-          const isUseable = ['coconut', 'boba-tea', 'herbal-tonic', 'retro-sunglasses', 'elephant-pants', 'flashlight', 'amulet'].includes(selectedKey);
+          const isUseable = ['coconut', 'boba-tea', 'herbal-tonic', 'coin-sack', 'retro-sunglasses', 'elephant-pants', 'flashlight', 'amulet'].includes(selectedKey);
           const isClothing = ['retro-sunglasses', 'elephant-pants'].includes(selectedKey);
           const isCurrentlyEquipped = equippedItems[selectedKey] === true;
 
