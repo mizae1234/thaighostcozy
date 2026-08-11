@@ -306,8 +306,6 @@ export default function PlayPage({ params }: PlayPageProps) {
         <CraftPanel />
         <QuestTracker />
         <InteractionPrompt />
-        <DialogueOverlay />
-        <EpisodeEndOverlay />
 
         {/* Fainting Overlay */}
         {showFaintOverlay && (
@@ -437,21 +435,6 @@ export default function PlayPage({ params }: PlayPageProps) {
           </>
         )}
 
-        {/* Cozy Modals */}
-        {showGacha && <GachaPanel onClose={() => setShowGacha(false)} />}
-        {showPass && <MuteluPassPanel onClose={() => setShowPass(false)} />}
-        {showShop && <OfferingShopPanel onClose={() => setShowShop(false)} />}
-        {showCardAlbum && <CardAlbumModal isOpen={showCardAlbum} onClose={() => setShowCardAlbum(false)} />}
-        {showCraftModal && <CraftPanel isModal onClose={() => setShowCraftModal(false)} />}
-        {showAd && (
-          <AdSimulatorModal 
-            rewardCoins={150} 
-            onRewardClaimed={() => {
-              // Optional: show a mini toast on successful ad reward
-            }} 
-            onClose={() => setShowAd(false)} 
-          />
-        )}
 
         {/* Virtual Mobile Controls */}
         {isMobile && slug === 'ghost-whisperer' && (
@@ -521,73 +504,93 @@ export default function PlayPage({ params }: PlayPageProps) {
           </div>
         )}
 
-        {/* Story Prologue Intro Overlay */}
-        {showPrologue && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-6 md:p-8 animate-fade-in pointer-events-auto select-none text-[#1E2922]">
-            <div className="mx-auto w-full max-w-xl rounded-3xl border-2 border-amber-500/30 bg-[#FCFBF9] p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center text-center">
-              {/* Inner border decoration */}
-              <div className="absolute inset-2.5 rounded-[22px] border border-amber-500/10 pointer-events-none" />
-
-              {/* Header Title */}
-              <span className="text-[10px] font-black text-[#C96E3A] uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-250 animate-pulse">
-                📖 ปฐมบทเนื้อเรื่อง (Story Prologue)
-              </span>
-              <h2 className="mt-4 text-base md:text-lg font-black text-[#2D4B32] uppercase tracking-wider">
-                มูเตลูทาวน์: ความลับสวนกล้วยคุณตา
-              </h2>
-              
-              {/* Scroll paper divider */}
-              <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent my-3.5" />
-
-              {/* Story scroll description */}
-              <div className="max-h-[220px] overflow-y-auto px-2 text-left space-y-4 mt-3 scrollbar-thin scrollbar-thumb-stone-200">
-                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
-                  คุณได้รับจดหมายมรดกจาก <strong className="text-[#C96E3A] font-black">&ldquo;ตาเดช&rdquo;</strong> คุณตาผู้ล่วงลับ ทิ้งมรดกชิ้นสุดท้ายเป็นบ้านไม้และสวนกล้วยน้ำว้าโบราณในหมู่บ้านชนบทอันเงียบสงบ
-                </p>
-                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
-                  เมื่อคุณก้าวเท้าเข้าสู่หมู่บ้านนี้ กลับมีผู้ใหญ่บ้านเข้ามาทักทายพร้อมเอ่ยเตือนกฎเหล็กด้วยท่าทางมีพิรุธ: 
-                  <span className="italic block mt-1 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl text-rose-800 font-extrabold text-xs md:text-sm">
-                    &ldquo;หลังพระอาทิตย์ตกดิน... อย่าริอ่านก้าวเท้าออกจากบ้านสวนป่ากล้วยเด็ดขาด!&rdquo;
-                  </span>
-                </p>
-                <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
-                  ตกดึก... กลิ่นอายความลี้ลับเริ่มปกคลุม แสงสีเขียวอ่อนวูบวาบ และเสียงกระซิบคร่ำครวญเรียกชื่อคุณจากกลางดงกล้วยยามค่ำคืน พร้อมกล่องล็อกโบราณปริศนาที่คุณตาฝังทิ้งไว้ในดิน...
-                </p>
-              </div>
-
-              {/* Quest goals bullet summary */}
-              <div className="mt-5 w-full bg-stone-50 border border-stone-200 rounded-2xl p-4 text-left">
-                <h4 className="text-xs font-black text-[#2D4B32] uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
-                  🎯 เป้าหมายหลัก (Core Missions):
-                </h4>
-                <ul className="space-y-2.5 text-[11px] md:text-xs text-stone-500 font-bold">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#C96E3A]">➔</span>
-                    <span>เอาชีวิตรอดให้ครบ <strong className="text-[#C96E3A] font-black">7 วัน 7 คืน</strong> (กลางวันเตรียมตัว / กลางคืนตัดสินใจสืบคดี)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#C96E3A]">➔</span>
-                    <span>สะสม <strong className="text-[#C96E3A] font-black">การ์ดเบาะแสความลับ</strong> จากการเลือกการตัดสินใจเพื่อเปิดความจริงหักมุม</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#C96E3A]">➔</span>
-                    <span>คราฟต์ศาลพระภูมิ อุปกรณ์ไฟฉาย เครื่องราง เพื่อคุ้มครองและฟื้นฟูพลังชีวิต</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Start Adventure button */}
-              <button
-                onClick={() => setShowPrologue(false)}
-                className="mt-6 w-full rounded-full bg-gradient-to-r from-[#2D4B32] to-[#1E3322] hover:brightness-110 py-3.5 text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg active:scale-95 transition-all select-none"
-              >
-                เริ่มการผจญภัยเอาชีวิตรอด ➔
-              </button>
-            </div>
-          </div>
-        )}
-
       </div>
+
+      {/* Global Overlays & Dialogue */}
+      <DialogueOverlay />
+      <EpisodeEndOverlay />
+
+      {/* Cozy Modals */}
+      {showGacha && <GachaPanel onClose={() => setShowGacha(false)} />}
+      {showPass && <MuteluPassPanel onClose={() => setShowPass(false)} />}
+      {showShop && <OfferingShopPanel onClose={() => setShowShop(false)} />}
+      {showCardAlbum && <CardAlbumModal isOpen={showCardAlbum} onClose={() => setShowCardAlbum(false)} />}
+      {showCraftModal && <CraftPanel isModal onClose={() => setShowCraftModal(false)} />}
+      {showAd && (
+        <AdSimulatorModal 
+          rewardCoins={150} 
+          onRewardClaimed={() => {
+            // Optional: show a mini toast on successful ad reward
+          }} 
+          onClose={() => setShowAd(false)} 
+        />
+      )}
+
+      {/* Story Prologue Intro Overlay */}
+      {showPrologue && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/90 p-4 md:p-8 flex justify-center items-start pointer-events-auto select-none text-[#1E2922]">
+          <div className="my-auto mx-auto w-full max-w-xl rounded-3xl border-2 border-amber-500/30 bg-[#FCFBF9] p-5 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center text-center">
+            {/* Inner border decoration */}
+            <div className="absolute inset-2.5 rounded-[22px] border border-amber-500/10 pointer-events-none" />
+
+            {/* Header Title */}
+            <span className="text-[10px] font-black text-[#C96E3A] uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-250 animate-pulse">
+              📖 ปฐมบทเนื้อเรื่อง (Story Prologue)
+            </span>
+            <h2 className="mt-4 text-base md:text-lg font-black text-[#2D4B32] uppercase tracking-wider">
+              มูเตลูทาวน์: ความลับสวนกล้วยคุณตา
+            </h2>
+            
+            {/* Scroll paper divider */}
+            <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent my-3.5" />
+
+            {/* Story scroll description */}
+            <div className="max-h-[220px] overflow-y-auto px-2 text-left space-y-4 mt-3 scrollbar-thin scrollbar-thumb-stone-200">
+              <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                คุณได้รับจดหมายมรดกจาก <strong className="text-[#C96E3A] font-black">&ldquo;ตาเดช&rdquo;</strong> คุณตาผู้ล่วงลับ ทิ้งมรดกชิ้นสุดท้ายเป็นบ้านไม้และสวนกล้วยน้ำว้าโบราณในหมู่บ้านชนบทอันเงียบสงบ
+              </p>
+              <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                เมื่อคุณก้าวเท้าเข้าสู่หมู่บ้านนี้ กลับมีผู้ใหญ่บ้านเข้ามาทักทายพร้อมเอ่ยเตือนกฎเหล็กด้วยท่าทางมีพิรุธ: 
+                <span className="italic block mt-1 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl text-rose-800 font-extrabold text-xs md:text-sm">
+                  &ldquo;หลังพระอาทิตย์ตกดิน... อย่าริอ่านก้าวเท้าออกจากบ้านสวนป่ากล้วยเด็ดขาด!&rdquo;
+                </span>
+              </p>
+              <p className="text-xs md:text-sm text-stone-600 font-bold leading-relaxed">
+                ตกดึก... กลิ่นอายความลี้ลับเริ่มปกคลุม แสงสีเขียวอ่อนวูบวาบ และเสียงกระซิบคร่ำครวญเรียกชื่อคุณจากกลางดงกล้วยยามค่ำคืน พร้อมกล่องล็อกโบราณปริศนาที่คุณตาฝังทิ้งไว้ในดิน...
+              </p>
+            </div>
+
+            {/* Quest goals bullet summary */}
+            <div className="mt-5 w-full bg-stone-50 border border-stone-200 rounded-2xl p-4 text-left">
+              <h4 className="text-xs font-black text-[#2D4B32] uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+                🎯 เป้าหมายหลัก (Core Missions):
+              </h4>
+              <ul className="space-y-2.5 text-[11px] md:text-xs text-stone-500 font-bold">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#C96E3A]">➔</span>
+                  <span>เอาชีวิตรอดให้ครบ <strong className="text-[#C96E3A] font-black">7 วัน 7 คืน</strong> (กลางวันเตรียมตัว / กลางคืนตัดสินใจสืบคดี)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#C96E3A]">➔</span>
+                  <span>สะสม <strong className="text-[#C96E3A] font-black">การ์ดเบาะแสความลับ</strong> จากการเลือกการตัดสินใจเพื่อเปิดความจริงหักมุม</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#C96E3A]">➔</span>
+                  <span>คราฟต์ศาลพระภูมิ อุปกรณ์ไฟฉาย เครื่องราง เพื่อคุ้มครองและฟื้นฟูพลังชีวิต</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Start Adventure button */}
+            <button
+              onClick={() => setShowPrologue(false)}
+              className="mt-6 w-full rounded-full bg-gradient-to-r from-[#2D4B32] to-[#1E3322] hover:brightness-110 py-3.5 text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg active:scale-95 transition-all select-none"
+            >
+              เริ่มการผจญภัยเอาชีวิตรอด ➔
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -72,8 +72,8 @@ export default function EpisodeEndOverlay() {
   const unlockedCount = unlockedGhosts.filter(g => g.startsWith('card-')).length;
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-4 animate-fade-in pointer-events-auto">
-      <div className="w-full max-w-2xl transform overflow-hidden rounded-3xl border-2 border-emerald-600/30 bg-stone-950 p-6 shadow-2xl transition-all duration-300 md:p-8 text-[#FCFBF9]">
+    <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto bg-black/90 p-4 md:p-8 animate-fade-in pointer-events-auto">
+      <div className="my-auto w-full max-w-2xl transform overflow-hidden rounded-3xl border-2 border-emerald-600/30 bg-stone-950 p-5 shadow-2xl transition-all duration-300 md:p-8 text-[#FCFBF9]">
         
         {/* Title Section */}
         <div className="text-center mb-5">

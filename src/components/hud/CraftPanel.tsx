@@ -91,8 +91,8 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
 
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm pointer-events-auto animate-fade-in">
-        <div className="relative w-full max-w-sm rounded-3xl border border-stone-200 bg-[#FCFBF9] p-6 shadow-2xl">
+      <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto bg-black/55 backdrop-blur-sm p-4 pointer-events-auto animate-fade-in">
+        <div className="my-auto relative w-full max-w-sm rounded-3xl border border-stone-200 bg-[#FCFBF9] p-5 md:p-6 shadow-2xl">
           {/* Close button */}
           <button
             onClick={onClose}

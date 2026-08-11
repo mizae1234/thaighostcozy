@@ -41,9 +41,9 @@ export default function AdSimulatorModal({ rewardCoins, onRewardClaimed, onClose
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto bg-black/90 backdrop-blur-md p-4">
       {/* Smartphone Container Mockup */}
-      <div className="relative w-full max-w-sm rounded-[36px] border-[12px] border-stone-850 bg-black p-4 shadow-2xl flex flex-col justify-between aspect-[9/16] overflow-hidden">
+      <div className="my-auto relative w-full max-w-sm rounded-[36px] border-[12px] border-stone-850 bg-black p-4 shadow-2xl flex flex-col justify-between aspect-[9/16] overflow-hidden">
         
         {/* Notch */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-5 bg-stone-850 rounded-full z-10" />

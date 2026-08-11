@@ -47,8 +47,8 @@ export default function DialogueOverlay() {
     const cardImagePath = `/assets/stories/ghost-whisperer/cards/${revealedChoice.cardKey}.png`;
     
     return (
-      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/85 p-6 md:p-8 animate-fade-in pointer-events-auto select-none text-[#1E2922]">
-        <div className="flex flex-col items-center max-w-sm w-full text-center">
+      <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto bg-black/85 p-4 md:p-8 animate-fade-in pointer-events-auto select-none text-[#1E2922]">
+        <div className="my-auto flex flex-col items-center max-w-sm w-full text-center">
           <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/60 border border-amber-800/40 px-3.5 py-1 rounded-full mb-5 animate-pulse">
             ✨ ปลดล็อกเบาะแสความลับสำรวจคืนนี้!
           </span>
@@ -128,8 +128,8 @@ export default function DialogueOverlay() {
 
   if (showChoices && choices && choices.length > 0) {
     return (
-      <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/60 p-6 md:p-8 animate-fade-in pointer-events-auto">
-        <div className="mx-auto w-full max-w-2xl rounded-3xl border-2 border-[#C96E3A]/30 bg-[#FCFBF9] p-6 shadow-2xl text-[#1E2922] select-none">
+      <div className="fixed inset-0 z-50 flex flex-col justify-end overflow-y-auto bg-black/60 p-4 md:p-8 animate-fade-in pointer-events-auto">
+        <div className="my-auto md:my-0 mx-auto w-full max-w-2xl rounded-3xl border-2 border-[#C96E3A]/30 bg-[#FCFBF9] p-5 md:p-6 shadow-2xl text-[#1E2922] select-none">
           <div className="text-center mb-5">
             <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest bg-rose-50 px-3.5 py-1 rounded-full border border-rose-200">
               ⚠️ การตัดสินใจสำคัญในคืนนี้ (Narrative Decision)
@@ -170,7 +170,7 @@ export default function DialogueOverlay() {
   if (!currentLine) return null;
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/45 p-6 md:p-8 animate-fade-in pointer-events-auto">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/45 p-4 md:p-8 animate-fade-in pointer-events-auto">
       {/* Dialogue box */}
       <div 
         onClick={nextDialogue}
