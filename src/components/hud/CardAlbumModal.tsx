@@ -541,9 +541,23 @@ export default function CardAlbumModal({ isOpen, onClose }: CardAlbumModalProps)
                             No.{ADVENTURE_CARDS.indexOf(card) + 1}
                           </span>
                         </div>
-                        <span className="text-3xl md:text-5xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)] select-none">
-                          {card.emoji}
-                        </span>
+                        <div className="w-full h-[52%] rounded-lg overflow-hidden border border-white/10 my-1 bg-black/10 flex items-center justify-center relative">
+                          <img 
+                            src={card.img} 
+                            alt={card.name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent && !parent.querySelector('.fallback-emoji')) {
+                                const fallback = document.createElement('span');
+                                fallback.className = "fallback-emoji text-3xl md:text-4xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)] select-none";
+                                fallback.innerText = card.emoji;
+                                parent.appendChild(fallback);
+                              }
+                            }}
+                          />
+                        </div>
                         <div className="text-left">
                           <span className="text-[6.5px] md:text-[7.5px] text-white/80 font-black uppercase tracking-wider block">บันทึกวิเศษ</span>
                           <h4 className="text-[8px] md:text-[10px] font-black text-white leading-tight uppercase truncate">{card.name}</h4>

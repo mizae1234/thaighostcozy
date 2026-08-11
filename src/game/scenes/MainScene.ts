@@ -126,9 +126,18 @@ export default class MainScene extends Phaser.Scene {
     this.player = new Player(this, ISLAND_BOUNDS.centerX, ISLAND_BOUNDS.centerY);
 
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    const defaultZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
+    const minZoomToCover = Math.max(this.scale.width / WORLD_WIDTH, this.scale.height / WORLD_HEIGHT);
+    const defaultZoom = Math.max(slug === 'ghost-whisperer' ? 1.8 : 2.0, minZoomToCover);
     this.cameras.main.setZoom(defaultZoom);
     this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
+
+    // Keep camera zoom clamped on resize to avoid revealing background borders
+    this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
+      const minZoom = Math.max(gameSize.width / WORLD_WIDTH, gameSize.height / WORLD_HEIGHT);
+      if (this.cameras.main.zoom < minZoom) {
+        this.cameras.main.setZoom(minZoom);
+      }
+    });
 
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {
@@ -155,11 +164,7 @@ export default class MainScene extends Phaser.Scene {
     EventBus.on('respawn-player', handleRespawn);
 
     const handleToggleZoom = () => {
-      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
-      const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
-      const wideZoom = slug === 'ghost-whisperer' ? 1.1 : 1.2;
-      const targetZoom = this.cameras.main.zoom > 1.4 ? wideZoom : closeZoom;
-      this.cameras.main.zoomTo(targetZoom, 300, 'Sine.easeInOut');
+      this.toggleZoom();
     };
     EventBus.on('toggle-camera-zoom', handleToggleZoom);
 
@@ -297,11 +302,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Toggle camera zoom with Z key
     if (Phaser.Input.Keyboard.JustDown(this.zoomKey)) {
-      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
-      const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
-      const wideZoom = slug === 'ghost-whisperer' ? 1.1 : 1.2;
-      const targetZoom = this.cameras.main.zoom > 1.4 ? wideZoom : closeZoom;
-      this.cameras.main.zoomTo(targetZoom, 300, 'Sine.easeInOut');
+      this.toggleZoom();
     }
   }
 
@@ -1171,5 +1172,16 @@ export default class MainScene extends Phaser.Scene {
         }
       });
     });
+  }
+
+  private toggleZoom() {
+    const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
+    const closeZoom = slug === 'ghost-whisperer' ? 1.8 : 2.0;
+    
+    const minZoomToCover = Math.max(this.scale.width / WORLD_WIDTH, this.scale.height / WORLD_HEIGHT);
+    const wideZoom = Math.max(slug === 'ghost-whisperer' ? 1.1 : 1.2, minZoomToCover);
+    
+    const targetZoom = this.cameras.main.zoom > 1.4 ? wideZoom : closeZoom;
+    this.cameras.main.zoomTo(targetZoom, 300, 'Sine.easeInOut');
   }
 }

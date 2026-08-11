@@ -33,19 +33,7 @@ export default function HomePage() {
       {/* Glow effect */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-amber-500/10 blur-[120px] pointer-events-none" />
 
-      {/* Top Capsule Patch Banner */}
-      <div className="relative z-10 mt-6 animate-pulse">
-        <button
-          type="button"
-          onClick={() => setShowNicknameModal(true)}
-          className="flex items-center gap-2 rounded-full border border-amber-600/30 bg-[#fde047]/95 px-5 py-1.5 shadow-md transition-all hover:scale-[1.03]"
-        >
-          <span className="h-2 w-2 rounded-full bg-[#d97706] animate-ping" />
-          <span className="text-[11px] font-extrabold text-[#78350f]">
-            มีแพทช์ใหม่ — แตะที่นี่เพื่ออัปเดต!
-          </span>
-        </button>
-      </div>
+
 
       {/* Header / Logo Section */}
       <div className="relative z-10 mt-12 flex flex-col items-center text-center px-4">

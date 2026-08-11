@@ -11,7 +11,7 @@ export function createGameConfig(parentId: string): Phaser.Types.Core.GameConfig
     parent: parentId,
     width: '100%',
     height: '100%',
-    backgroundColor: '#1c4d6b',
+    backgroundColor: '#0a0d10',
     pixelArt: true,
     scale: {
       mode: Phaser.Scale.RESIZE,
