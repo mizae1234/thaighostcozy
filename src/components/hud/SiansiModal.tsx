@@ -58,10 +58,10 @@ export default function SiansiModal({ isOpen, onClose }: SiansiModalProps) {
       desc: 'แม่นางตานีร่างดีเห็นใจในความเหน็ดเหนื่อย แอบโบกใบกล้วยพัดพาไอเย็นมาปัดเป่าความอ่อนล้า ดับกระหายล้างความเหนื่อย',
       rewardText: 'ฟื้นฟูพลังชีวิตและดับกระหายจนเต็ม 💚',
       effect: () => {
-        usePlayerStatsStore.setState((state) => ({
+        usePlayerStatsStore.setState({
           health: 100,
           thirst: 100
-        }));
+        });
       }
     },
     {
@@ -129,9 +129,9 @@ export default function SiansiModal({ isOpen, onClose }: SiansiModalProps) {
       desc: 'พญานาครุ่นเยาว์พ่นน้ำมนต์ชุ่มฉ่ำลงสู่หน้าผากคุณ คลายความร้อนและบำรุงหัวใจให้เต้นคงที่ แข็งแรงสู้ภารกิจ',
       rewardText: 'ฟื้นฟูหลอดกระหายน้ำ Thirst เต็ม 100% 🌊',
       effect: () => {
-        usePlayerStatsStore.setState((state) => ({
+        usePlayerStatsStore.setState({
           thirst: 100
-        }));
+        });
       }
     },
     {

@@ -5,15 +5,7 @@ import { useQuestStore } from '@/stores/useQuestStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useContentStore } from '@/stores/useContentStore';
 
-// Pla Boo Thong static fallback dictionaries
-const PLA_BOO_STEP_TITLES: Record<string, string> = {
-  'washed-ashore': 'ภารกิจที่ 1: ฟื้นฟูร่างกายหลังคลื่นซัด',
-  'well-song': 'ภารกิจที่ 2: ตามหาบ่อน้ำศักดิ์สิทธิ์',
-  'goby-revealed': 'ภารกิจที่ 3: สื่อสารกับปลาบู่ทอง',
-  'collect-three-treasures': 'ภารกิจที่ 4: ออกตามหาของวิเศษ 3 อย่าง',
-  'lift-the-curse': 'ภารกิจที่ 5: ปลดปล่อยวิญญาณปลาบู่ทอง',
-};
-
+// Pla Boo Thong static fallback dictionary
 const PLA_BOO_HINTS: Record<string, string> = {
   'washed-ashore': '💡 คำแนะนำ: เดินเก็บลังไม้ 5 ชิ้น และมะพร้าว 2 ลูกตามชายหาด จากนั้นเปิดเมนูคราฟต์ด้านซ้ายเพื่อสร้างกองไฟ',
   'well-song': '💡 คำแนะนำ: เดินไปทางขวาบนเพื่อตามหาบ่อน้ำโบราณใจกลางเกาะ และเก็บลูกไม้สีเขียว 3 ลูกที่ตกอยู่รอบบ่อน้ำ',

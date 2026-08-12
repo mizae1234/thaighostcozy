@@ -144,7 +144,6 @@ export default class Player {
       const length = Math.hypot(vx, vy);
       body.setVelocity((vx / length) * currentSpeed, (vy / length) * currentSpeed);
 
-      const previousDirection = this.direction;
       if (vx < 0) this.direction = 'left';
       else if (vx > 0) this.direction = 'right';
       else if (vy < 0) this.direction = 'up';

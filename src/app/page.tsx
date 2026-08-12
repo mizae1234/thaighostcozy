@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import NicknameModal from '@/components/NicknameModal';
 
 export default function HomePage() {
@@ -85,9 +86,11 @@ export default function HomePage() {
 
       {/* Left Character Badge */}
       <div className="absolute bottom-16 left-8 z-10 flex items-center gap-3 bg-black/40 backdrop-blur-sm px-3.5 py-2 rounded-2xl border border-white/5">
-        <img
+        <Image
           src="/assets/stories/pla-boo-thong/sprites/player/player-down.png"
           alt="Player sprite"
+          width={40}
+          height={40}
           className="w-10 h-10 object-contain pixelated"
         />
         <div className="text-left">
@@ -102,9 +105,11 @@ export default function HomePage() {
           <p className="text-[9px] font-bold text-stone-500 uppercase tracking-wider">วิญญาณอารักษ์</p>
           <p className="text-xs font-black text-emerald-400">นางตานีมินิมอล</p>
         </div>
-        <img
+        <Image
           src="/assets/stories/pla-boo-thong/sprites/npc/golden-goby.png"
           alt="Goby sprite"
+          width={40}
+          height={40}
           className="w-10 h-10 object-contain pixelated"
         />
       </div>

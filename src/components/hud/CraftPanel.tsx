@@ -138,7 +138,7 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
     <div
       className={
         isMobileViewport
-          ? 'pointer-events-auto absolute right-2 top-[92px] z-40 w-64 origin-top-right select-none'
+          ? 'pointer-events-auto absolute right-2 top-[92px] z-40 w-64 origin-top-right scale-[0.65] select-none'
           : 'pointer-events-auto absolute bottom-5 left-5 w-64 md:w-72'
       }
     >

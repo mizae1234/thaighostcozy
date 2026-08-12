@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { loadAllStoryContent } from '../src/lib/content/loadStoryContent';
 
 const prisma = new PrismaClient();
@@ -124,7 +124,7 @@ async function main() {
           update: {
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as any,
+            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as unknown as Prisma.InputJsonValue,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },
@@ -133,7 +133,7 @@ async function main() {
             key: step.key,
             order,
             title: step.title,
-            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as any,
+            content: { dialogue: step.dialogue, objectives: step.objectives || [], rewards: step.rewards || [], choices: step.choices || [], phase: step.phase || 'DAY' } as unknown as Prisma.InputJsonValue,
             requiresStepId: previousStepId,
             isEpisodeEnd: step.isEpisodeEnd ?? false,
           },
