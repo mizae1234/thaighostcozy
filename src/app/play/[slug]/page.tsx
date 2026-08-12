@@ -543,7 +543,7 @@ export default function PlayPage({ params }: PlayPageProps) {
 
         {/* Tutorial Tip Box */}
         {tutorialTip && (
-          <div className="absolute bottom-32 left-1/2 z-40 w-full max-w-sm -translate-x-1/2 px-4 animate-fade-in pointer-events-auto">
+          <div className="absolute top-16 md:top-20 left-1/2 z-40 w-full max-w-xs -translate-x-1/2 px-4 animate-fade-in pointer-events-auto">
             <div className="rounded-2xl border border-amber-500/30 bg-black/90 p-4 shadow-xl backdrop-blur-md text-stone-200 text-[10px] font-bold leading-relaxed flex items-start gap-2.5 relative">
               <span className="text-sm select-none">💡</span>
               <div className="flex-grow pr-4">

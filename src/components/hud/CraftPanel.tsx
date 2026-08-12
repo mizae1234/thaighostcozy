@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useContentStore } from '@/stores/useContentStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
 import { useInteractionStore } from '@/stores/useInteractionStore';
@@ -23,6 +23,16 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
   const quantities = useInventoryStore((state) => state.quantities);
   const craft = useInventoryStore((state) => state.craft);
   const [message, setMessage] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 1024;
+      setIsMobileViewport(isMobile);
+      setIsCollapsed(isMobile);
+    }
+  }, []);
 
   const canAfford = (recipeKey: string) => {
     const recipe = recipes.find((r) => r.key === recipeKey);
@@ -108,8 +118,36 @@ export default function CraftPanel({ isModal = false, onClose }: CraftPanelProps
     );
   }
 
+  if (isCollapsed) {
+    // Stacked under the inventory pill on the right — the left side is
+    // taken by StatsBar/QuestTracker, and bottom is taken by the mobile
+    // joystick + action button, so this is the only clear on-screen spot.
+    return (
+      <div className="pointer-events-auto absolute right-2 top-[92px] z-40 origin-top-right scale-[0.75] select-none">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="bg-[#5c3a2a]/95 hover:bg-[#482c1f] border border-[#C96E3A]/45 rounded-full px-4 py-2 text-xs font-black text-[#FCFBF9] shadow-lg flex items-center gap-1.5 active:scale-95 transition-all"
+        >
+          🛠️ <span>คราฟต์</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 w-64 md:w-72 hidden lg:block">
+    <div
+      className={
+        isMobileViewport
+          ? 'pointer-events-auto absolute right-2 top-[92px] z-40 w-64 origin-top-right select-none'
+          : 'pointer-events-auto absolute bottom-5 left-5 w-64 md:w-72'
+      }
+    >
+      <button
+        onClick={() => setIsCollapsed(true)}
+        className="absolute -top-2 -right-2 z-10 bg-stone-700 hover:bg-stone-800 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-bold shadow-md pointer-events-auto"
+      >
+        ➖
+      </button>
       {content}
     </div>
   );
