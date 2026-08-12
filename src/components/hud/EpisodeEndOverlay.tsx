@@ -2,6 +2,7 @@
 
 import { useQuestStore } from '@/stores/useQuestStore';
 import { useInventoryStore } from '@/stores/useInventoryStore';
+import { useContentStore } from '@/stores/useContentStore';
 
 const GHOST_EPISODES = [
   { id: 1, name: 'มรดกสวนกล้วย', status: 'COMPLETED', desc: 'จบเดโมสืบสวน 7 วันแรก' },
@@ -28,12 +29,10 @@ const PLABOO_EPISODES = [
 export default function EpisodeEndOverlay() {
   const { isEpisodeEnd, startQuest, selectedChoices } = useQuestStore();
   const { unlockedGhosts } = useInventoryStore();
+  const slug = useContentStore((state) => state.slug) ?? 'pla-boo-thong';
+  const isGhostMode = slug === 'ghost-whisperer';
 
   if (!isEpisodeEnd) return null;
-
-  // Resolve story slug dynamically from path
-  const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
-  const isGhostMode = slug === 'ghost-whisperer';
 
   const handleRestart = () => {
     if (isGhostMode) {

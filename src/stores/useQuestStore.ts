@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { useInventoryStore } from './useInventoryStore';
 import { usePlayerStatsStore } from './usePlayerStatsStore';
 import { EventBus } from '@/game/EventBus';
+import { useContentStore } from './useContentStore';
 import type { DialogueLine, QuestContent, QuestStepContent } from '@/lib/content/types';
 
 interface QuestState {
@@ -233,7 +234,7 @@ export const useQuestStore = create<QuestState>((set, get) => {
       if (get().isDialogueActive) return;
 
       let customLines: Array<{ speaker: string; thai: string }> = [];
-      const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'ghost-whisperer';
+      const slug = useContentStore.getState().slug ?? 'ghost-whisperer';
 
       if (slug === 'ghost-whisperer') {
         if (npcKey === 'chief') {

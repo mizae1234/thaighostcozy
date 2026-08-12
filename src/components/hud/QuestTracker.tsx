@@ -25,6 +25,8 @@ const PLA_BOO_HINTS: Record<string, string> = {
 export default function QuestTracker() {
   const { currentQuestKey, currentStepIndex, quests, reachedLocations, talkedNPCs, placedBuildings, isEpisodeEnd, showChoices } = useQuestStore();
   const { quantities: inventory } = useInventoryStore();
+  const slug = useContentStore((state) => state.slug) ?? 'pla-boo-thong';
+  const isGhostMode = slug === 'ghost-whisperer';
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -42,10 +44,6 @@ export default function QuestTracker() {
 
   const activeStep = quest.steps[currentStepIndex];
   if (!activeStep) return null;
-
-  // Determine current slug from window path
-  const slug = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : 'pla-boo-thong';
-  const isGhostMode = slug === 'ghost-whisperer';
 
   // Get localized step titles and hints
   const stepTitle = activeStep.title || activeStep.key;

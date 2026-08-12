@@ -126,6 +126,12 @@ export default class MainScene extends Phaser.Scene {
     this.player = new Player(this, ISLAND_BOUNDS.centerX, ISLAND_BOUNDS.centerY);
 
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    // Arcade physics world bounds default to the canvas size at boot time
+    // (which on Scale.RESIZE is the actual device viewport, e.g. ~400px on
+    // mobile) rather than the fixed logical world — without this, players
+    // on narrow screens get physically clamped long before reaching the
+    // 1280-wide map's edges/area-transition triggers.
+    this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     const minZoomToCover = Math.max(this.scale.width / WORLD_WIDTH, this.scale.height / WORLD_HEIGHT);
     const defaultZoom = Math.max(slug === 'ghost-whisperer' ? 1.8 : 2.0, minZoomToCover);
     this.cameras.main.setZoom(defaultZoom);

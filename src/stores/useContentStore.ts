@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { ItemContent, RecipeContent, QuestContent } from '@/lib/content/types';
 
 interface ContentState {
+  slug: string | null;
   items: ItemContent[];
   recipes: RecipeContent[];
   quests: QuestContent[];
@@ -14,6 +15,7 @@ interface ContentState {
 }
 
 export const useContentStore = create<ContentState>((set, get) => ({
+  slug: null,
   items: [],
   recipes: [],
   quests: [],
@@ -24,10 +26,10 @@ export const useContentStore = create<ContentState>((set, get) => ({
       const res = await fetch(`/api/stories/${slug}`);
       if (!res.ok) throw new Error(`Failed to load story content: ${res.status}`);
       const data: { items: ItemContent[]; recipes: RecipeContent[]; quests: QuestContent[] } = await res.json();
-      set({ items: data.items, recipes: data.recipes, quests: data.quests || [], loaded: true, error: null });
+      set({ slug, items: data.items, recipes: data.recipes, quests: data.quests || [], loaded: true, error: null });
     } catch (error) {
       console.error(error);
-      set({ error: error instanceof Error ? error.message : 'Unknown error', loaded: false });
+      set({ slug, error: error instanceof Error ? error.message : 'Unknown error', loaded: false });
     }
   },
   getItem: (itemKey: string) => get().items.find((item) => item.key === itemKey),

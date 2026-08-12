@@ -41,14 +41,18 @@ fi
 
 cd "$APP_DIR"
 
-# Create .env if not exists
+# .env must already exist on the server with real secrets. It is never
+# generated here — a plaintext DB credential previously lived in this
+# script and got committed to git history; don't repeat that mistake.
 if [ ! -f ".env" ]; then
-    echo "📝 Creating .env file..."
-    cat > .env << 'ENVEOF'
-DATABASE_URL="postgresql://pop_user:%40Kanitta12PRD@127.0.0.1:5432/thaiflok?schema=public&options=-c%20timezone%3DAsia/Bangkok"
-TZ=Asia/Bangkok
-ENVEOF
-    echo "✅ .env created"
+    echo "❌ .env not found at $APP_DIR/.env"
+    echo "   Create it manually on the server first, e.g.:"
+    echo "   cat > .env << 'EOF'"
+    echo "   DATABASE_URL=\"postgresql://<user>:<password>@127.0.0.1:5432/<db>?schema=public&options=-c%20timezone%3DAsia/Bangkok\""
+    echo "   TZ=Asia/Bangkok"
+    echo "   EOF"
+    echo "   Then re-run deploy.sh."
+    exit 1
 fi
 
 # Docker compose down → build → up
